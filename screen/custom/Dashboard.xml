@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Dashboard">
+
+    <transition name="createOrder">
+        <default-response url="../CreateOrder"/>
+    </transition>
+    <transition name="editOrder">
+        <default-response url="../Order"/>
+    </transition>
+
+    <actions>
+        <entity-find entity-name="mkdecision.dashboard.OrderHeaderDetail" list="orderList">
+            <search-form-inputs/>
+        </entity-find>
+    </actions>
+    
+    <widgets>
+        <container>
+            <label text="Orders" type="h4"/>
+            <link url="createOrder" text="Create Order"/>
+
+            <form-list name="OrderList" list="orderList" list-entry="order" header-dialog="true" select-columns="true" saved-finds="true">
+                <row-actions>
+                    <set field="customerName" from="((customerFirstName ?: '') + ' ' + (customerMiddleName ?: '') + ' ' + (customerLastName ?: '')).trim()"/>
+                    <set field="productDescription" from="((unitAmount ?: '') + ' - ' + (productName ?: '')).trim()"/>
+                </row-actions>
+
+                <field name="customerFirstName">
+                    <header-field title="Parties" show-order-by="true">
+                        <text-find/>
+                    </header-field>
+                    <default-field>
+                        <link url="editOrder" text="${customerName}" link-type="anchor"/>
+                    </default-field>
+                </field>
+
+                <field name="statusId">
+                    <header-field title="Status" show-order-by="true">
+                        <drop-down allow-empty="true">
+                            <entity-options text="${description}" key="${statusId}">
+                                <entity-find entity-name="moqui.basic.StatusItem">
+                                    <econdition field-name="statusTypeId" value="OrderHeader"/>
+                                    <order-by field-name="description"/>
+                                </entity-find>
+                            </entity-options>
+                        </drop-down>
+                    </header-field>
+                    <default-field>
+                        <display text="${statusDescription}"/>
+                    </default-field>
+                </field>
+
+                <field name="productId">
+                    <header-field title="Order Details" show-order-by="true">
+                        <drop-down allow-empty="true">
+                            <entity-options text="${productName}" key="${productId}">
+                                <entity-find entity-name="mantle.product.Product">
+                                    <order-by field-name="productName"/>
+                                </entity-find>
+                            </entity-options>
+                        </drop-down>
+                    </header-field>
+                    <default-field>
+                        <display text="${productDescription}"/>
+                    </default-field>
+                </field>
+
+                <field name="productStoreName">
+                    <header-field title="Source" show-order-by="true">
+                        <drop-down allow-empty="true">
+                            <entity-options text="${storeName}" key="${productStoreId}">
+                                <entity-find entity-name="mantle.product.store.ProductStore">
+                                    <order-by field-name="storeName"/>
+                                </entity-find>
+                            </entity-options>
+                        </drop-down>
+                    </header-field>
+                    <default-field>
+                        <display text="${productStoreName}"/>
+                    </default-field>
+                </field>
+
+                <field name="orderId">
+                    <header-field show-order-by="true">
+                        <text-find/>
+                    </header-field>
+                    <default-field>
+                        <link url="editOrder" text="${orderId}" link-type="anchor"/>
+                    </default-field>
+                </field>
+
+                <field name="entryDate">
+                    <header-field show-order-by="true">
+                        <date-period/>
+                    </header-field>
+                    <default-field>
+                        <display/>
+                    </default-field>
+                </field>
+
+                <field name="find">
+                    <header-field title="Find">
+                        <submit/>
+                    </header-field>
+                </field>
+            </form-list>
+        </container>
+    </widgets>
+</screen>

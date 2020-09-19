@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/entity-definition-2.1.xsd">
+
+    <view-entity entity-name="OrderHeaderDetail" package="mkdecision.dashboard">
+        <member-entity entity-alias="ORDH" entity-name="mantle.order.OrderHeader"/>
+        <member-entity entity-alias="ORDP" entity-name="mantle.order.OrderPart" join-from-alias="ORDH">
+            <key-map field-name="orderId"/>
+            <entity-condition>
+                <econdition field-name="orderPartSeqId" value="01"/>
+            </entity-condition>
+        </member-entity>
+        <member-entity entity-alias="STAT" entity-name="moqui.basic.StatusItem" join-from-alias="ORDH">
+            <key-map field-name="statusId"/>
+        </member-entity>
+        <member-entity entity-alias="PRDS" entity-name="mantle.product.store.ProductStore" join-from-alias="ORDH">
+            <key-map field-name="productStoreId"/>
+        </member-entity>
+        <member-entity entity-alias="ORDI" entity-name="mantle.order.OrderItem" join-from-alias="ORDP" join-optional="true">
+            <key-map field-name="orderId"/>
+            <key-map field-name="orderPartSeqId"/>
+        </member-entity>
+        <member-entity entity-alias="PROD" entity-name="mantle.product.Product" join-from-alias="ORDI" join-optional="true">
+            <key-map field-name="productId"/>
+        </member-entity>
+        <member-entity entity-alias="CPRT" entity-name="mantle.party.Party" join-from-alias="ORDP">
+            <key-map field-name="customerPartyId"/>
+        </member-entity>
+        <member-entity entity-alias="CPRS" entity-name="mantle.party.Person" join-from-alias="CPRT">
+            <key-map field-name="partyId"/>
+        </member-entity>
+
+        <alias-all entity-alias="ORDH"/>
+        <alias name="orderPartSeqId" entity-alias="ORDP" field="orderPartSeqId"/>
+        <alias name="unitAmount" entity-alias="ORDI" field="unitAmount"/>
+        <alias name="statusCode" entity-alias="STAT" field="statusCode"/>
+        <alias name="statusDescription" entity-alias="STAT" field="description"/>
+        <alias name="productStoreName" entity-alias="PRDS" field="storeName"/>
+        <alias name="productId" entity-alias="PROD" field="productId"/>
+        <alias name="productName" entity-alias="PROD" field="productName"/>
+        <alias name="customerFirstName" entity-alias="CPRS" field="firstName"/>
+        <alias name="customerMiddleName" entity-alias="CPRS" field="middleName"/>
+        <alias name="customerLastName" entity-alias="CPRS" field="lastName"/>
+    </view-entity>
+
+</entities>
