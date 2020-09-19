@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Overview"
+        default-menu-index="1">
+
+    <parameter name="orderId" required="true"/>
+
+    <actions>
+        <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart">
+            <field-map field-name="orderId" from="orderId"/>
+            <field-map field-name="orderPartSeqId" value="01"/>
+        </entity-find-one>
+        <entity-find-one entity-name="mantle.order.OrderItem" value-field="orderItem">
+            <field-map field-name="orderId" from="orderId"/>
+            <field-map field-name="orderPartSeqId" value="01"/>
+            <field-map field-name="parentItemSeqId" from="null"/>
+        </entity-find-one>
+        <entity-find-related-one value-field="orderItem" relationship-name="product" to-value-field="product"/>
+        <entity-find-related-one value-field="orderHeader" relationship-name="productStore" to-value-field="productStore"/>
+        <entity-find-related value-field="orderPart" relationship-name="parties" list="partyList"/>
+        <entity-find-related value-field="orderHeader" relationship-name="notes" list="noteList"/>
+        <service-call name="close.OrderServices.get#EstimatedPayment" in-map="context" out-map="context"/>
+    </actions>
+
+    <widgets>
+        <container>
+            <label text="Order Items" type="h4"/>
+            <container type="dl" style="dl-horizontal">
+                <label text="Date Entered" type="dt"/>
+                <label text="${orderHeader.entryDate}" type="dd"/>
+                <label text="Last Updated" type="dt"/>
+                <label text="${orderHeader.lastUpdatedStamp}" type="dd"/>
+                <label text="Projected Amount" type="dt"/>
+                <label text="${estimatedPayment}" type="dd"/>
+                <label text="Amount" type="dt"/>
+                <label text="${orderItem.unitAmount}" type="dd"/>
+            </container>
+        </container>
+
+        <container type="hr"/>
+
+        <container>
+            <label text="Internal" type="h4"/>
+            <form-list name="RoleList" list="roleList" >
+                <field name="role">
+                    <default-field>
+                        <display/>
+                    </default-field>
+                </field>
+                <field name="name">
+                    <default-field>
+                        <display/>
+                    </default-field>
+                </field>
+                <field name="phone">
+                    <default-field>
+                        <display/>
+                    </default-field>
+                </field>
+                <field name="email">
+                    <default-field>
+                        <display/>
+                    </default-field>
+                </field>
+            </form-list>
+            <section name="EmptyRoleList" condition="roleList == null || roleList.isEmpty()">
+                <widgets>
+                    <label text="No data found." style="text-grey text-italic"/>
+                </widgets>
+            </section>
+        </container>
+
+        <container type="hr"/>
+
+        <container>
+            <container-row>
+                <row-col sm="6" xs="6">
+                    <label text="Parties" type="h4"/>
+                </row-col>
+                <row-col sm="6" xs="6">
+                    <container style="text-right">
+                        <container-dialog id="AddPartyDialog" button-text="Add Party" width="960">
+                            <form-single name="AddPartyForm">
+                                <field name="submit">
+                                    <default-field>
+                                        <submit text="Save"/>
+                                    </default-field>
+                                </field>
+                            </form-single>
+                        </container-dialog>
+                    </container>
+                </row-col>
+            </container-row>
+            <form-list name="PartyList" list="partyList">
+                <row-actions>
+                    <entity-find-one entity-name="mantle.party.RoleType" value-field="roleType"/>
+                    <entity-find-one entity-name="mantle.party.PartyDetail" value-field="party"/>
+                    <entity-find entity-name="mantle.party.contact.PartyContactMechTelecomNumber" list="phoneList">
+                        <econdition field-name="partyId" from="party.partyId"/>
+                        <date-filter/>
+                    </entity-find>
+                    <entity-find entity-name="mantle.party.contact.PartyContactMechInfo" list="emailList">
+                        <econdition field-name="partyId" from="party.partyId"/>
+                        <date-filter/>
+                    </entity-find>
+                    <set field="partyName" from="((party.firstName ?: '') + ' ' + (party.middleName ?: '') + ' ' + (party.lastName ?: '')).trim()"/>
+                    <set field="phone" from="phoneList.isEmpty() ? '' : phoneList.getFirst().contactNumber"/>
+                    <set field="email" from="emailList.isEmpty() ? '' : emailList.getFirst().infoString"/>
+                </row-actions>
+                <field name="applicants">
+                    <default-field>
+                        <display text="${roleType.description}"/>
+                    </default-field>
+                </field>
+                <field name="name">
+                    <default-field>
+                        <display text="${partyName}"/>
+                    </default-field>
+                </field>
+                <field name="phone">
+                    <default-field>
+                        <display/>
+                    </default-field>
+                </field>
+                <field name="email">
+                    <default-field>
+                        <display/>
+                    </default-field>
+                </field>
+            </form-list>
+            <section name="EmptyPartyList" condition="partyList == null || partyList.isEmpty()">
+                <widgets>
+                    <label text="No data found." style="text-grey text-italic"/>
+                </widgets>
+            </section>
+        </container>
+
+        <container type="hr"/>
+
+        <container>
+            <label text="Rules Summary" type="h4"/>
+            <container-row>
+                <row-col lg="6">
+                    <container type="dl" style="dl-horizontal">
+                        <label text="Credit Score" type="dt"/>
+                        <label text="${creditScore}" type="dd"/>
+                        <label text="Rules Failed" type="dt"/>
+                        <label text="${rulesFailed}" type="dd"/>
+                        <label text="Rules Passed" type="dt"/>
+                        <label text="${rulesPassed}" type="dd"/>
+                    </container>
+                </row-col>
+                <row-col lg="6">
+                    <container type="dl" style="dl-horizontal">
+                        <label text="Combined Income" type="dt"/>
+                        <label text="${combinedIncome}" type="dd"/>
+                        <label text="Combined Expense" type="dt"/>
+                        <label text="${combinedExpense}" type="dd"/>
+                        <label text="Combined Projected DTI" type="dt"/>
+                        <label text="${combinedProjectedDti}" type="dd"/>
+                    </container>
+                </row-col>
+            </container-row>
+        </container>
+
+        <container type="hr"/>
+
+        <container>
+            <container-row>
+                <row-col sm="6" xs="6">
+                    <label text="Requirements" type="h4"/>
+                </row-col>
+                <row-col sm="6" xs="6">
+                    <container style="text-right">
+                        <container-dialog id="AddRequirementDialog" button-text="Add Requirement" width="960">
+                            <form-single name="AddRequirementForm">
+                                <field name="requirement">
+                                    <default-field>
+                                        <text-area/>
+                                    </default-field>
+                                </field>
+                                <field name="submit">
+                                    <default-field>
+                                        <submit text="Save"/>
+                                    </default-field>
+                                </field>
+                            </form-single>
+                        </container-dialog>
+                    </container>
+                </row-col>
+            </container-row>
+        </container>
+
+        <container type="hr"/>
+
+        <container>
+            <container-row>
+                <row-col sm="6" xs="6">
+                    <label text="Notes" type="h4"/>
+                </row-col>
+                <row-col sm="6" xs="6">
+                    <container style="text-right">
+                        <container-dialog id="AddNoteDialog" button-text="Add Note" width="960">
+                            <form-single name="AddNoteForm">
+                                <field name="private">
+                                    <default-field title="Make this note private?">
+                                        <check>
+                                            <option key="true" text=" "/>
+                                        </check>
+                                    </default-field>
+                                </field>
+                                <field name="note">
+                                    <default-field>
+                                        <text-area/>
+                                    </default-field>
+                                </field>
+                                <field name="submit">
+                                    <default-field>
+                                        <submit text="Save"/>
+                                    </default-field>
+                                </field>
+                            </form-single>
+                        </container-dialog>
+                    </container>
+                </row-col>
+            </container-row>
+            <section-iterate name="NodeForm" list="noteList" entry="note">
+                <actions>
+                    <entity-find-related-one value-field="note" relationship-name="moqui.security.UserAccount" to-value-field="userAccount"/>
+                </actions>
+                <widgets>
+                    <container-box>
+                        <box-header>
+                            <!-- TODO: Make icon dynamic -->
+                            <label text="&amp;nbsp;" style="fa fa-lock" encode="false"/>
+                            <label text="${note.noteDate} - ${userAccount.userFullName}" style="text-bold"/>
+                        </box-header>
+                        <box-body><label text="${note.noteText}"/></box-body>
+                    </container-box>
+                </widgets>
+            </section-iterate>
+        </container>
+
+        <container type="hr"/>
+
+        <container>
+            <label text="Agent" type="h4"/>
+            <container-row>
+                <row-col lg="6">
+                    <container type="dl" style="dl-horizontal">
+                        <label text="Agent" type="dt"/>
+                        <label text="${productStore.storeName}" type="dd"/>
+                        <label text="Phone Number" type="dt"/>
+                        <label text="${phoneNumber}" type="dd"/>
+                        <label text="Email" type="dt"/>
+                        <label text="${email}" type="dd"/>
+                    </container>
+                </row-col>
+                <row-col lg="6">
+                    <container type="dl" style="dl-horizontal">
+                        <label text="Address" type="dt"/>
+                        <label text="${postalAddress}" type="dd"/>
+                    </container>
+                </row-col>
+            </container-row>
+        </container>
+
+        <container type="hr"/>
+
+        <container>
+            <label text="Customer Service Information" type="h4"/>
+            <container-row>
+                <row-col lg="6">
+                    <container type="dl" style="dl-horizontal">
+                        <label text="Bank Branch Location" type="dt"/>
+                        <label text="${bankBranchLocation}" type="dd"/>
+                        <label text="Branch Number" type="dt"/>
+                        <label text="${branchNumber}" type="dd"/>
+                        <label text="CSRID" type="dt"/>
+                        <label text="${csrId}" type="dd"/>
+                    </container>
+                </row-col>
+                <row-col lg="6">
+                    <container type="dl" style="dl-horizontal">
+                        <label text="Representative Name" type="dt"/>
+                        <label text="${representativeName}" type="dd"/>
+                        <label text="Phone Number" type="dt"/>
+                        <label text="${representativePhoneNumber}" type="dd"/>
+                    </container>
+                </row-col>
+            </container-row>
+        </container>
+
+        <container type="hr"/>
+
+        <container>
+            <label text="Product Details" type="h4"/>
+            <container-row>
+                <row-col lg="6">
+                    <container type="dl" style="dl-horizontal">
+                        <label text="Product" type="dt"/>
+                        <label text="${product.productName}" type="dd"/>
+                        <label text="Product Code" type="dt"/>
+                        <label text="" type="dd"/>
+                        <label text="Sub-product Code" type="dt"/>
+                        <label text="" type="dd"/>
+                        <label text="Bill Code" type="dt"/>
+                        <label text="" type="dd"/>
+                        <label text="Account Type" type="dt"/>
+                        <label text="" type="dd"/>
+                        <label text="Group ID" type="dt"/>
+                        <label text="" type="dd"/>
+                    </container>
+                </row-col>
+                <row-col lg="6">
+                    <container type="dl" style="dl-horizontal">
+                        <label text="Agent Prefix" type="dt"/>
+                        <label text="" type="dd"/>
+                        <label text="Plan" type="dt"/>
+                        <label text="" type="dd"/>
+                        <label text="Source Code" type="dt"/>
+                        <label text="" type="dd"/>
+                        <label text="Plastic Suffix" type="dt"/>
+                        <label text="" type="dd"/>
+                        <label text="Cash Limit Percentage" type="dt"/>
+                        <label text="" type="dd"/>
+                        <label text="Agent ID" type="dt"/>
+                        <label text="" type="dd"/>
+                    </container>
+                </row-col>
+            </container-row>
+        </container>
+    </widgets>
+
+</screen>

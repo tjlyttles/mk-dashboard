@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Documents"
+        default-menu-index="3">
+
+    <parameter name="orderId" required="true"/>
+
+    <widgets>
+        <container-box>
+            <box-header title="Agreements"/>
+            <box-body>
+                <form-list name="AgreementList" list="agreementList">
+                    <field name="type">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                    <field name="party">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                    <field name="source">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                    <field name="performedBy">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                    <field name="date">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                </form-list>
+            </box-body>
+        </container-box>
+
+        <container-box>
+            <box-header title="Files"/>
+            <box-body>
+                <form-list name="FileList" list="fileList">
+                    <field name="type">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                    <field name="party">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                    <field name="source">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                    <field name="performedBy">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                    <field name="date">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                </form-list>
+            </box-body>
+        </container-box>
+
+        <container-box>
+            <box-header title="Emails"/>
+            <box-body>
+                <form-list name="EmailList" list="emailList">
+                    <field name="type">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                    <field name="party">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                    <field name="source">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                    <field name="performedBy">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                    <field name="date">
+                        <default-field>
+                            <display/>
+                        </default-field>
+                    </field>
+                </form-list>
+            </box-body>
+        </container-box>
+    </widgets>
+
+</screen>

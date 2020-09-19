@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Application"
+        default-menu-index="2">
+
+    <parameter name="orderId" required="true"/>
+
+    <actions>
+        <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart">
+            <field-map field-name="orderId" from="orderId"/>
+            <field-map field-name="orderPartSeqId" value="01"/>
+        </entity-find-one>
+        <entity-find-related value-field="orderPart" relationship-name="parties" list="partyList"/>
+        <log level="warn" message="${orderPart}"/>
+        <log level="warn" message="${partyList}"/>
+    </actions>
+
+    <widgets>
+        <container style="row">
+            <section-iterate name="PartySection" list="partyList" entry="party">
+                <actions>
+                    <entity-find-one entity-name="mantle.party.PartyDetail" value-field="partyDetail">
+                        <field-map field-name="partyId" from="party.partyId"/>
+                    </entity-find-one>
+                </actions>
+                <widgets>
+                    <section name="PersonSection" condition="partyDetail.partyTypeEnumId == 'PtyPerson'">
+                        <widgets>
+                            <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                <label text="${partyDetail.firstName} ${partyDetail.lastName}" type="h4"/>
+
+
+                                <container-box>
+                                    <box-header title="${partyDetail.firstName} ${partyDetail.lastName}"/>
+                                    <box-toolbar>
+                                        <link url="#" text="Edit"/>
+                                    </box-toolbar>
+                                    <box-body height="210">
+                                        <label text="Personal" type="h6"/>
+                                        <container type="dl" style="dl-horizontal">
+                                            <label text="First Name" type="dt"/>
+                                            <label text="${partyDetail.firstName}" type="dd"/>
+                                            <label text="Last Name" type="dt"/>
+                                            <label text="${partyDetail.lastName}" type="dd"/>
+                                        </container>
+
+                                        <label text="Contact" type="h6"/>
+                                        <container type="dl" style="dl-horizontal">
+                                            <label text="Email Address" type="dt"/>
+                                            <label text="" type="dd"/>
+                                            <label text="Primary Phone Number" type="dt"/>
+                                            <label text="" type="dd"/>
+                                            <label text="Residential Address" type="dt"/>
+                                            <label text="" type="dd"/>
+                                            <label text="Mailing Address" type="dt"/>
+                                            <label text="" type="dd"/>
+                                        </container>
+                                    </box-body>
+                                </container-box>
+                            </container>
+                        </widgets>
+                    </section>
+                </widgets>
+            </section-iterate>
+        </container>
+
+
+<!--        <container-row>-->
+<!--            <row-col lg="6">-->
+<!--                <container-box>-->
+<!--                    <box-header>MK Decision</box-header>-->
+<!--                    <box-toolbar>-->
+<!--                        <link url="#" text="Edit"/>-->
+<!--                    </box-toolbar>-->
+<!--                    <box-body>-->
+<!--                        <form-single name="OrganizationForm">-->
+<!--                            <field name="organizationName">-->
+<!--                                <default-field>-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="dbaName">-->
+<!--                                <default-field title="DBA Name (Optional)">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="businessName">-->
+<!--                                <default-field title="Business Name on Card">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="structure">-->
+<!--                                <default-field title="Structure">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="naics">-->
+<!--                                <default-field title="NAICS">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="taxNumber">-->
+<!--                                <default-field title="Tax ID Number">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="formationDate">-->
+<!--                                <default-field title="Date of Formation">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="yearsInBusiness">-->
+<!--                                <default-field title="Years In Business">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="employeeCount">-->
+<!--                                <default-field title="Number of Employees">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="annualRevenue">-->
+<!--                                <default-field title="Annual Revenue">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="legalInUs">-->
+<!--                                <default-field title="Legally formed in U.S.?">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="businessState">-->
+<!--                                <default-field title="State of Business Formation">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="activityCountry">-->
+<!--                                <default-field title="Country of Primary Activity">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="primaryPhoneNumber">-->
+<!--                                <default-field title="Primary Phone Number">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="postalAddress">-->
+<!--                                <default-field title="Address">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="unitNumber">-->
+<!--                                <default-field title="Apt/Unit #">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="zipCode">-->
+<!--                                <default-field title="ZIP Code">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="city">-->
+<!--                                <default-field title="City">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            <field name="state">-->
+<!--                                <default-field title="State">-->
+<!--                                    <display/>-->
+<!--                                </default-field>-->
+<!--                            </field>-->
+<!--                            -->
+<!--                            <field-layout>-->
+<!--                                <field-accordion>-->
+<!--                                    <field-group title="Organization Information">-->
+<!--                                        <field-ref name="organizationName"/>-->
+<!--                                        <field-ref name="dbaName"/>-->
+<!--                                        <field-ref name="businessName"/>-->
+<!--                                        <field-ref name="structure"/>-->
+<!--                                        <field-ref name="naics"/>-->
+<!--                                        <field-ref name="taxNumber"/>-->
+<!--                                        <field-ref name="formationDate"/>-->
+<!--                                        <field-ref name="yearsInBusiness"/>-->
+<!--                                        <field-ref name="employeeCount"/>-->
+<!--                                        <field-ref name="annualRevenue"/>-->
+<!--                                        <field-ref name="legalInUs"/>-->
+<!--                                        <field-ref name="businessState"/>-->
+<!--                                        <field-ref name="activityCountry"/>-->
+<!--                                    </field-group>-->
+<!--                                </field-accordion>-->
+<!--                                <field-accordion>-->
+<!--                                    <field-group title="Organization Contact">-->
+<!--                                        <field-ref name="primaryPhoneNumber"/>-->
+<!--                                        <field-ref name="postalAddress"/>-->
+<!--                                        <field-ref name="unitNumber"/>-->
+<!--                                        <field-ref name="zipCode"/>-->
+<!--                                        <field-ref name="city"/>-->
+<!--                                        <field-ref name="state"/>-->
+<!--                                    </field-group>-->
+<!--                                </field-accordion>-->
+<!--                            </field-layout>-->
+<!--                        </form-single>-->
+<!--                    </box-body>-->
+<!--                </container-box>-->
+<!--            </row-col>-->
+<!--            <row-col lg="6">-->
+
+<!--            </row-col>-->
+<!--        </container-row>-->
+    </widgets>
+
+</screen>

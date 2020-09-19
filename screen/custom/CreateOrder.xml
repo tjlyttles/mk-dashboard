@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Create Order"
+        default-menu-include="false">
+
+    <widgets>
+        <form-single name="CreateSalesOrder" transition="createOrder">
+            <field name="salesChannelEnumId">
+                <default-field title="Method">
+                    <drop-down>
+                        <entity-options key="${enumId}" text="${description}">
+                            <entity-find entity-name="moqui.basic.EnumAndGroup">
+                                <econdition field-name="enumGroupEnumId" value="RequestChannelTypes"/>
+                                <order-by field-name="description"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="productStoreId" from="productStoreId ?: defaultProductStoreId">
+                <default-field title="Referrer">
+                    <drop-down>
+                        <!-- Figure out which store are available to the user-->
+                        <entity-options key="${productStoreId}" text="${productStoreId}: ${storeName}">
+                            <entity-find entity-name="mantle.product.store.ProductStore">
+                                <order-by field-name="storeName"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="salesRepresentative">
+                <default-field title="Sales Representative">
+                    <drop-down>
+                        <dynamic-options transition="getStoreSalesReps">
+                            <depends-on field="productStoreId"/>
+                        </dynamic-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="productId" >
+                <default-field title="Product">
+                    <drop-down>
+                        <dynamic-options transition="getStoreProducts" value-field="value" label-field="label">
+                            <depends-on field="productStoreId"/>
+                        </dynamic-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="submitButton"><default-field title="Create"><submit/></default-field></field>
+        </form-single>
+    </widgets>
+
+</screen>
