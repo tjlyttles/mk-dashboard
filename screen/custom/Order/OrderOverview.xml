@@ -139,6 +139,7 @@
 
         <container type="hr"/>
 
+        <!--
         <container>
             <label text="Rules Summary" type="h4"/>
             <container-row>
@@ -156,7 +157,7 @@
                     <container type="dl" style="dl-horizontal">
                         <label text="Combined Income" type="dt"/>
                         <label text="${combinedIncome}" type="dd"/>
-                        <label text="Combined Expense" type="dt"/>
+                        <label text="Combined Expenses" type="dt"/>
                         <label text="${combinedExpense}" type="dd"/>
                         <label text="Combined Projected DTI" type="dt"/>
                         <label text="${combinedProjectedDti}" type="dd"/>
@@ -164,6 +165,7 @@
                 </row-col>
             </container-row>
         </container>
+        -->
 
         <container type="hr"/>
 
