@@ -167,36 +167,6 @@
         </container>
         -->
 
-        <container type="hr"/>
-
-        <container>
-            <container-row>
-                <row-col sm="6" xs="6">
-                    <label text="Requirements" type="h4"/>
-                </row-col>
-                <row-col sm="6" xs="6">
-                    <container style="text-right">
-                        <container-dialog id="AddRequirementDialog" button-text="Add Requirement" width="960">
-                            <form-single name="AddRequirementForm">
-                                <field name="requirement">
-                                    <default-field>
-                                        <text-area/>
-                                    </default-field>
-                                </field>
-                                <field name="submit">
-                                    <default-field>
-                                        <submit text="Save"/>
-                                    </default-field>
-                                </field>
-                            </form-single>
-                        </container-dialog>
-                    </container>
-                </row-col>
-            </container-row>
-        </container>
-
-        <container type="hr"/>
-
         <container>
             <container-row>
                 <row-col sm="6" xs="6">
