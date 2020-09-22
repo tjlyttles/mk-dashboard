@@ -127,6 +127,10 @@
             <form-list name="ItemList" list="itemList">
                 <row-actions>
                     <entity-find-one entity-name="mantle.product.Product" value-field="product"/>
+                    <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+                    <entity-find-one entity-name="moqui.basic.StatusItem" value-field="orderPartStatus">
+                        <field-map field-name="statusId" from="orderPart.statusId"/>
+                    </entity-find-one>
                 </row-actions>
                 <field name="productName">
                     <default-field title="Description">
@@ -135,7 +139,7 @@
                 </field>
                 <field name="status">
                     <default-field>
-                        <display text="-- Missing Mapping --" style="text-red"/>
+                        <display text="${orderPartStatus.description}"/>
                     </default-field>
                 </field>
                 <field name="unitAmount">
