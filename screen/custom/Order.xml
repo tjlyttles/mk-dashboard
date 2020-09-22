@@ -52,7 +52,6 @@
             </container-dialog>
             <button-menu text="More" icon="fa fa-ellipsis-v">
                 <link url="#" text="Add Party"/>
-                <link url="#" text="Add Balance Transfer"/>
                 <link url="#" text="Cancel Order"/>
             </button-menu>
         </container>
