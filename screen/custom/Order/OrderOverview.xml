@@ -17,6 +17,9 @@
             <field-map field-name="orderPartSeqId" value="01"/>
             <field-map field-name="parentItemSeqId" from="null"/>
         </entity-find-one>
+        <entity-find-one entity-name="mantle.party.PartyDetail" value-field="enteredBy">
+            <field-map field-name="partyId" from="orderHeader.enteredByPartyId"/>
+        </entity-find-one>
         <entity-find-related-one value-field="orderHeader" relationship-name="status" to-value-field="orderStatus"/>
         <entity-find-related-one value-field="orderHeader" relationship-name="productStore" to-value-field="productStore"/>
         <entity-find-related-one value-field="orderItem" relationship-name="product" to-value-field="product"/>
@@ -27,17 +30,33 @@
 
     <widgets>
         <container>
-            <label text="${orderId} - ${statusDescription}" text-map="[orderId: orderHeader.orderId, statusDescription: orderStatus.description]" type="h4"/>
-            <container type="dl" style="dl-horizontal">
-                <label text="Date Entered" type="dt"/>
-                <label text="${orderHeader.entryDate}" type="dd"/>
-                <label text="Last Updated" type="dt"/>
-                <label text="${orderHeader.lastUpdatedStamp}" type="dd"/>
-                <label text="Projected Amount" type="dt"/>
-                <label text="${estimatedPayment}" type="dd"/>
-                <label text="Amount" type="dt"/>
-                <label text="${orderItem.unitAmount}" type="dd"/>
-            </container>
+            <label text="${orderHeader.orderId} - ${orderStatus.description}" type="h4" style="q-my-md"/>
+            <container-row>
+                <row-col lg="6">
+                    <container-row>
+                        <row-col lg="6"><label text="Agent" style="text-grey"/></row-col>
+                        <row-col lg="6"><label text="${productStore.storeName}"/></row-col>
+                    </container-row>
+                    <container-row>
+                        <row-col lg="6"><label text="Method" style="text-grey"/></row-col>
+                        <row-col lg="6"><label text=""/></row-col>
+                    </container-row>
+                    <container-row>
+                        <row-col lg="6"><label text="Entered By" style="text-grey"/></row-col>
+                        <row-col lg="6"><label text="${enteredBy.firstName} ${enteredBy.lastName}"/></row-col>
+                    </container-row>
+                </row-col>
+                <row-col lg="6">
+                    <container-row>
+                        <row-col lg="6"><label text="Entered On" style="text-grey"/></row-col>
+                        <row-col lg="6"><label text="${ec.l10n.format(orderHeader.entryDate, 'd/M/yyyy h:mm:ss a')}"/></row-col>
+                    </container-row>
+                    <container-row>
+                        <row-col lg="6"><label text="Last Updated" style="text-grey"/></row-col>
+                        <row-col lg="6"><label text="${ec.l10n.format(orderHeader.lastUpdatedStamp, 'd/M/yyyy h:mm:ss a')}"/></row-col>
+                    </container-row>
+                </row-col>
+            </container-row>
         </container>
 
         <container type="hr"/>
