@@ -13,8 +13,6 @@
             <field-map field-name="orderPartSeqId" value="01"/>
         </entity-find-one>
         <entity-find-related value-field="orderPart" relationship-name="parties" list="partyList"/>
-        <log level="warn" message="${orderPart}"/>
-        <log level="warn" message="${partyList}"/>
     </actions>
 
     <widgets>
@@ -24,38 +22,60 @@
                     <entity-find-one entity-name="mantle.party.PartyDetail" value-field="partyDetail">
                         <field-map field-name="partyId" from="party.partyId"/>
                     </entity-find-one>
+                    <entity-find-one entity-name="mantle.party.RoleType" value-field="roleType">
+                        <field-map field-name="roleTypeId" from="party.roleTypeId"/>
+                    </entity-find-one>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
+                        <field-map field-name="partyId" from="party.partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryTelecomNumber" out-map="context">
+                        <field-map field-name="partyId" from="party.partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryEmailAddress" out-map="context">
+                        <field-map field-name="partyId" from="party.partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryPostalAddress" out-map="context">
+                        <field-map field-name="partyId" from="party.partyId"/>
+                    </service-call>
                 </actions>
                 <widgets>
                     <section name="PersonSection" condition="partyDetail.partyTypeEnumId == 'PtyPerson'">
                         <widgets>
                             <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                                <label text="${partyDetail.firstName} ${partyDetail.lastName}" type="h4"/>
-
-
                                 <container-box>
-                                    <box-header title="${partyDetail.firstName} ${partyDetail.lastName}"/>
-                                    <box-toolbar>
-                                        <link url="#" text="Edit"/>
-                                    </box-toolbar>
-                                    <box-body height="210">
-                                        <label text="Personal" type="h6"/>
-                                        <container type="dl" style="dl-horizontal">
-                                            <label text="First Name" type="dt"/>
-                                            <label text="${partyDetail.firstName}" type="dd"/>
-                                            <label text="Last Name" type="dt"/>
-                                            <label text="${partyDetail.lastName}" type="dd"/>
+                                    <box-header title="${partyName}"/>
+                                    <box-body>
+                                        <container style="q-pb-sm">
+                                            <label text="${roleType.description}"/>
                                         </container>
+                                        <container>
+                                            <label text="Personal" type="h6" style="q-pb-sm"/>
+                                            <container style="q-pb-md">
+                                                <container-row>
+                                                    <row-col lg="6" sm="6" xs="6"><label text="First Name" style="text-grey"/></row-col>
+                                                    <row-col lg="6" sm="6" xs="6"><label text="${partyDetail.firstName ?: '-'}"/></row-col>
+                                                </container-row>
+                                                <container-row>
+                                                    <row-col lg="6" sm="6" xs="6"><label text="Last Name" style="text-grey"/></row-col>
+                                                    <row-col lg="6" sm="6" xs="6"><label text="${partyDetail.lastName ?: '-'}"/></row-col>
+                                                </container-row>
+                                            </container>
 
-                                        <label text="Contact" type="h6"/>
-                                        <container type="dl" style="dl-horizontal">
-                                            <label text="Email Address" type="dt"/>
-                                            <label text="" type="dd"/>
-                                            <label text="Primary Phone Number" type="dt"/>
-                                            <label text="" type="dd"/>
-                                            <label text="Residential Address" type="dt"/>
-                                            <label text="" type="dd"/>
-                                            <label text="Mailing Address" type="dt"/>
-                                            <label text="" type="dd"/>
+                                            <label text="Contact" type="h6" style="q-pb-sm"/>
+                                            <container>
+                                                <container-row>
+                                                    <row-col lg="6" sm="6" xs="6"><label text="Email" style="text-grey"/></row-col>
+                                                    <row-col lg="6" sm="6" xs="6"><label text="${emailAddress ?: '-'}"/></row-col>
+                                                </container-row>
+                                                <container-row>
+                                                    <row-col lg="6" sm="6" xs="6"><label text="Mobile Phone Number" style="text-grey"/></row-col>
+                                                    <row-col lg="6" sm="6" xs="6"><label text="${telecomNumber ?: '-'}"/></row-col>
+                                                </container-row>
+                                                <container-row>
+                                                    <row-col lg="6" sm="6" xs="6"><label text="Residential Address" style="text-grey"/></row-col>
+                                                    <row-col lg="6" sm="6" xs="6"><label text="${postalAddress ?: '-'}"/></row-col>
+                                                </container-row>
+                                            </container>
                                         </container>
                                     </box-body>
                                 </container-box>

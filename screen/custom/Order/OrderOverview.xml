@@ -180,7 +180,7 @@
                     <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
-                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryPhoneNumber" out-map="context">
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryTelecomNumber" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
                     <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryEmailAddress" out-map="context">
@@ -197,9 +197,9 @@
                         <display text="${partyName ?: '-'}"/>
                     </default-field>
                 </field>
-                <field name="phoneNumber">
-                    <default-field>
-                        <display text="${phoneNumber ?: '-'}"/>
+                <field name="telecomNumber">
+                    <default-field title="Phone Number">
+                        <display text="${telecomNumber ?: '-'}"/>
                     </default-field>
                 </field>
                 <field name="emailAddress">
