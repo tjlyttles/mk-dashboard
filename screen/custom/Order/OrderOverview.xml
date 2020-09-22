@@ -95,42 +95,7 @@
             <section name="EmptyDecisionList" condition="decisionList == null || decisionList.isEmpty()">
                 <widgets>
                     <container style="text-center">
-                        <label text="No data found." style="text-grey"/>
-                    </container>
-                </widgets>
-            </section>
-        </container>
-
-        <container type="hr"/>
-
-        <container>
-            <label text="Internal" type="h4"/>
-            <form-list name="RoleList" list="roleList" >
-                <field name="role">
-                    <default-field>
-                        <display/>
-                    </default-field>
-                </field>
-                <field name="name">
-                    <default-field>
-                        <display/>
-                    </default-field>
-                </field>
-                <field name="phone">
-                    <default-field>
-                        <display/>
-                    </default-field>
-                </field>
-                <field name="email">
-                    <default-field>
-                        <display/>
-                    </default-field>
-                </field>
-            </form-list>
-            <section name="EmptyRoleList" condition="roleList == null || roleList.isEmpty()">
-                <widgets>
-                    <container style="text-center">
-                        <label text="No data found." style="text-grey"/>
+                        <label text="No decisions have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
@@ -169,7 +134,6 @@
                         <econdition field-name="partyId" from="party.partyId"/>
                         <date-filter/>
                     </entity-find>
-                    <set field="partyName" from="((party.firstName ?: '') + ' ' + (party.middleName ?: '') + ' ' + (party.lastName ?: '')).trim()"/>
                     <set field="phone" from="phoneList.isEmpty() ? '' : phoneList.getFirst().contactNumber"/>
                     <set field="email" from="emailList.isEmpty() ? '' : emailList.getFirst().infoString"/>
                 </row-actions>
@@ -180,7 +144,7 @@
                 </field>
                 <field name="name">
                     <default-field>
-                        <display text="${partyName}"/>
+                        <display text="${party.firstName} ${party.lastName}"/>
                     </default-field>
                 </field>
                 <field name="phone">
@@ -196,7 +160,9 @@
             </form-list>
             <section name="EmptyPartyList" condition="partyList == null || partyList.isEmpty()">
                 <widgets>
-                    <label text="No data found." style="text-grey text-italic"/>
+                    <container style="text-center">
+                        <label text="No parties have been added yet" style="text-grey"/>
+                    </container>
                 </widgets>
             </section>
         </container>
@@ -277,96 +243,13 @@
                     </container-box>
                 </widgets>
             </section-iterate>
-        </container>
-
-        <container type="hr"/>
-
-        <container>
-            <label text="Agent" type="h4"/>
-            <container-row>
-                <row-col lg="6">
-                    <container type="dl" style="dl-horizontal">
-                        <label text="Agent" type="dt"/>
-                        <label text="${productStore.storeName}" type="dd"/>
-                        <label text="Phone Number" type="dt"/>
-                        <label text="${phoneNumber}" type="dd"/>
-                        <label text="Email" type="dt"/>
-                        <label text="${email}" type="dd"/>
+            <section name="EmptyNoteList" condition="noteList == null || noteList.isEmpty()">
+                <widgets>
+                    <container style="text-center">
+                        <label text="No notes have been added yet" style="text-grey"/>
                     </container>
-                </row-col>
-                <row-col lg="6">
-                    <container type="dl" style="dl-horizontal">
-                        <label text="Address" type="dt"/>
-                        <label text="${postalAddress}" type="dd"/>
-                    </container>
-                </row-col>
-            </container-row>
-        </container>
-
-        <container type="hr"/>
-
-        <container>
-            <label text="Customer Service Information" type="h4"/>
-            <container-row>
-                <row-col lg="6">
-                    <container type="dl" style="dl-horizontal">
-                        <label text="Bank Branch Location" type="dt"/>
-                        <label text="${bankBranchLocation}" type="dd"/>
-                        <label text="Branch Number" type="dt"/>
-                        <label text="${branchNumber}" type="dd"/>
-                        <label text="CSRID" type="dt"/>
-                        <label text="${csrId}" type="dd"/>
-                    </container>
-                </row-col>
-                <row-col lg="6">
-                    <container type="dl" style="dl-horizontal">
-                        <label text="Representative Name" type="dt"/>
-                        <label text="${representativeName}" type="dd"/>
-                        <label text="Phone Number" type="dt"/>
-                        <label text="${representativePhoneNumber}" type="dd"/>
-                    </container>
-                </row-col>
-            </container-row>
-        </container>
-
-        <container type="hr"/>
-
-        <container>
-            <label text="Product Details" type="h4"/>
-            <container-row>
-                <row-col lg="6">
-                    <container type="dl" style="dl-horizontal">
-                        <label text="Product" type="dt"/>
-                        <label text="${product.productName}" type="dd"/>
-                        <label text="Product Code" type="dt"/>
-                        <label text="" type="dd"/>
-                        <label text="Sub-product Code" type="dt"/>
-                        <label text="" type="dd"/>
-                        <label text="Bill Code" type="dt"/>
-                        <label text="" type="dd"/>
-                        <label text="Account Type" type="dt"/>
-                        <label text="" type="dd"/>
-                        <label text="Group ID" type="dt"/>
-                        <label text="" type="dd"/>
-                    </container>
-                </row-col>
-                <row-col lg="6">
-                    <container type="dl" style="dl-horizontal">
-                        <label text="Agent Prefix" type="dt"/>
-                        <label text="" type="dd"/>
-                        <label text="Plan" type="dt"/>
-                        <label text="" type="dd"/>
-                        <label text="Source Code" type="dt"/>
-                        <label text="" type="dd"/>
-                        <label text="Plastic Suffix" type="dt"/>
-                        <label text="" type="dd"/>
-                        <label text="Cash Limit Percentage" type="dt"/>
-                        <label text="" type="dd"/>
-                        <label text="Agent ID" type="dt"/>
-                        <label text="" type="dd"/>
-                    </container>
-                </row-col>
-            </container-row>
+                </widgets>
+            </section>
         </container>
     </widgets>
 
