@@ -105,6 +105,16 @@
                         <submit/>
                     </header-field>
                 </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="customerFirstName"/>
+                        <field-ref name="productId"/>
+                    </column>
+                    <column>
+                        <field-ref name="entryDate"/>
+                    </column>
+                </columns>
             </form-list>
         </container>
     </widgets>
