@@ -17,16 +17,18 @@
             <field-map field-name="orderPartSeqId" value="01"/>
             <field-map field-name="parentItemSeqId" from="null"/>
         </entity-find-one>
-        <entity-find-one entity-name="mantle.party.PartyDetail" value-field="enteredBy">
+        <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="enteredBy">
             <field-map field-name="partyId" from="orderHeader.enteredByPartyId"/>
-        </entity-find-one>
+        </service-call>
         <entity-find entity-name="mantle.order.OrderDecision" list="decisionList">
             <econdition field-name="orderId" from="orderId"/>
             <order-by field-name="-decisionDate"/>
         </entity-find>
         <entity-find-related-one value-field="orderHeader" relationship-name="status" to-value-field="orderStatus"/>
         <entity-find-related-one value-field="orderHeader" relationship-name="productStore" to-value-field="productStore"/>
+        <entity-find-related-one value-field="orderHeader" relationship-name="salesChannel" to-value-field="salesChannel"/>
         <entity-find-related-one value-field="orderItem" relationship-name="product" to-value-field="product"/>
+        <entity-find-related value-field="orderPart" relationship-name="items" list="itemList"/>
         <entity-find-related value-field="orderPart" relationship-name="parties" list="partyList"/>
         <entity-find-related value-field="orderHeader" relationship-name="notes" list="noteList"/>
         <service-call name="close.OrderServices.get#EstimatedPayment" in-map="context" out-map="context"/>
@@ -38,26 +40,26 @@
             <container-row>
                 <row-col lg="6">
                     <container-row>
-                        <row-col lg="6"><label text="Agent" style="text-grey"/></row-col>
-                        <row-col lg="6"><label text="${productStore.storeName}"/></row-col>
+                        <row-col lg="6" sm="6" xs="6"><label text="Agent" style="text-grey"/></row-col>
+                        <row-col lg="6" sm="6" xs="6"><label text="${productStore.storeName}"/></row-col>
                     </container-row>
                     <container-row>
-                        <row-col lg="6"><label text="Method" style="text-grey"/></row-col>
-                        <row-col lg="6"><label text=""/></row-col>
+                        <row-col lg="6" sm="6" xs="6"><label text="Method" style="text-grey"/></row-col>
+                        <row-col lg="6" sm="6" xs="6"><label text="${salesChannel?.description ?: '-'}"/></row-col>
                     </container-row>
                     <container-row>
-                        <row-col lg="6"><label text="Entered By" style="text-grey"/></row-col>
-                        <row-col lg="6"><label text="${enteredBy.firstName} ${enteredBy.lastName}"/></row-col>
+                        <row-col lg="6" sm="6" xs="6"><label text="Entered By" style="text-grey"/></row-col>
+                        <row-col lg="6" sm="6" xs="6"><label text="${enteredBy.partyName ?: '-'}"/></row-col>
                     </container-row>
                 </row-col>
                 <row-col lg="6">
                     <container-row>
-                        <row-col lg="6"><label text="Entered On" style="text-grey"/></row-col>
-                        <row-col lg="6"><label text="${ec.l10n.format(orderHeader.entryDate, 'd/M/yyyy h:mm:ss a')}"/></row-col>
+                        <row-col lg="6" sm="6" xs="6"><label text="Entered On" style="text-grey"/></row-col>
+                        <row-col lg="6" sm="6" xs="6"><label text="${ec.l10n.format(orderHeader.entryDate, 'd/M/yyyy h:mm:ss a')}"/></row-col>
                     </container-row>
                     <container-row>
-                        <row-col lg="6"><label text="Last Updated" style="text-grey"/></row-col>
-                        <row-col lg="6"><label text="${ec.l10n.format(orderHeader.lastUpdatedStamp, 'd/M/yyyy h:mm:ss a')}"/></row-col>
+                        <row-col lg="6" sm="6" xs="6"><label text="Last Updated" style="text-grey"/></row-col>
+                        <row-col lg="6" sm="6" xs="6"><label text="${ec.l10n.format(orderHeader.lastUpdatedStamp, 'd/M/yyyy h:mm:ss a')}"/></row-col>
                     </container-row>
                 </row-col>
             </container-row>
@@ -82,7 +84,7 @@
                     </default-field>
                 </field>
                 <field name="decisionBy">
-                    <default-field>
+                    <default-field title="Completed By">
                         <display text="${decisionBy.firstName} ${decisionBy.lastName}"/>
                     </default-field>
                 </field>
@@ -96,6 +98,60 @@
                 <widgets>
                     <container style="text-center">
                         <label text="No decisions have been added yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
+
+        <container type="hr"/>
+
+        <container>
+            <container-row>
+                <row-col sm="6" xs="6">
+                    <label text="Order Items" type="h4"/>
+                </row-col>
+                <row-col sm="6" xs="6">
+                    <container style="text-right">
+                        <container-dialog id="AddItemDialog" button-text="Add Item" width="960">
+                            <form-single name="AddItemForm">
+                                <field name="submit">
+                                    <default-field>
+                                        <submit text="Save"/>
+                                    </default-field>
+                                </field>
+                            </form-single>
+                        </container-dialog>
+                    </container>
+                </row-col>
+            </container-row>
+            <form-list name="ItemList" list="itemList">
+                <row-actions>
+                    <entity-find-one entity-name="mantle.product.Product" value-field="product"/>
+                    <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+                    <entity-find-one entity-name="moqui.basic.StatusItem" value-field="orderPartStatus">
+                        <field-map field-name="statusId" from="orderPart.statusId"/>
+                    </entity-find-one>
+                </row-actions>
+                <field name="productName">
+                    <default-field title="Description">
+                        <display text="${product.productName}"/>
+                    </default-field>
+                </field>
+                <field name="status">
+                    <default-field>
+                        <display text="${orderPartStatus.description}"/>
+                    </default-field>
+                </field>
+                <field name="unitAmount">
+                    <default-field title="Amount">
+                        <display/>
+                    </default-field>
+                </field>
+            </form-list>
+            <section name="EmptyItemList" condition="itemList == null || itemList.isEmpty()">
+                <widgets>
+                    <container style="text-center">
+                        <label text="No items have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
@@ -125,36 +181,34 @@
             <form-list name="PartyList" list="partyList">
                 <row-actions>
                     <entity-find-one entity-name="mantle.party.RoleType" value-field="roleType"/>
-                    <entity-find-one entity-name="mantle.party.PartyDetail" value-field="party"/>
-                    <entity-find entity-name="mantle.party.contact.PartyContactMechTelecomNumber" list="phoneList">
-                        <econdition field-name="partyId" from="party.partyId"/>
-                        <date-filter/>
-                    </entity-find>
-                    <entity-find entity-name="mantle.party.contact.PartyContactMechInfo" list="emailList">
-                        <econdition field-name="partyId" from="party.partyId"/>
-                        <date-filter/>
-                    </entity-find>
-                    <set field="phone" from="phoneList.isEmpty() ? '' : phoneList.getFirst().contactNumber"/>
-                    <set field="email" from="emailList.isEmpty() ? '' : emailList.getFirst().infoString"/>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
+                        <field-map field-name="partyId" from="partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryTelecomNumber" out-map="context">
+                        <field-map field-name="partyId" from="partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryEmailAddress" out-map="context">
+                        <field-map field-name="partyId" from="partyId"/>
+                    </service-call>
                 </row-actions>
                 <field name="applicants">
                     <default-field>
                         <display text="${roleType.description}"/>
                     </default-field>
                 </field>
-                <field name="name">
+                <field name="partyName">
                     <default-field>
-                        <display text="${party.firstName} ${party.lastName}"/>
+                        <display text="${partyName ?: '-'}"/>
                     </default-field>
                 </field>
-                <field name="phone">
-                    <default-field>
-                        <display/>
+                <field name="telecomNumber">
+                    <default-field title="Phone Number">
+                        <display text="${telecomNumber ?: '-'}"/>
                     </default-field>
                 </field>
-                <field name="email">
+                <field name="emailAddress">
                     <default-field>
-                        <display/>
+                        <display text="${emailAddress ?: '-'}"/>
                     </default-field>
                 </field>
             </form-list>
@@ -168,34 +222,6 @@
         </container>
 
         <container type="hr"/>
-
-        <!--
-        <container>
-            <label text="Rules Summary" type="h4"/>
-            <container-row>
-                <row-col lg="6">
-                    <container type="dl" style="dl-horizontal">
-                        <label text="Credit Score" type="dt"/>
-                        <label text="${creditScore}" type="dd"/>
-                        <label text="Rules Failed" type="dt"/>
-                        <label text="${rulesFailed}" type="dd"/>
-                        <label text="Rules Passed" type="dt"/>
-                        <label text="${rulesPassed}" type="dd"/>
-                    </container>
-                </row-col>
-                <row-col lg="6">
-                    <container type="dl" style="dl-horizontal">
-                        <label text="Combined Income" type="dt"/>
-                        <label text="${combinedIncome}" type="dd"/>
-                        <label text="Combined Expenses" type="dt"/>
-                        <label text="${combinedExpense}" type="dd"/>
-                        <label text="Combined Projected DTI" type="dt"/>
-                        <label text="${combinedProjectedDti}" type="dd"/>
-                    </container>
-                </row-col>
-            </container-row>
-        </container>
-        -->
 
         <container>
             <container-row>
@@ -236,8 +262,18 @@
                     <container-box>
                         <box-header>
                             <!-- TODO: Make icon dynamic -->
-                            <label text="&amp;nbsp;" style="fa fa-lock" encode="false"/>
-                            <label text="${note.noteDate} - ${userAccount.userFullName}" style="text-bold"/>
+                            <section name="NoteIcon">
+                                <condition>
+                                    <expression>note.internalNote == 'Y'</expression>
+                                </condition>
+                                <widgets>
+                                    <label text="&amp;nbsp;" style="fa fa-lock" encode="false"/>
+                                </widgets>
+                                <fail-widgets>
+                                    <label text="&amp;nbsp;" style="fa fa-unlock" encode="false"/>
+                                </fail-widgets>
+                            </section>
+                            <label text="${ec.l10n.format(note.noteDate, 'd/M/yyyy h:mm:ss a')} - ${userAccount.userFullName}" style="text-bold"/>
                         </box-header>
                         <box-body><label text="${note.noteText}"/></box-body>
                     </container-box>
