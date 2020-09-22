@@ -17,8 +17,9 @@
             <field-map field-name="orderPartSeqId" value="01"/>
             <field-map field-name="parentItemSeqId" from="null"/>
         </entity-find-one>
-        <entity-find-related-one value-field="orderItem" relationship-name="product" to-value-field="product"/>
+        <entity-find-related-one value-field="orderHeader" relationship-name="status" to-value-field="orderStatus"/>
         <entity-find-related-one value-field="orderHeader" relationship-name="productStore" to-value-field="productStore"/>
+        <entity-find-related-one value-field="orderItem" relationship-name="product" to-value-field="product"/>
         <entity-find-related value-field="orderPart" relationship-name="parties" list="partyList"/>
         <entity-find-related value-field="orderHeader" relationship-name="notes" list="noteList"/>
         <service-call name="close.OrderServices.get#EstimatedPayment" in-map="context" out-map="context"/>
@@ -26,7 +27,7 @@
 
     <widgets>
         <container>
-            <label text="Order Items" type="h4"/>
+            <label text="${orderId} - ${statusDescription}" text-map="[orderId: orderHeader.orderId, statusDescription: orderStatus.description]" type="h4"/>
             <container type="dl" style="dl-horizontal">
                 <label text="Date Entered" type="dt"/>
                 <label text="${orderHeader.entryDate}" type="dd"/>
