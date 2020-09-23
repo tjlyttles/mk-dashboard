@@ -6,105 +6,162 @@
 
     <parameter name="orderId" required="true"/>
 
+    <actions>
+        <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart">
+            <field-map field-name="orderId" from="orderId"/>
+            <field-map field-name="orderPartSeqId" value="01"/>
+        </entity-find-one>
+        <entity-find-related value-field="orderPart" relationship-name="parties" list="partyList"/>
+        <set field="partyIdList" from="partyList?.partyId?.toSet()"/>
+        <entity-find entity-name="mantle.party.PartyContent" list="contentList">
+            <econdition field-name="partyId" operator="in" from="partyIdList"/>
+        </entity-find>
+        <entity-find entity-name="mantle.order.OrderContent" list="fileList">
+            <econdition field-name="orderId" from="orderId"/>
+        </entity-find>
+        <entity-find entity-name="mantle.order.OrderEmailMessageDetail" list="emailList">
+            <econdition field-name="orderId" from="orderId"/>
+        </entity-find>
+    </actions>
+
     <widgets>
-        <container-box>
-            <box-header title="Agreements"/>
-            <box-body>
-                <form-list name="AgreementList" list="agreementList">
-                    <field name="type">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                    <field name="party">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                    <field name="source">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                    <field name="performedBy">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                    <field name="date">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                </form-list>
-            </box-body>
-        </container-box>
+        <container>
+            <label text="Agreements" type="h4" style="q-my-md"/>
+            <form-list name="ContentList" list="contentList" list-entry="content">
+                <row-actions>
+                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
+                        <field-map field-name="enumId" from="content.partyContentTypeEnumId"/>
+                    </entity-find-one>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="party">
+                        <field-map field-name="partyId" from="content.partyId"/>
+                    </service-call>
+                    <set field="resourceRef" from="ec.resource.getLocationReference(content.contentLocation)"/>
+                </row-actions>
+                <field name="description">
+                    <default-field>
+                        <display text="${contentType?.description ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="party">
+                    <default-field>
+                        <display text="${party.partyName ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="source">
+                    <default-field>
+                        <display text="${resourceRef?.getFileName() ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="performedBy">
+                    <default-field>
+                        <display text="Missing Mapping" style="text-red"/>
+                    </default-field>
+                </field>
+                <field name="contentDate">
+                    <default-field title="Date">
+                        <display format="d/M/yyyy h:mm:ss a"/>
+                    </default-field>
+                </field>
+            </form-list>
+            <section name="EmptyContentList" condition="contentList == null || contentList.isEmpty()">
+                <widgets>
+                    <container style="text-center">
+                        <label text="No agreements have been added yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
 
-        <container-box>
-            <box-header title="Files"/>
-            <box-body>
-                <form-list name="FileList" list="fileList">
-                    <field name="type">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                    <field name="party">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                    <field name="source">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                    <field name="performedBy">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                    <field name="date">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                </form-list>
-            </box-body>
-        </container-box>
+        <container>
+            <label text="Files" type="h4" style="q-my-md"/>
+            <form-list name="FileList" list="fileList" list-entry="content">
+                <row-actions>
+                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
+                        <field-map field-name="enumId" from="content.orderContentTypeEnumId"/>
+                    </entity-find-one>
+                    <set field="resourceRef" from="ec.resource.getLocationReference(content.contentLocation)"/>
+                </row-actions>
+                <field name="description">
+                    <default-field>
+                        <display text="${contentType?.description ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="party">
+                    <default-field>
+                        <display text="Missing Mapping" style="text-red"/>
+                    </default-field>
+                </field>
+                <field name="source">
+                    <default-field>
+                        <display text="${resourceRef?.getFileName() ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="performedBy">
+                    <default-field>
+                        <display text="Missing Mapping" style="text-red"/>
+                    </default-field>
+                </field>
+                <field name="contentDate">
+                    <default-field title="Date">
+                        <display format="d/M/yyyy h:mm:ss a"/>
+                    </default-field>
+                </field>
+            </form-list>
+            <section name="EmptyFileList" condition="fileList == null || fileList.isEmpty()">
+                <widgets>
+                    <container style="text-center">
+                        <label text="No files have been added yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
 
-        <container-box>
-            <box-header title="Emails"/>
-            <box-body>
-                <form-list name="EmailList" list="emailList">
-                    <field name="type">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                    <field name="party">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                    <field name="source">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                    <field name="performedBy">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                    <field name="date">
-                        <default-field>
-                            <display/>
-                        </default-field>
-                    </field>
-                </form-list>
-            </box-body>
-        </container-box>
+        <container>
+            <label text="Emails" type="h4" style="q-my-md"/>
+            <form-list name="EmailList" list="emailList" list-entry="email">
+                <row-actions>
+                    <entity-find-one entity-name="moqui.basic.email.EmailTemplate" value-field="emailTemplate">
+                        <field-map field-name="emailTemplateId" from="email.emailTemplateId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="moqui.basic.email.EmailMessage" value-field="emailMessage">
+                        <field-map field-name="emailMessageId" from="email.emailMessageId"/>
+                    </entity-find-one>
+                </row-actions>
+                <field name="type">
+                    <default-field>
+                        <display text="Missing Mapping" style="text-red"/>
+                    </default-field>
+                </field>
+                <field name="party">
+                    <default-field>
+                        <display text="${emailMessage.toAddresses ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="source">
+                    <default-field>
+                        <display text="${emailTemplate?.description ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="performedBy">
+                    <default-field>
+                        <display text="Missing Mapping" style="text-red"/>
+                    </default-field>
+                </field>
+                <field name="sentDate">
+                    <default-field title="Date">
+                        <display format="d/M/yyyy h:mm:ss a"/>
+                    </default-field>
+                </field>
+            </form-list>
+            <section name="EmptyEmailList" condition="emailList == null || emailList.isEmpty()">
+                <widgets>
+                    <container style="text-center">
+                        <label text="No emails have been sent yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
     </widgets>
 
 </screen>
