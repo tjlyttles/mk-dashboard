@@ -23,8 +23,10 @@
 
             <form-list name="OrderList" list="orderList" list-entry="order" header-dialog="true" select-columns="true" saved-finds="true">
                 <row-actions>
-                    <set field="customerName" from="((customerFirstName ?: '') + ' ' + (customerMiddleName ?: '') + ' ' + (customerLastName ?: '')).trim()"/>
-                    <set field="productDescription" from="((unitAmount ?: '') + ' - ' + (productName ?: '')).trim()"/>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
+                        <field-map field-name="partyId" from="order.customerPartyId"/>
+                    </service-call>
+                    <set field="productDescription" from="((ec.l10n.formatCurrency(unitAmount, currencyUomId, 2) ?: '') + ' - ' + (productName ?: '')).trim()"/>
                 </row-actions>
 
                 <field name="customerFirstName">
@@ -32,7 +34,7 @@
                         <text-find/>
                     </header-field>
                     <default-field>
-                        <link url="editOrder" text="${customerName}" link-type="anchor"/>
+                        <link url="editOrder" text="${partyName}" link-type="anchor"/>
                     </default-field>
                 </field>
 

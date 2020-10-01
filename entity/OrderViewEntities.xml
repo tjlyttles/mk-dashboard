@@ -32,6 +32,7 @@
 
         <alias-all entity-alias="ORDH"/>
         <alias name="orderPartSeqId" entity-alias="ORDP" field="orderPartSeqId"/>
+        <alias name="customerPartyId" entity-alias="ORDP" field="customerPartyId"/>
         <alias name="unitAmount" entity-alias="ORDI" field="unitAmount"/>
         <alias name="statusCode" entity-alias="STAT" field="statusCode"/>
         <alias name="statusDescription" entity-alias="STAT" field="description"/>
