@@ -9,6 +9,10 @@
     <transition name="dashboard">
         <default-response url="../Dashboard"/>
     </transition>
+    <transition name="addNote">
+        <service-call name="create#mantle.order.OrderNote" in-map="context"/>
+        <default-response url="."/>
+    </transition>
 
     <subscreens default-item="OrderOverview"/>
 
@@ -16,16 +20,21 @@
         <container>
             <link url="dashboard" text="Back" icon="fa fa-arrow-left"/>
             <container-dialog id="AddNoteDialog" button-text="Add Note" width="960">
-                <form-single name="AddNoteForm">
-                    <field name="private">
+                <form-single name="AddNoteForm" transition="addNote">
+                    <field name="orderId">
+                        <default-field>
+                            <hidden default-value="${orderId}"/>
+                        </default-field>
+                    </field>
+                    <field name="internalNote">
                         <default-field title="Make this note private?">
                             <check>
-                                <option key="true" text=" "/>
+                                <option key="Y" text=" "/>
                             </check>
                         </default-field>
                     </field>
-                    <field name="note">
-                        <default-field>
+                    <field name="noteText">
+                        <default-field title="Note">
                             <text-area/>
                         </default-field>
                     </field>
