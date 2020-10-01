@@ -38,72 +38,34 @@
         <container>
             <label text="${orderHeader.orderId} - ${orderStatus.description}" type="h4" style="q-my-md"/>
             <container-row>
-                <row-col lg="6">
+                <row-col lg="6" md="6" sm="6" xs="12">
                     <container-row>
-                        <row-col lg="6" sm="6" xs="6"><label text="Agent" style="text-grey"/></row-col>
-                        <row-col lg="6" sm="6" xs="6"><label text="${productStore.storeName}"/></row-col>
+                        <row-col lg="3" md="3" sm="4" xs="12"><label text="Agent" style="text-light-grey"/></row-col>
+                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${productStore.storeName}"/></row-col>
                     </container-row>
                     <container-row>
-                        <row-col lg="6" sm="6" xs="6"><label text="Method" style="text-grey"/></row-col>
-                        <row-col lg="6" sm="6" xs="6"><label text="${salesChannel?.description ?: '-'}"/></row-col>
+                        <row-col lg="3" md="3" sm="4" xs="12"><label text="Method" style="text-light-grey"/></row-col>
+                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${salesChannel?.description ?: '-'}"/></row-col>
                     </container-row>
                     <container-row>
-                        <row-col lg="6" sm="6" xs="6"><label text="Entered By" style="text-grey"/></row-col>
-                        <row-col lg="6" sm="6" xs="6"><label text="${enteredBy.partyName ?: '-'}"/></row-col>
+                        <row-col lg="3" md="3" sm="4" xs="12"><label text="Entered by" style="text-light-grey"/></row-col>
+                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${enteredBy.partyName ?: '-'}"/></row-col>
                     </container-row>
                 </row-col>
-                <row-col lg="6">
+                <row-col lg="6" md="6" sm="6" xs="12">
                     <container-row>
-                        <row-col lg="6" sm="6" xs="6"><label text="Entered On" style="text-grey"/></row-col>
-                        <row-col lg="6" sm="6" xs="6"><label text="${ec.l10n.format(orderHeader.entryDate, 'd/M/yyyy h:mm:ss a')}"/></row-col>
+                        <row-col lg="3" md="3" sm="4" xs="12"><label text="Entered on" style="text-light-grey"/></row-col>
+                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${ec.l10n.format(orderHeader.entryDate, 'd/M/yyyy h:mm:ss a')}"/></row-col>
                     </container-row>
                     <container-row>
-                        <row-col lg="6" sm="6" xs="6"><label text="Last Updated" style="text-grey"/></row-col>
-                        <row-col lg="6" sm="6" xs="6"><label text="${ec.l10n.format(orderHeader.lastUpdatedStamp, 'd/M/yyyy h:mm:ss a')}"/></row-col>
+                        <row-col lg="3" md="3" sm="4" xs="12"><label text="Last updated" style="text-light-grey"/></row-col>
+                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${ec.l10n.format(orderHeader.lastUpdatedStamp, 'd/M/yyyy h:mm:ss a')}"/></row-col>
                     </container-row>
                 </row-col>
             </container-row>
         </container>
 
-        <container type="hr"/>
-
-        <container>
-            <label text="Decision" type="h4" style="q-my-md"/>
-            <form-list name="DecisionList" list="decisionList" list-entry="decision">
-                <row-actions>
-                    <entity-find-one entity-name="moqui.basic.StatusItem" value-field="decisionStatus">
-                        <field-map field-name="statusId" from="decision.statusId"/>
-                    </entity-find-one>
-                    <entity-find-one entity-name="mantle.party.PartyDetail" value-field="decisionBy">
-                        <field-map field-name="partyId" from="decision.decisionByPartyId"/>
-                    </entity-find-one>
-                </row-actions>
-                <field name="description">
-                    <default-field>
-                        <display text="${decisionStatus.description}"/>
-                    </default-field>
-                </field>
-                <field name="decisionBy">
-                    <default-field title="Completed By">
-                        <display text="${decisionBy.firstName} ${decisionBy.lastName}"/>
-                    </default-field>
-                </field>
-                <field name="decisionDate">
-                    <default-field>
-                        <display format="d/M/yyyy h:mm:ss a"/>
-                    </default-field>
-                </field>
-            </form-list>
-            <section name="EmptyDecisionList" condition="decisionList == null || decisionList.isEmpty()">
-                <widgets>
-                    <container style="text-center">
-                        <label text="No decisions have been added yet" style="text-grey"/>
-                    </container>
-                </widgets>
-            </section>
-        </container>
-
-        <container type="hr"/>
+        <container style="h-separator margin-tb-1"/>
 
         <container>
             <container-row>
@@ -157,7 +119,45 @@
             </section>
         </container>
 
-        <container type="hr"/>
+        <container style="h-separator margin-tb-1"/>
+
+        <container>
+            <label text="Decision" type="h4" style="q-my-md"/>
+            <form-list name="DecisionList" list="decisionList" list-entry="decision">
+                <row-actions>
+                    <entity-find-one entity-name="moqui.basic.StatusItem" value-field="decisionStatus">
+                        <field-map field-name="statusId" from="decision.statusId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="mantle.party.PartyDetail" value-field="decisionBy">
+                        <field-map field-name="partyId" from="decision.decisionByPartyId"/>
+                    </entity-find-one>
+                </row-actions>
+                <field name="description">
+                    <default-field>
+                        <display text="${decisionStatus.description}"/>
+                    </default-field>
+                </field>
+                <field name="decisionBy">
+                    <default-field title="Completed by">
+                        <display text="${decisionBy.firstName} ${decisionBy.lastName}"/>
+                    </default-field>
+                </field>
+                <field name="decisionDate">
+                    <default-field title="Date">
+                        <display format="d/M/yyyy h:mm:ss a"/>
+                    </default-field>
+                </field>
+            </form-list>
+            <section name="EmptyDecisionList" condition="decisionList == null || decisionList.isEmpty()">
+                <widgets>
+                    <container style="text-center">
+                        <label text="No decisions have been added yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
+
+        <container style="h-separator margin-tb-1"/>
 
         <container>
             <container-row>
@@ -197,17 +197,17 @@
                     </default-field>
                 </field>
                 <field name="partyName">
-                    <default-field>
+                    <default-field title="Name">
                         <display text="${partyName ?: '-'}"/>
                     </default-field>
                 </field>
                 <field name="telecomNumber">
-                    <default-field title="Phone Number">
+                    <default-field title="Phone">
                         <display text="${telecomNumber ?: '-'}"/>
                     </default-field>
                 </field>
                 <field name="emailAddress">
-                    <default-field>
+                    <default-field title="Email">
                         <display text="${emailAddress ?: '-'}"/>
                     </default-field>
                 </field>
@@ -221,7 +221,7 @@
             </section>
         </container>
 
-        <container type="hr"/>
+        <container style="h-separator margin-tb-1"/>
 
         <container>
             <container-row>
