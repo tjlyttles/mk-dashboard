@@ -67,21 +67,6 @@
                     </default-field>
                 </field>
 
-                <field name="productStoreName">
-                    <header-field title="Source" show-order-by="true">
-                        <drop-down allow-empty="true">
-                            <entity-options text="${storeName}" key="${productStoreId}">
-                                <entity-find entity-name="mantle.product.store.ProductStore">
-                                    <order-by field-name="storeName"/>
-                                </entity-find>
-                            </entity-options>
-                        </drop-down>
-                    </header-field>
-                    <default-field>
-                        <display text="${productStoreName}"/>
-                    </default-field>
-                </field>
-
                 <field name="orderId">
                     <header-field show-order-by="true">
                         <text-find/>
@@ -92,11 +77,11 @@
                 </field>
 
                 <field name="entryDate">
-                    <header-field show-order-by="true">
+                    <header-field show-order-by="true" title="Date">
                         <date-period/>
                     </header-field>
                     <default-field>
-                        <display/>
+                        <display format="MMM d h:mm a"/>
                     </default-field>
                 </field>
 
