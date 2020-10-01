@@ -5,6 +5,7 @@
         <screen location="component://webroot/screen/webroot.xml">
             <subscreens-item name="capps" menu-include="false" location="component://mk-dashboard/screen/capps.xml"/>
             <subscreens-item name="custom" menu-include="false" location="component://mk-dashboard/screen/custom.xml"/>
+            <subscreens-item name="static" menu-include="false" location="component://mk-dashboard/screen/static.xml"/>
         </screen>
     </screen-facade>
 </moqui-conf>
