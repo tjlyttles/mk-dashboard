@@ -1,0 +1,14 @@
+.text-light-grey { color: rgb(117, 117, 117); }
+
+.margin-all-0 { margin: 0em; }
+.margin-all-1 { margin: 1em; }
+.margin-tb-1 { margin: 1em 0 1em 0; }
+.margin-lr-1 { margin: 0 1em 0 1em; }
+
+.padding-all-0 { padding: 0em; }
+.padding-all-1 { padding: 1em; }
+.padding-tb-1 { padding: 1em 0 1em 0; }
+.padding-lr-1 { padding: 0 1em 0 1em; }
+
+.h-separator { border-bottom: 1px solid rgb(211, 212, 216); }
+.v-separator { border-right: 1px solid rgb(211, 212, 216); }

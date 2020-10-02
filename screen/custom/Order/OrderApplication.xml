@@ -42,43 +42,46 @@
                     <section name="PersonSection" condition="partyDetail.partyTypeEnumId == 'PtyPerson'">
                         <widgets>
                             <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                                <container-box>
-                                    <box-header title="${partyName}"/>
-                                    <box-body>
-                                        <container style="q-pb-sm">
+                                <container style="h-separator v-separator">
+                                    <container style="padding-all-1">
+                                        <container>
+                                            <label text="${partyName}" type="h4"/>
                                             <label text="${roleType.description}"/>
                                         </container>
-                                        <container>
-                                            <label text="Personal" type="h6" style="q-pb-sm"/>
-                                            <container style="q-pb-md">
-                                                <container-row>
-                                                    <row-col lg="6" sm="6" xs="6"><label text="First Name" style="text-grey"/></row-col>
-                                                    <row-col lg="6" sm="6" xs="6"><label text="${partyDetail.firstName ?: '-'}"/></row-col>
-                                                </container-row>
-                                                <container-row>
-                                                    <row-col lg="6" sm="6" xs="6"><label text="Last Name" style="text-grey"/></row-col>
-                                                    <row-col lg="6" sm="6" xs="6"><label text="${partyDetail.lastName ?: '-'}"/></row-col>
-                                                </container-row>
-                                            </container>
 
-                                            <label text="Contact" type="h6" style="q-pb-sm"/>
-                                            <container>
+                                        <container style="q-pt-md">
+                                            <label text="Personal" type="h6"/>
+                                            <container style="q-pt-sm">
                                                 <container-row>
-                                                    <row-col lg="6" sm="6" xs="6"><label text="Email" style="text-grey"/></row-col>
-                                                    <row-col lg="6" sm="6" xs="6"><label text="${emailAddress ?: '-'}"/></row-col>
+                                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="First name" style="text-light-grey"/></row-col>
+                                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${partyDetail.firstName ?: '-'}"/></row-col>
                                                 </container-row>
                                                 <container-row>
-                                                    <row-col lg="6" sm="6" xs="6"><label text="Mobile Phone Number" style="text-grey"/></row-col>
-                                                    <row-col lg="6" sm="6" xs="6"><label text="${telecomNumber ?: '-'}"/></row-col>
-                                                </container-row>
-                                                <container-row>
-                                                    <row-col lg="6" sm="6" xs="6"><label text="Residential Address" style="text-grey"/></row-col>
-                                                    <row-col lg="6" sm="6" xs="6"><label text="${postalAddress ?: '-'}"/></row-col>
+                                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Last name" style="text-light-grey"/></row-col>
+                                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${partyDetail.lastName ?: '-'}"/></row-col>
                                                 </container-row>
                                             </container>
                                         </container>
-                                    </box-body>
-                                </container-box>
+
+                                        <container style="q-pt-md">
+                                            <label text="Contact" type="h6"/>
+                                            <container style="q-pt-sm">
+                                                <container-row>
+                                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Email" style="text-light-grey"/></row-col>
+                                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${emailAddress ?: '-'}"/></row-col>
+                                                </container-row>
+                                                <container-row>
+                                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Primary phone number" style="text-light-grey"/></row-col>
+                                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${telecomNumber ?: '-'}"/></row-col>
+                                                </container-row>
+                                                <container-row>
+                                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Residential Address" style="text-light-grey"/></row-col>
+                                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${postalAddress ?: '-'}"/></row-col>
+                                                </container-row>
+                                            </container>
+                                        </container>
+                                    </container>
+                                </container>
                             </container>
                         </widgets>
                     </section>

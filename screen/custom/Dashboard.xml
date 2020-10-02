@@ -23,8 +23,10 @@
 
             <form-list name="OrderList" list="orderList" list-entry="order" header-dialog="true" select-columns="true" saved-finds="true">
                 <row-actions>
-                    <set field="customerName" from="((customerFirstName ?: '') + ' ' + (customerMiddleName ?: '') + ' ' + (customerLastName ?: '')).trim()"/>
-                    <set field="productDescription" from="((unitAmount ?: '') + ' - ' + (productName ?: '')).trim()"/>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
+                        <field-map field-name="partyId" from="order.customerPartyId"/>
+                    </service-call>
+                    <set field="productDescription" from="((ec.l10n.formatCurrency(unitAmount, currencyUomId, 2) ?: '') + ' - ' + (productName ?: '')).trim()"/>
                 </row-actions>
 
                 <field name="customerFirstName">
@@ -32,7 +34,7 @@
                         <text-find/>
                     </header-field>
                     <default-field>
-                        <link url="editOrder" text="${customerName}" link-type="anchor"/>
+                        <link url="editOrder" text="${partyName}" link-type="anchor"/>
                     </default-field>
                 </field>
 
@@ -67,21 +69,6 @@
                     </default-field>
                 </field>
 
-                <field name="productStoreName">
-                    <header-field title="Source" show-order-by="true">
-                        <drop-down allow-empty="true">
-                            <entity-options text="${storeName}" key="${productStoreId}">
-                                <entity-find entity-name="mantle.product.store.ProductStore">
-                                    <order-by field-name="storeName"/>
-                                </entity-find>
-                            </entity-options>
-                        </drop-down>
-                    </header-field>
-                    <default-field>
-                        <display text="${productStoreName}"/>
-                    </default-field>
-                </field>
-
                 <field name="orderId">
                     <header-field show-order-by="true">
                         <text-find/>
@@ -92,11 +79,11 @@
                 </field>
 
                 <field name="entryDate">
-                    <header-field show-order-by="true">
+                    <header-field show-order-by="true" title="Date">
                         <date-period/>
                     </header-field>
                     <default-field>
-                        <display/>
+                        <display format="MMM d h:mm a"/>
                     </default-field>
                 </field>
 

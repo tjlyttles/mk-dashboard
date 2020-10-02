@@ -43,6 +43,7 @@ along with this software (see the LICENSE.md file). If not, see
             </#if>
 
             <#-- NOTE: tried using q-breadcrumbs but last item with q-breadcrumbs--last class makes never clickable! -->
+            <!-- NOTE: Breadcrumbs are not required
             <template v-for="(navMenuItem, menuIndex) in navMenuList"><template v-if="menuIndex < (navMenuList.length - 1)">
                 <m-link v-if="navMenuItem.hasTabMenu" :href="getNavHref(menuIndex)">{{navMenuItem.title}}</m-link>
                 <div v-else-if="navMenuItem.subscreens && navMenuItem.subscreens.length" class="cursor-pointer">
@@ -65,6 +66,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <q-icon size="1.5em" name="chevron_right" color="grey"></q-icon>
             </template></template>
             <m-link v-if="navMenuList.length > 0" :href="getNavHref(navMenuList.length - 1)">{{navMenuList[navMenuList.length - 1].title}}</m-link>
+            -->
 
             <q-space></q-space>
 
