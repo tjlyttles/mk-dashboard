@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Order Header"
+        default-menu-include="false"
+        default-menu-index="1">
+
+    <transition name="createOrder">
+        <service-call name="close.dashboard.OrderServices.create#NewOrder"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="getStoreSalesReps">
+        <actions>
+            <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
+                <econdition field-name="partyId" from="ec.user.userAccount.partyId"/>
+                <econdition field-name="roleTypeId" value="FinanceManager"/>
+                <date-filter/>
+            </entity-find-count>
+
+            <if condition="financeManagerCount > 0">
+                <entity-find entity-name="mkdecision.dashboard.ProductStorePartyDetail" list="storePartyList">
+                    <econdition field-name="productStoreId"/>
+                    <econdition field-name="roleTypeId" value="SalesRepresentative"/>
+                    <date-filter/>
+                    <select-field field-name="partyId,firstName,lastName"/>
+                </entity-find>
+                <else>
+                    <entity-find entity-name="mkdecision.dashboard.ProductStorePartyDetail" list="storePartyList">
+                        <econdition field-name="productStoreId"/>
+                        <econdition field-name="partyId" from="ec.user.userAccount.partyId"/>
+                        <econdition field-name="roleTypeId" value="SalesRepresentative"/>
+                        <date-filter/>
+                        <select-field field-name="partyId,firstName,lastName"/>
+                    </entity-find>
+                </else>
+            </if>
+
+            <set field="resultList" from="[]"/>
+            <iterate list="storePartyList" entry="storeParty">
+                <script>resultList.add([value:storeParty.partyId, label:(storeParty.firstName+ " " +storeParty.lastName)])</script>
+            </iterate>
+            <script>ec.web.sendJsonResponse(resultList)</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    <transition name="getStoreProducts">
+        <actions>
+            <log level="warn" message="${productStoreId}"/>
+            <entity-find entity-name="mkdecision.dashboard.ProductStoreProductDetail" list="productList">
+                <econdition field-name="productStoreId"/>
+            </entity-find>
+            <log level="warn" message="${productList}"/>
+
+            <set field="resultList" from="[]"/>
+            <iterate list="productList" entry="product">
+                <script>resultList.add([value:product.productId, label:(product.productName)])</script>
+            </iterate>
+            <script>ec.web.sendJsonResponse(resultList)</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    
+    <actions>
+        <entity-find entity-name="mantle.product.store.ProductStoreParty" list="partyProductStoreList">
+            <econdition field-name="partyId" from="ec.user.userAccount.partyId"/>
+            <econditions combine="or">
+                <econdition field-name="roleTypeId" value="FinanceManager"/>
+                <econdition field-name="roleTypeId" value="SalesRepresentative"/>
+            </econditions>
+            <date-filter/>
+        </entity-find>
+        <set field="productStoreIdSet" from="new TreeSet(partyProductStoreList*.productStoreId)"/>
+    </actions>
+
+    <widgets>
+        <label text="New Application" type="h4" style="margin-b-1"/>
+        <label text="Application Details" type="h5" style="margin-b-1"/>
+        <label text="Please specify application details." style="margin-b-1"/>
+
+        <container style="h-separator margin-tb-2"/>
+
+        <form-single name="CreateSalesOrder" transition="createOrder">
+            <field name="salesChannelEnumId">
+                <default-field title="Method">
+                    <drop-down>
+                        <entity-options key="${enumId}" text="${description}">
+                            <entity-find entity-name="moqui.basic.EnumAndGroup">
+                                <econdition field-name="enumGroupEnumId" value="RequestChannelTypes"/>
+                                <order-by field-name="description"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="productStoreId">
+                <default-field title="Referrer">
+                    <drop-down>
+                        <entity-options key="${productStoreId}" text="${productStoreId}: ${storeName}">
+                            <entity-find entity-name="mantle.product.store.ProductStore">
+                                <econdition field-name="productStoreId" operator="in" from="productStoreIdSet"/>
+                                <order-by field-name="storeName"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="salesRepresentative">
+                <default-field title="Sales Representative">
+                    <drop-down>
+                        <dynamic-options transition="getStoreSalesReps">
+                            <depends-on field="productStoreId"/>
+                        </dynamic-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="productId" >
+                <default-field title="Product">
+                    <drop-down>
+                        <dynamic-options transition="getStoreProducts">
+                            <depends-on field="productStoreId"/>
+                        </dynamic-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="submitButton"><default-field title="Create"><submit/></default-field></field>
+        </form-single>
+    </widgets>
+
+</screen>
