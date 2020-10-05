@@ -2,7 +2,7 @@
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
 
-    <service verb="get" noun="PartyName" type="script" location="component://mk-dashboard/script/mkdecision/dashboard/getPartyName.groovy">
+    <service verb="get" noun="PartyName" type="java" location="com.mkdecision.dashboard.PartyServices" method="getPartyName">
         <in-parameters>
             <parameter name="partyId"/>
         </in-parameters>
@@ -10,7 +10,7 @@
             <parameter name="partyName"/>
         </out-parameters>
     </service>
-    <service verb="get" noun="PartyPrimaryTelecomNumber" type="script" location="component://mk-dashboard/script/mkdecision/dashboard/getPartyPrimaryTelecomNumber.groovy">
+    <service verb="get" noun="PartyPrimaryTelecomNumber" type="java" location="com.mkdecision.dashboard.PartyServices" method="getPartyPrimaryTelecomNumber">
         <in-parameters>
             <parameter name="partyId"/>
         </in-parameters>
@@ -18,7 +18,7 @@
             <parameter name="telecomNumber"/>
         </out-parameters>
     </service>
-    <service verb="get" noun="PartyPrimaryEmailAddress" type="script" location="component://mk-dashboard/script/mkdecision/dashboard/getPartyPrimaryEmailAddress.groovy">
+    <service verb="get" noun="PartyPrimaryEmailAddress" type="java" location="com.mkdecision.dashboard.PartyServices" method="getPartyPrimaryEmailAddress">
         <in-parameters>
             <parameter name="partyId"/>
         </in-parameters>
@@ -26,7 +26,7 @@
             <parameter name="emailAddress"/>
         </out-parameters>
     </service>
-    <service verb="get" noun="PartyPrimaryPostalAddress" type="script" location="component://mk-dashboard/script/mkdecision/dashboard/getPartyPrimaryPostalAddress.groovy">
+    <service verb="get" noun="PartyPrimaryPostalAddress" type="java" location="com.mkdecision.dashboard.PartyServices" method="getPartyPrimaryPostalAddress">
         <in-parameters>
             <parameter name="partyId"/>
         </in-parameters>
