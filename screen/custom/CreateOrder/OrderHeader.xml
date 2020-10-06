@@ -264,12 +264,8 @@
             <field-layout>
                 <fields-not-referenced/>
                 <field-col-row>
-                    <field-col xs="6" sm="6" md="6" lg="6">
-                        <field-ref name="cancelButton"/>
-                    </field-col>
-                    <field-col xs="6" sm="6" md="6" lg="6" style="text-right">
-                        <field-ref name="submitButton"/>
-                    </field-col>
+                    <field-col xs="6" sm="6" md="6" lg="6"><field-ref name="cancelButton"/></field-col>
+                    <field-col xs="6" sm="6" md="6" lg="6" style="text-right"><field-ref name="submitButton"/></field-col>
                 </field-col-row>
             </field-layout>
         </form-single>

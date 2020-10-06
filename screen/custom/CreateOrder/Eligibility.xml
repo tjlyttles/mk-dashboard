@@ -18,8 +18,9 @@
 
     <transition name="createOrder">
         <service-call name="mkdecision.dashboard.OrderServices.create#Order" in-map="context" out-map="context"/>
-        <default-response url="../Applicants">
+        <default-response url="../Applicant">
             <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
         </default-response>
     </transition>
     <transition name="cancelOrder">
@@ -74,12 +75,8 @@
                         <field-ref name="eligibilityHeader"/>
                         <fields-not-referenced/>
                         <field-col-row>
-                            <field-col xs="6" sm="6" md="6" lg="6">
-                                <field-ref name="cancelButton"/>
-                            </field-col>
-                            <field-col xs="6" sm="6" md="6" lg="6" style="text-right">
-                                <field-ref name="submitButton"/>
-                            </field-col>
+                            <field-col xs="6" sm="6" md="6" lg="6"><field-ref name="cancelButton"/></field-col>
+                            <field-col xs="6" sm="6" md="6" lg="6" style="text-right"><field-ref name="submitButton"/></field-col>
                         </field-col-row>
                     </field-layout>
                 </form-single>
