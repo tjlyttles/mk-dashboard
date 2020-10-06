@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed">
+
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PRODUCT_STORE" locale="en" localized="Invalid product store selection."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_SALES_REP" locale="en" localized="Invalid sales representative selection."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PRODUCT_CATEGORY" locale="en" localized="Invalid product category selection."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PRODUCT" locale="en" localized="Invalid product selection."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_TOTAL_PURCHASE_PRICE" locale="en" localized="Invalid total purchase price."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_DOWN_PAYMENT" locale="en" localized="Invalid down payment."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_LOAN_FEE" locale="en" localized="Invalid loan fee."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_AMOUNT" locale="en" localized="Invalid amount."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PROJECTED_AMOUNT" locale="en" localized="Invalid projected amount."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ELIGIBILITY_FORM" locale="en" localized="No eligibility form setup for the selected product."/>
+
+    <moqui.basic.LocalizedMessage original="DASHBOARD_APPLICANT_NOT_ELIGIBLE" locale="en" localized="Applicant is not eligible to place an order."/>
+    
+</entity-facade-xml>
