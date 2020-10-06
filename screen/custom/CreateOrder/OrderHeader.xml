@@ -5,9 +5,23 @@
         default-menu-include="false"
         default-menu-index="1">
 
-    <transition name="createOrder">
-        <service-call name="close.dashboard.OrderServices.create#NewOrder"/>
-        <default-response url="."/>
+    <transition name="checkEligibility">
+        <service-call name="mkdecision.dashboard.OrderServices.validate#OrderFields" in-map="context"/>
+        <default-response url="../Eligibility">
+            <parameter name="salesChannelEnumId"/>
+            <parameter name="productStoreId"/>
+            <parameter name="salesRepresentativeId"/>
+            <parameter name="productCategoryId"/>
+            <parameter name="productId"/>
+            <parameter name="totalPurchasePrice"/>
+            <parameter name="downPayment"/>
+            <parameter name="loanFee"/>
+            <parameter name="amount"/>
+            <parameter name="projectedAmount"/>
+        </default-response>
+    </transition>
+    <transition name="cancelOrder">
+        <default-response url="../../Dashboard"/>
     </transition>
     <transition name="getStoreSalesReps">
         <actions>
@@ -43,13 +57,33 @@
         </actions>
         <default-response type="none"/>
     </transition>
+    <transition name="getStoreProductCategories">
+        <actions>
+            <entity-find entity-name="mkdecision.dashboard.ProductStoreCategoryDetail" list="categoryList">
+                <econdition field-name="productStoreId"/>
+                <econdition field-name="storeCategoryTypeEnumId" value="PsctFinanceableProducts"/>
+                <date-filter/>
+            </entity-find>
+
+            <set field="resultList" from="[]"/>
+            <iterate list="categoryList" entry="category">
+                <script>resultList.add([value:category.productCategoryId, label:(category.categoryName)])</script>
+            </iterate>
+            <script>ec.web.sendJsonResponse(resultList)</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
     <transition name="getStoreProducts">
         <actions>
-            <log level="warn" message="${productStoreId}"/>
+            <entity-find entity-name="mantle.product.category.ProductCategoryMember" list="productCategoryMemberList">
+                <econdition field-name="productCategoryId"/>
+                <date-filter/>
+            </entity-find>
+            <set field="productIdSet" from="new TreeSet(productCategoryMemberList*.productId)"/>
             <entity-find entity-name="mkdecision.dashboard.ProductStoreProductDetail" list="productList">
                 <econdition field-name="productStoreId"/>
+                <econdition field-name="productId" operator="in" from="productIdSet"/>
             </entity-find>
-            <log level="warn" message="${productList}"/>
 
             <set field="resultList" from="[]"/>
             <iterate list="productList" entry="product">
@@ -59,7 +93,46 @@
         </actions>
         <default-response type="none"/>
     </transition>
-    
+    <transition name="calculateLoanFee">
+        <actions>
+            <service-call name="mkdecision.dashboard.ProductServices.get#ProductParameterValue" out-map="loanFee">
+                <field-map field-name="productId"/>
+                <field-map field-name="productParameterId" value="LoanFee"/>
+            </service-call>
+            <script>ec.web.sendTextResponse(loanFee?.parameterValue ?: '0')</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    <transition name="calculateOrderAmount">
+        <actions>
+            <if condition="totalPurchasePrice == null || loanFee == null || downPayment == null">
+                <script>ec.web.sendTextResponse('"Enter all amounts above"')</script>
+                <return/>
+                <else>
+                    <set field="orderAmount" from="(Double.parseDouble(totalPurchasePrice) + Double.parseDouble(loanFee)) - Double.parseDouble(downPayment)" type="BigDecimal"/>
+                    <script>ec.web.sendTextResponse(String.format("%s", orderAmount))</script>
+                </else>
+            </if>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    <transition name="calculateEstimatedPayment">
+        <actions>
+            <service-call name="mkdecision.dashboard.ProductServices.get#ProductPrice" out-map="productPrice">
+                <field-map field-name="productId"/>
+                <field-map field-name="productStoreId"/>
+                <field-map field-name="priceTypeEnumId" value="PptCurrent"/>
+            </service-call>
+            <set field="creditLine" from="productPrice.price"/>
+            <service-call name="close.ProductServices.calculate#EstimatedPayment" out-map="estimatedPayment">
+                <field-map field-name="productId"/>
+                <field-map field-name="creditLine"/>
+            </service-call>
+            <script>ec.web.sendTextResponse(String.format("%f", estimatedPayment?.estimatedPayment ?: 0.0))</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+
     <actions>
         <entity-find entity-name="mantle.product.store.ProductStoreParty" list="partyProductStoreList">
             <econdition field-name="partyId" from="ec.user.userAccount.partyId"/>
@@ -73,13 +146,15 @@
     </actions>
 
     <widgets>
-        <label text="New Application" type="h4" style="margin-b-1"/>
-        <label text="Application Details" type="h5" style="margin-b-1"/>
-        <label text="Please specify application details." style="margin-b-1"/>
-
-        <container style="h-separator margin-tb-2"/>
-
-        <form-single name="CreateSalesOrder" transition="createOrder">
+        <form-single name="OrderForm" transition="checkEligibility">
+            <field name="applicationHeader">
+                <default-field>
+                    <label text="New Application" type="h4" style="margin-b-1"/>
+                    <label text="Application Details" type="h5" style="margin-b-1"/>
+                    <label text="Please specify application details." style="margin-b-1"/>
+                    <container style="h-separator margin-tb-2"/>
+                </default-field>
+            </field>
             <field name="salesChannelEnumId">
                 <default-field title="Method">
                     <drop-down>
@@ -104,25 +179,99 @@
                     </drop-down>
                 </default-field>
             </field>
-            <field name="salesRepresentative">
+            <field name="salesRepresentativeId">
                 <default-field title="Sales Representative">
-                    <drop-down>
+                    <drop-down style="">
                         <dynamic-options transition="getStoreSalesReps">
                             <depends-on field="productStoreId"/>
                         </dynamic-options>
                     </drop-down>
                 </default-field>
             </field>
-            <field name="productId" >
-                <default-field title="Product">
+            <field name="productHeader">
+                <default-field>
+                    <label text="Product Details" type="h5" style="margin-tb-1"/>
+                    <label text="Please specify product details." style="margin-b-1"/>
+                    <container style="h-separator margin-tb-2"/>
+                </default-field>
+            </field>
+            <field name="productCategoryId">
+                <default-field title="Merchandise">
                     <drop-down>
-                        <dynamic-options transition="getStoreProducts">
+                        <dynamic-options transition="getStoreProductCategories">
                             <depends-on field="productStoreId"/>
                         </dynamic-options>
                     </drop-down>
                 </default-field>
             </field>
-            <field name="submitButton"><default-field title="Create"><submit/></default-field></field>
+            <field name="productId">
+                <default-field title="Product">
+                    <drop-down allow-empty="true">
+                        <dynamic-options transition="getStoreProducts">
+                            <depends-on field="productStoreId"/>
+                            <depends-on field="productCategoryId"/>
+                        </dynamic-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="totalPurchasePrice">
+                <default-field>
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="downPayment">
+                <default-field>
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="loanFee">
+                <default-field>
+                    <display dynamic-transition="calculateLoanFee" depends-optional="true">
+                        <depends-on field="productId"/>
+                    </display>
+                </default-field>
+            </field>
+            <field name="amount">
+                <default-field>
+                    <display dynamic-transition="calculateOrderAmount" depends-optional="true">
+                        <depends-on field="totalPurchasePrice"/>
+                        <depends-on field="downPayment"/>
+                        <depends-on field="loanFee"/>
+                    </display>
+                </default-field>
+            </field>
+            <field name="projectedAmount">
+                <default-field>
+                    <display dynamic-transition="calculateEstimatedPayment" depends-optional="true">
+                        <depends-on field="productStoreId"/>
+                        <depends-on field="productId"/>
+                        <depends-on field="amount"/>
+                    </display>
+                </default-field>
+            </field>
+
+            <field name="cancelButton">
+                <default-field>
+                    <link url="cancelOrder" text="Cancel"/>
+                </default-field>
+            </field>
+            <field name="submitButton">
+                <default-field title="Continue">
+                    <submit/>
+                </default-field>
+            </field>
+
+            <field-layout>
+                <fields-not-referenced/>
+                <field-col-row>
+                    <field-col xs="6" sm="6" md="6" lg="6">
+                        <field-ref name="cancelButton"/>
+                    </field-col>
+                    <field-col xs="6" sm="6" md="6" lg="6" style="text-right">
+                        <field-ref name="submitButton"/>
+                    </field-col>
+                </field-col-row>
+            </field-layout>
         </form-single>
     </widgets>
 

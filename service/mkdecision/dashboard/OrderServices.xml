@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <service verb="validate" noun="OrderFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateOrderFields">
+        <in-parameters>
+            <parameter name="salesChannelEnumId"/>
+            <parameter name="productStoreId"/>
+            <parameter name="salesRepresentativeId"/>
+            <parameter name="productCategoryId"/>
+            <parameter name="productId"/>
+            <parameter name="totalPurchasePrice" type="Double"/>
+            <parameter name="downPayment" type="Double"/>
+            <parameter name="loanFee" type="Double"/>
+            <parameter name="amount"/>
+            <parameter name="projectedAmount" type="Double"/>
+        </in-parameters>
+    </service>
+    <service verb="create" noun="Order" type="java" location="com.mkdecision.dashboard.OrderServices" method="createOrder">
+        <in-parameters>
+            <parameter name="salesChannelEnumId"/>
+            <parameter name="productStoreId"/>
+            <parameter name="salesRepresentativeId"/>
+            <parameter name="productCategoryId"/>
+            <parameter name="productId"/>
+            <parameter name="totalPurchasePrice" type="Double"/>
+            <parameter name="downPayment" type="Double"/>
+            <parameter name="loanFee" type="Double"/>
+            <parameter name="amount" type="Double"/>
+            <parameter name="projectedAmount" type="Double"/>
+            <parameter name="eligibilityQuestion1"/>
+            <parameter name="eligibilityQuestion2"/>
+            <parameter name="eligibilityQuestion3"/>
+            <parameter name="eligibilityQuestion4"/>
+            <parameter name="eligibilityQuestion5"/>
+            <parameter name="eligibilityQuestion6"/>
+            <parameter name="eligibilityQuestion7"/>
+            <parameter name="eligibilityQuestion8"/>
+            <parameter name="eligibilityQuestion9"/>
+            <parameter name="eligibilityQuestion10"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+        </out-parameters>
+    </service>
+
+</services>

@@ -33,5 +33,18 @@
         <alias name="productStoreId" entity-alias="PSP" field="productStoreId"/>
         <alias name="storeName" entity-alias="STR" field="storeName"/>
     </view-entity>
+    <view-entity entity-name="ProductStoreCategoryDetail" package="mkdecision.dashboard">
+        <member-entity entity-alias="PSCT" entity-name="mantle.product.store.ProductStoreCategory"/>
+        <member-entity entity-alias="PCAT" entity-name="mantle.product.category.ProductCategory" join-from-alias="PSCT">
+            <key-map field-name="productCategoryId"/>
+        </member-entity>
+        <member-entity entity-alias="PSTR" entity-name="mantle.product.store.ProductStore" join-from-alias="PSCT">
+            <key-map field-name="productStoreId"/>
+        </member-entity>
+
+        <alias-all entity-alias="PSCT"/>
+        <alias name="categoryName" entity-alias="PCAT" field="categoryName"/>
+        <alias name="storeName" entity-alias="PSTR" field="storeName"/>
+    </view-entity>
 
 </entities>
