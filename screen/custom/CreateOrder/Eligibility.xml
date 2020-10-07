@@ -14,7 +14,7 @@
     <parameter name="downPayment"/>
     <parameter name="loanFee"/>
     <parameter name="amount"/>
-    <parameter name="projectedAmount"/>
+    <parameter name="estimatedAmount"/>
 
     <transition name="createOrder">
         <service-call name="mkdecision.dashboard.OrderServices.create#Order" in-map="context" out-map="context"/>
@@ -58,7 +58,7 @@
                     <field name="downPayment"><default-field><hidden/></default-field></field>
                     <field name="loanFee"><default-field><hidden/></default-field></field>
                     <field name="amount"><default-field><hidden/></default-field></field>
-                    <field name="projectedAmount"><default-field><hidden/></default-field></field>
+                    <field name="estimatedAmount"><default-field><hidden/></default-field></field>
 
                     <field name="cancelButton">
                         <default-field>

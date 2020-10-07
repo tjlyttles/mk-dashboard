@@ -17,7 +17,7 @@
             <parameter name="downPayment"/>
             <parameter name="loanFee"/>
             <parameter name="amount"/>
-            <parameter name="projectedAmount"/>
+            <parameter name="estimatedAmount"/>
         </default-response>
     </transition>
     <transition name="cancelOrder">
@@ -107,7 +107,6 @@
         <actions>
             <if condition="totalPurchasePrice == null || loanFee == null || downPayment == null">
                 <script>ec.web.sendTextResponse('"Enter all amounts above"')</script>
-                <return/>
                 <else>
                     <set field="orderAmount" from="(Double.parseDouble(totalPurchasePrice) + Double.parseDouble(loanFee)) - Double.parseDouble(downPayment)" type="BigDecimal"/>
                     <script>ec.web.sendTextResponse(String.format("%s", orderAmount))</script>
@@ -118,17 +117,17 @@
     </transition>
     <transition name="calculateEstimatedPayment">
         <actions>
-            <service-call name="mkdecision.dashboard.ProductServices.get#ProductPrice" out-map="productPrice">
-                <field-map field-name="productId"/>
-                <field-map field-name="productStoreId"/>
-                <field-map field-name="priceTypeEnumId" value="PptCurrent"/>
-            </service-call>
-            <set field="creditLine" from="productPrice.price"/>
-            <service-call name="close.ProductServices.calculate#EstimatedPayment" out-map="estimatedPayment">
-                <field-map field-name="productId"/>
-                <field-map field-name="creditLine"/>
-            </service-call>
-            <script>ec.web.sendTextResponse(String.format("%f", estimatedPayment?.estimatedPayment ?: 0.0))</script>
+            <if condition="totalPurchasePrice == null || loanFee == null || downPayment == null">
+                <script>ec.web.sendTextResponse('"Enter all amounts above"')</script>
+                <else>
+                    <set field="orderAmount" from="(Double.parseDouble(totalPurchasePrice) + Double.parseDouble(loanFee)) - Double.parseDouble(downPayment)" type="BigDecimal"/>
+                    <service-call name="close.ProductServices.calculate#EstimatedPayment" out-map="estimatedPayment">
+                        <field-map field-name="productId"/>
+                        <field-map field-name="creditLine" from="orderAmount"/>
+                    </service-call>
+                    <script>ec.web.sendTextResponse(String.format("%f", estimatedPayment?.estimatedPayment ?: 0.0))</script>
+                </else>
+            </if>
         </actions>
         <default-response type="none"/>
     </transition>
@@ -241,12 +240,13 @@
                     </display>
                 </default-field>
             </field>
-            <field name="projectedAmount">
+            <field name="estimatedAmount">
                 <default-field>
                     <display dynamic-transition="calculateEstimatedPayment" depends-optional="true">
-                        <depends-on field="productStoreId"/>
                         <depends-on field="productId"/>
-                        <depends-on field="amount"/>
+                        <depends-on field="totalPurchasePrice"/>
+                        <depends-on field="downPayment"/>
+                        <depends-on field="loanFee"/>
                     </display>
                 </default-field>
             </field>
@@ -321,7 +321,7 @@
                 </field-col-row>
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="projectedAmount"/></field-col>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="estimatedAmount"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
 

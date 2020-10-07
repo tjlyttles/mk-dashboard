@@ -13,7 +13,7 @@
             <parameter name="downPayment" type="Double"/>
             <parameter name="loanFee" type="Double"/>
             <parameter name="amount"/>
-            <parameter name="projectedAmount" type="Double"/>
+            <parameter name="estimatedAmount" type="Double"/>
         </in-parameters>
     </service>
     <service verb="create" noun="Order" type="java" location="com.mkdecision.dashboard.OrderServices" method="createOrder">
@@ -27,7 +27,7 @@
             <parameter name="downPayment" type="Double"/>
             <parameter name="loanFee" type="Double"/>
             <parameter name="amount" type="Double"/>
-            <parameter name="projectedAmount" type="Double"/>
+            <parameter name="estimatedAmount" type="Double"/>
             <parameter name="eligibilityQuestion1"/>
             <parameter name="eligibilityQuestion2"/>
             <parameter name="eligibilityQuestion3"/>

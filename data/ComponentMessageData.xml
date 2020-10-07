@@ -9,7 +9,7 @@
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_DOWN_PAYMENT" locale="en" localized="Invalid down payment."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_LOAN_FEE" locale="en" localized="Invalid loan fee."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_AMOUNT" locale="en" localized="Invalid amount."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PROJECTED_AMOUNT" locale="en" localized="Invalid projected amount."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ESTIMATED_AMOUNT" locale="en" localized="Invalid estimated amount."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ELIGIBILITY_FORM" locale="en" localized="No eligibility form setup for the selected product."/>
 
     <moqui.basic.LocalizedMessage original="DASHBOARD_APPLICANT_NOT_ELIGIBLE" locale="en" localized="Applicant is not eligible to place an order."/>

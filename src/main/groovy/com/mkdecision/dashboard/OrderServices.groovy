@@ -36,7 +36,7 @@ class OrderServices {
         Double downPayment = (Double) cs.getOrDefault("downPayment", null)
         Double loanFee = (Double) cs.getOrDefault("loanFee", null)
         String amount = (String) cs.getOrDefault("amount", null)
-        Double projectedAmount = (Double) cs.getOrDefault("projectedAmount", null)
+        Double estimatedAmount = (Double) cs.getOrDefault("estimatedAmount", null)
 
         // validate product store
         EntityFacadeImpl efi = (EntityFacadeImpl) ef
@@ -138,9 +138,9 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
-        // validate project amount
-        if (projectedAmount == null || projectedAmount <= 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_PROJECTED_AMOUNT"))
+        // validate estimated amount
+        if (estimatedAmount == null || estimatedAmount <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ESTIMATED_AMOUNT"))
             return new HashMap<String, Object>()
         }
 
@@ -168,7 +168,7 @@ class OrderServices {
         Double downPayment = (Double) cs.getOrDefault("downPayment", null)
         Double loanFee = (Double) cs.getOrDefault("loanFee", null)
         Double amount = (Double) cs.getOrDefault("amount", null)
-        Double projectedAmount = (Double) cs.getOrDefault("projectedAmount", null)
+        Double estimatedAmount = (Double) cs.getOrDefault("estimatedAmount", null)
 
         // validate order fields
         sf.sync().name("mkdecision.dashboard.OrderServices.validate#OrderFields")
@@ -272,7 +272,7 @@ class OrderServices {
         sf.sync().name("create#mantle.product.ProductParameterValue")
                 .parameter("productParameterId", "ProjectedPayment")
                 .parameter("productParameterSetId", productParameterSetId)
-                .parameter("parameterValue", projectedAmount)
+                .parameter("parameterValue", estimatedAmount)
                 .call()
 
         // return the output parameters
