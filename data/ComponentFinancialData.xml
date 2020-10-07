@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed">
+
+    <!-- Product parameters -->
+    <mantle.product.ProductParameter productParameterId="ProductCategory" description="Product Category"/>
+    <mantle.product.ProductParameter productParameterId="TotalPurchasePrice" description="Total Purchase Price"/>
+    <mantle.product.ProductParameter productParameterId="DownPayment" description="Down Payment"/>
+    <mantle.product.ProductParameter productParameterId="LoanFee" description="Loan Fee"/>
+    <mantle.product.ProductParameter productParameterId="EstimatedPayment" description="Estimated Payment"/>
+
+    <!-- Financial flow types -->
+    <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowAnnualInsuranceCosts" description="Annual Insurance Costs"/>
+    <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowAnnualPropertyTaxes" description="Annual Property Taxes"/>
+    <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowHoaMonthlyFee" description="HOA Monthly Fee"/>
+
+</entity-facade-xml>

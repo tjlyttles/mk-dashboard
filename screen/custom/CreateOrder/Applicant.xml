@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Applicant"
+        default-menu-include="false"
+        default-menu-index="3">
+
+    <parameter name="orderId"/>
+    <parameter name="orderPartSeqId"/>
+
+    <transition name="createPrimaryApplicant">
+        <service-call name="mkdecision.dashboard.OrderServices.create#PrimaryApplicant" in-map="context" out-map="context"/>
+        <default-response url="../Property">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+        </default-response>
+    </transition>
+
+    <widgets>
+        <form-single name="ApplicantForm" transition="createPrimaryApplicant">
+            <field name="orderId"><default-field><hidden/></default-field></field>
+            <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
+
+            <field name="applicantHeader">
+                <default-field>
+                    <label text="New Application" type="h4" style="margin-b-1"/>
+                    <label text="Primary Applicant" type="h5" style="margin-b-1"/>
+                    <label text="Please add all parties associated with the new application." style="margin-b-1"/>
+                    <container style="h-separator margin-tb-2"/>
+                </default-field>
+            </field>
+            <field name="personaInfoHeader">
+                <default-field>
+                    <label text="Personal Information" type="h5" style="margin-tb-1"/>
+                    <container style="h-separator margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="firstName">
+                <default-field>
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="middleName">
+                <default-field title="M.I (Optional)">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="lastName">
+                <default-field>
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="suffix">
+                <default-field title="Suffix (Optional)">
+                    <text-line/>
+                </default-field>
+            </field>
+
+            <field name="addressHeader">
+                <default-field>
+                    <label text="Residential Address" type="h5" style="margin-tb-1"/>
+                    <container style="h-separator margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="address1">
+                <default-field title="Residential Address">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="unitNumber">
+                <default-field title="Apt / Unit # (Optional)">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="postalCode">
+                <default-field title="ZIP Code">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="city">
+                <default-field>
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="stateProvinceGeoId">
+                <default-field title="State">
+                    <drop-down>
+                        <entity-options text="${geoName}" key="${toGeoId}">
+                            <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                <econdition field-name="geoId" value="USA"/>
+                                <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+
+            <field name="identityHeader">
+                <default-field>
+                    <label text="Identity Information" type="h5" style="margin-tb-1"/>
+                    <container style="h-separator margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="socialSecurityNumber">
+                <default-field>
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="birthDate">
+                <default-field title="Date of Birth">
+                    <date-time type="date" size="200"/>
+                </default-field>
+            </field>
+            <field name="idTypeEnumId">
+                <default-field title="ID Type (Optional)">
+                    <drop-down allow-empty="true">
+                        <entity-options text="${description}" key="${enumId}">
+                            <entity-find entity-name="moqui.basic.Enumeration">
+                                <econdition field-name="enumTypeId" value="PartyIdType"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="idIssuedBy">
+                <default-field title="ID State Issued (Optional)">
+                    <drop-down allow-empty="true">
+                        <entity-options text="${geoName}" key="${geoName}">
+                            <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                <econdition field-name="geoId" value="USA"/>
+                                <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="idValue">
+                <default-field title="ID Number (Optional)">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="idIssueDate">
+                <default-field title="Issue Date (Optional)">
+                    <date-time type="date" size="200"/>
+                </default-field>
+            </field>
+            <field name="idExpiryDate">
+                <default-field title="Expiration Date (Optional)">
+                    <date-time type="date" size="200"/>
+                </default-field>
+            </field>
+            <field name="maritalStatusEnumId">
+                <default-field title="Marital Status">
+                    <drop-down>
+                        <entity-options text="${description}" key="${enumId}">
+                            <entity-find entity-name="moqui.basic.Enumeration">
+                                <econdition field-name="enumTypeId" value="MaritalStatus"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+
+            <field name="contactHeader">
+                <default-field>
+                    <label text="Contact Information" type="h5" style="margin-tb-1"/>
+                    <container style="h-separator margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="contactNumber">
+                <default-field title="Phone Number">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="contactMechPurposeId">
+                <default-field title="Type">
+                    <drop-down>
+                        <entity-options text="${description}" key="${contactMechPurposeId}">
+                            <entity-find entity-name="mantle.party.contact.ContactMechPurpose">
+                                <econdition field-name="contactMechTypeEnumId" value="CmtTelecomNumber"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="email">
+                <default-field title="Email Address">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="emailVerify">
+                <default-field title="Verify Email Address">
+                    <text-line/>
+                </default-field>
+            </field>
+
+            <field name="financialHeader">
+                <default-field>
+                    <label text="Financial Information" type="h5" style="margin-tb-1"/>
+                    <container style="h-separator margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="employmentHeader">
+                <default-field>
+                    <label text="Employment" type="strong" style="margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="occupation">
+                <default-field title="Occupation">
+                    <text-line/>
+                </default-field>
+            </field>
+
+            <field name="employmentTipHeader">
+                <default-field>
+                    <label text="Please enter all employments for the past 2 years." style="margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="employmentStatusEnumId">
+                <default-field title="Employment Status">
+                    <drop-down>
+                        <entity-options text="${description}" key="${enumId}">
+                            <entity-find entity-name="moqui.basic.Enumeration">
+                                <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="employerName">
+                <default-field>
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="jobTitle">
+                <default-field title="Title">
+                    <text-line/>
+                </default-field>
+            </field>
+
+            <field name="durationHeader">
+                <default-field>
+                    <label text="Duration" style="margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="years">
+                <default-field>
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="months">
+                <default-field>
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="monthlyIncome">
+                <default-field title="Pre-Tax Income Monthly">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="employerAddress1">
+                <default-field title="Employer Address (Optional)">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="employerUnitNumber">
+                <default-field title="Apt / Unit # (Optional)">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="employerPostalCode">
+                <default-field title="ZIP Code">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="employerCity">
+                <default-field>
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="employerStateProvinceGeoId">
+                <default-field title="State">
+                    <drop-down>
+                        <entity-options text="${geoName}" key="${toGeoId}">
+                            <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                <econdition field-name="geoId" value="USA"/>
+                                <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="employerContactNumber">
+                <default-field title="Employer Phone Number (Optional)">
+                    <text-line/>
+                </default-field>
+            </field>
+
+            <field name="nonEmploymentHeader">
+                <default-field>
+                    <label text="Non-Employment Income" type="strong" style="margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="nonEmploymentTipHeader">
+                <default-field>
+                    <label text="Alimony, child support, or separate maintenance income need not be provided if you do not wish it to be considered as a basis for repaying this obligation" style="margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="otherMonthlyIncome">
+                <default-field title="Total Other Income Monthly">
+                    <text-line/>
+                </default-field>
+            </field>
+
+            <field name="submitButton">
+                <default-field title="Continue">
+                    <submit/>
+                </default-field>
+            </field>
+
+            <field-layout>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="applicantHeader"/>
+                        <field-ref name="personaInfoHeader"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="firstName"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="middleName"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="lastName"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="suffix"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="addressHeader"/>
+                        <field-ref name="address1"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="unitNumber"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="postalCode"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="city"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="stateProvinceGeoId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="identityHeader"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="socialSecurityNumber"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="birthDate"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idTypeEnumId"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idIssuedBy"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="idValue"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idIssueDate"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idExpiryDate"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="maritalStatusEnumId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="contactHeader"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="contactNumber"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="contactMechPurposeId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="email"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="emailVerify"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="financialHeader"/>
+                        <field-ref name="employmentHeader"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="occupation"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentTipHeader"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employerName"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="jobTitle"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="durationHeader"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="years"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="months"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employerAddress1"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="employerUnitNumber"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="employerPostalCode"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="employerCity"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employerContactNumber"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="nonEmploymentHeader"/>
+                        <field-ref name="nonEmploymentTipHeader"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="otherMonthlyIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <fields-not-referenced/>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6" style="text-right"><field-ref name="submitButton"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+            </field-layout>
+        </form-single>
+    </widgets>
+
+</screen>

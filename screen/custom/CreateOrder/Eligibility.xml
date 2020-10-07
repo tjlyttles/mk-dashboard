@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Applicant Eligibility"
+        default-menu-include="false"
+        default-menu-index="2">
+
+    <parameter name="salesChannelEnumId"/>
+    <parameter name="productStoreId"/>
+    <parameter name="salesRepresentativeId"/>
+    <parameter name="productCategoryId"/>
+    <parameter name="productId"/>
+    <parameter name="totalPurchasePrice"/>
+    <parameter name="downPayment"/>
+    <parameter name="loanFee"/>
+    <parameter name="amount"/>
+    <parameter name="estimatedAmount"/>
+
+    <transition name="createOrder">
+        <service-call name="mkdecision.dashboard.OrderServices.create#Order" in-map="context" out-map="context"/>
+        <default-response url="../Applicant">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+        </default-response>
+    </transition>
+    <transition name="cancelOrder">
+        <default-response url="../../Dashboard"/>
+    </transition>
+    
+    <actions>
+        <entity-find entity-name="mantle.product.ProductDbForm" list="formList">
+            <econdition field-name="productId"/>
+        </entity-find>
+        <set field="formId" from="formList.isEmpty() ? null : formList.getFirst().get('formId')"/>
+    </actions>
+
+    <widgets>
+        <section name="EligibilitySection">
+            <widgets>
+                <form-single name="EligibilityForm" extends="DbForm#${formId}" dynamic="true" transition="createOrder">
+                    <field name="eligibilityHeader">
+                        <default-field>
+                            <label text="New Application" type="h4" style="margin-b-1"/>
+                            <label text="Eligibility" type="h5" style="margin-tb-1"/>
+                            <label text="Please verify the applicant's eligibility." style="margin-b-1"/>
+                            <container style="h-separator margin-tb-2"/>
+                        </default-field>
+                    </field>
+
+                    <field name="formLocation"><default-field><hidden default-value="DbForm#${formId}"/></default-field></field>
+                    <field name="formId" from="formId"><default-field><hidden/></default-field></field>
+                    <field name="salesChannelEnumId"><default-field><hidden/></default-field></field>
+                    <field name="productStoreId"><default-field><hidden/></default-field></field>
+                    <field name="salesRepresentativeId"><default-field><hidden/></default-field></field>
+                    <field name="productCategoryId"><default-field><hidden/></default-field></field>
+                    <field name="productId"><default-field><hidden/></default-field></field>
+                    <field name="totalPurchasePrice"><default-field><hidden/></default-field></field>
+                    <field name="downPayment"><default-field><hidden/></default-field></field>
+                    <field name="loanFee"><default-field><hidden/></default-field></field>
+                    <field name="amount"><default-field><hidden/></default-field></field>
+                    <field name="estimatedAmount"><default-field><hidden/></default-field></field>
+
+                    <field name="cancelButton">
+                        <default-field>
+                            <link url="cancelOrder" text="Cancel"/>
+                        </default-field>
+                    </field>
+                    <field name="submitButton">
+                        <default-field title="Continue">
+                            <submit/>
+                        </default-field>
+                    </field>
+
+                    <field-layout>
+                        <field-col-row>
+                            <field-col xs="0" sm="1" md="3" lg="3"/>
+                            <field-col xs="12" sm="10" md="6" lg="6">
+                                <field-ref name="eligibilityHeader"/>
+                                <fields-not-referenced/>
+                            </field-col>
+                            <field-col xs="0" sm="1" md="3" lg="3"/>
+                        </field-col-row>
+
+                        <field-col-row>
+                            <field-col xs="0" sm="1" md="3" lg="3"/>
+                            <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="cancelButton"/></field-col>
+                            <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="submitButton"/></field-col>
+                            <field-col xs="0" sm="1" md="3" lg="3"/>
+                        </field-col-row>
+                    </field-layout>
+                </form-single>
+            </widgets>
+            <fail-widgets>
+                <label text="No eligibility form set for the select product" style="text-warn"/>
+            </fail-widgets>
+        </section>
+    </widgets>
+
+</screen>
