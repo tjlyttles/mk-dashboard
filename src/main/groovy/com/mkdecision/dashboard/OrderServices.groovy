@@ -32,11 +32,11 @@ class OrderServices {
         String salesRepresentativeId = (String) cs.getOrDefault("salesRepresentativeId", null)
         String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
         String productId = (String) cs.getOrDefault("productId", null)
-        Double totalPurchasePrice = (Double) cs.getOrDefault("totalPurchasePrice", null)
-        Double downPayment = (Double) cs.getOrDefault("downPayment", null)
-        Double loanFee = (Double) cs.getOrDefault("loanFee", null)
+        BigDecimal totalPurchasePrice = (BigDecimal) cs.getOrDefault("totalPurchasePrice", null)
+        BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
+        BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
         String amount = (String) cs.getOrDefault("amount", null)
-        Double estimatedAmount = (Double) cs.getOrDefault("estimatedAmount", null)
+        BigDecimal estimatedAmount = (BigDecimal) cs.getOrDefault("estimatedAmount", null)
 
         // validate product store
         EntityFacadeImpl efi = (EntityFacadeImpl) ef
@@ -128,12 +128,8 @@ class OrderServices {
         }
 
         // validate amount
-        Double amountDouble;
-        try {
-            amountDouble = Double.parseDouble(amount)
-        } catch (NumberFormatException e) {
-        }
-        if (amountDouble == null || amountDouble != ((totalPurchasePrice + loanFee) - downPayment)) {
+        BigDecimal amountBigDecimal = new BigDecimal(amount);
+        if (amountBigDecimal == null || amountBigDecimal != ((totalPurchasePrice + loanFee) - downPayment)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_AMOUNT"))
             return new HashMap<String, Object>()
         }
@@ -164,11 +160,11 @@ class OrderServices {
         String salesRepresentativeId = (String) cs.getOrDefault("salesRepresentativeId", null)
         String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
         String productId = (String) cs.getOrDefault("productId", null)
-        Double totalPurchasePrice = (Double) cs.getOrDefault("totalPurchasePrice", null)
-        Double downPayment = (Double) cs.getOrDefault("downPayment", null)
-        Double loanFee = (Double) cs.getOrDefault("loanFee", null)
-        Double amount = (Double) cs.getOrDefault("amount", null)
-        Double estimatedAmount = (Double) cs.getOrDefault("estimatedAmount", null)
+        BigDecimal totalPurchasePrice = (BigDecimal) cs.getOrDefault("totalPurchasePrice", null)
+        BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
+        BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
+        BigDecimal amount = (BigDecimal) cs.getOrDefault("amount", null)
+        BigDecimal estimatedAmount = (BigDecimal) cs.getOrDefault("estimatedAmount", null)
 
         // validate order fields
         sf.sync().name("mkdecision.dashboard.OrderServices.validate#OrderFields")
@@ -322,14 +318,14 @@ class OrderServices {
         String jobTitle = (String) cs.getOrDefault("jobTitle", null)
         Integer years = (Integer) cs.getOrDefault("years", null)
         Integer months = (Integer) cs.getOrDefault("months", null)
-        Double monthlyIncome = (Double) cs.getOrDefault("monthlyIncome", null)
+        BigDecimal monthlyIncome = (BigDecimal) cs.getOrDefault("monthlyIncome", null)
         String employerAddress1 = (String) cs.getOrDefault("employerAddress1", null)
         String employerUnitNumber = (String) cs.getOrDefault("employerUnitNumber", null)
         String employerPostalCode = (String) cs.getOrDefault("employerPostalCode", null)
         String employerCity = (String) cs.getOrDefault("employerCity", null)
         String employerStateProvinceGeoId = (String) cs.getOrDefault("employerStateProvinceGeoId", null)
         String employerContactNumber = (String) cs.getOrDefault("employerContactNumber", null)
-        Double otherMonthlyIncome = (Double) cs.getOrDefault("otherMonthlyIncome", null)
+        BigDecimal otherMonthlyIncome = (BigDecimal) cs.getOrDefault("otherMonthlyIncome", null)
 
         // TODO: Add validations
 
@@ -491,14 +487,14 @@ class OrderServices {
         String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String partyId = (String) cs.getOrDefault("partyId", null)
         String assetTypeEnumId = (String) cs.getOrDefault("assetTypeEnumId", null)
-        Double salvageValue = (Double) cs.getOrDefault("salvageValue", null)
-        Double acquireCost = (Double) cs.getOrDefault("acquireCost", null)
-        Double hoaFeeMonthly = (Double) cs.getOrDefault("hoaFeeMonthly", null)
-        Double propertyTaxesAnnually = (Double) cs.getOrDefault("propertyTaxesAnnually", null)
-        Double propertyInsuranceCostsAnnually = (Double) cs.getOrDefault("propertyInsuranceCostsAnnually", null)
+        BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
+        BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
+        BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
+        BigDecimal propertyTaxesAnnually = (BigDecimal) cs.getOrDefault("propertyTaxesAnnually", null)
+        BigDecimal propertyInsuranceCostsAnnually = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsAnnually", null)
         String lenderName = (String) cs.getOrDefault("lenderName", null)
-        Double mortgageBalance = (Double) cs.getOrDefault("mortgageBalance", null)
-        Double mortgagePaymentMonthly = (Double) cs.getOrDefault("mortgagePaymentMonthly", null)
+        BigDecimal mortgageBalance = (BigDecimal) cs.getOrDefault("mortgageBalance", null)
+        BigDecimal mortgagePaymentMonthly = (BigDecimal) cs.getOrDefault("mortgagePaymentMonthly", null)
 
         // TODO: Add validations
 
