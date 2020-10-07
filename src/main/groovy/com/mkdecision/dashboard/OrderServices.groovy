@@ -455,6 +455,13 @@ class OrderServices {
                 .parameter("amount", otherMonthlyIncome)
                 .call()
 
+        // update order part party
+        sf.sync().name("update#mantle.order.OrderPart")
+                .parameter("orderId", orderId)
+                .parameter("orderPartSeqId", orderPartSeqId)
+                .parameter("customerPartyId", partyId)
+                .call();
+
         // create order party
         sf.sync().name("create#mantle.order.OrderPartParty")
                 .parameter("orderId", orderId)
