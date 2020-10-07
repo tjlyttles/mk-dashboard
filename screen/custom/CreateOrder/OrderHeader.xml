@@ -188,6 +188,7 @@
                     </drop-down>
                 </default-field>
             </field>
+
             <field name="productHeader">
                 <default-field>
                     <label text="Product Details" type="h5" style="margin-tb-1"/>
@@ -262,10 +263,73 @@
             </field>
 
             <field-layout>
-                <fields-not-referenced/>
                 <field-col-row>
-                    <field-col xs="6" sm="6" md="6" lg="6"><field-ref name="cancelButton"/></field-col>
-                    <field-col xs="6" sm="6" md="6" lg="6" style="text-right"><field-ref name="submitButton"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="applicationHeader"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="salesChannelEnumId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="productStoreId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="salesRepresentativeId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="productHeader"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="productCategoryId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="productId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="totalPurchasePrice"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="downPayment"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="loanFee"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="amount"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="projectedAmount"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="cancelButton"/></field-col>
+                    <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="submitButton"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
             </field-layout>
         </form-single>

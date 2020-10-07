@@ -10,6 +10,9 @@
     <parameter name="partyId"/>
     <parameter name="assetId"/>
 
+    <transition name="openOrder">
+        <default-response url="../../Dashboard"/>
+    </transition>
     <transition name="requestAgreement">
         <default-response url="."/>
     </transition>
@@ -29,34 +32,42 @@
                     <container style="h-separator margin-tb-2"/>
                 </default-field>
             </field>
-            <field name="disclaimerHeader">
+            <field name="agreementText">
                 <default-field>
-                    <label text="Text goes here" style="margin-b-1"/>
+                    <label text="By clicking &lt;strong&gt;&quot;Request&quot;&lt;/strong&gt; below, I, the dealer salesperson submitting this credit application, represent and agree to the following:" encode="false" type="div" style="margin-b-1"/>
+                    <label text="The application information is true and correct in all respects." type="div"/>
+                    <label text="I made the applicant(s) aware they are applying for credit." type="div"/>
+                    <label text="The applicant(s) were provided with all disclosures required by applicable federal, state and local law." type="div"/>
+                    <label text="The applicant(s) acknowledge and agree to provide identity verification information to lenders." type="div"/>
+                    <label text="The applicant(s) consent to sharing credit application information to lenders." type="div"/>
+                    <label text="The applicant(s) authorize lenders to share credit application information with third parties, including credit reporting agencies and our contracting company." type="div"/>
+                    <label text="If application contains information regarding a co-applicant, both applicants have clearly expressed their intent to apply jointly for credit." type="div"/>
                 </default-field>
             </field>
 
-            <field name="openButton">
-                <default-field title="Open">
-                    <submit/>
-                </default-field>
-            </field>
-            <field name="requestButton">
+            <field name="buttons">
                 <default-field title="Request">
+                    <link url="openOrder" text="Open"/>
                     <submit/>
                 </default-field>
             </field>
 
             <field-layout>
-                <field-ref name="agreementHeader"/>
-                <field-ref name="disclaimerHeader"/>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="agreementHeader"/>
+                        <field-ref name="agreementText"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
 
                 <fields-not-referenced/>
 
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12" style="text-right">
-                        <field-ref name="openButton"/>
-                        <field-ref name="requestButton"/>
-                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6" style="text-right"><field-ref name="buttons"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
             </field-layout>
         </form-single>

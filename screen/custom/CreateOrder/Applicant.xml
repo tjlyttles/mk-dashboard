@@ -320,112 +320,199 @@
             </field>
 
             <field-layout>
-                <field-ref name="applicantHeader"/>
-                <field-ref name="personaInfoHeader"/>
                 <field-col-row>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="firstName"/></field-col>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="middleName"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="applicantHeader"/>
+                        <field-ref name="personaInfoHeader"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="lastName"/></field-col>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="suffix"/></field-col>
-                </field-col-row>
-
-                <field-ref name="addressHeader"/>
-                <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="address1"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="firstName"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="middleName"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="unitNumber"/></field-col>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="postalCode"/></field-col>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="city"/></field-col>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="stateProvinceGeoId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="lastName"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="suffix"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
 
-                <field-ref name="identityHeader"/>
                 <field-col-row>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="socialSecurityNumber"/></field-col>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="birthDate"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="addressHeader"/>
+                        <field-ref name="address1"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="idTypeEnumId"/></field-col>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="idIssuedBy"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="unitNumber"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="postalCode"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="idValue"/></field-col>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="idIssueDate"/></field-col>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="idExpiryDate"/></field-col>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="maritalStatusEnumId"/></field-col>
-                </field-col-row>
-
-                <field-ref name="contactHeader"/>
-                <field-col-row>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="contactNumber"/></field-col>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="contactMechPurposeId"/></field-col>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="email"/></field-col>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="emailVerify"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="city"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="stateProvinceGeoId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
 
-                <field-ref name="financialHeader"/>
-                <field-ref name="employmentHeader"/>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="occupation"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="identityHeader"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="socialSecurityNumber"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="birthDate"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idTypeEnumId"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idIssuedBy"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="idValue"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idIssueDate"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idExpiryDate"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="maritalStatusEnumId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
 
-                <field-ref name="employmentTipHeader"/>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employmentStatusEnumId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="contactHeader"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerName"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="contactNumber"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="contactMechPurposeId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="jobTitle"/></field-col>
-                </field-col-row>
-
-                <field-ref name="durationHeader"/>
-                <field-col-row>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="email"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="monthlyIncome"/></field-col>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
-                    <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="emailVerify"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
 
-                <field-ref name="nonEmploymentHeader"/>
-                <field-ref name="nonEmploymentTipHeader"/>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="otherMonthlyIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="financialHeader"/>
+                        <field-ref name="employmentHeader"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="occupation"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentTipHeader"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employerName"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="jobTitle"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="durationHeader"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="years"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="months"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employerAddress1"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="employerUnitNumber"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="employerPostalCode"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="employerCity"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employerContactNumber"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="nonEmploymentHeader"/>
+                        <field-ref name="nonEmploymentTipHeader"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="otherMonthlyIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
 
                 <fields-not-referenced/>
 
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12" style="text-right"><field-ref name="submitButton"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6" style="text-right"><field-ref name="submitButton"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
             </field-layout>
         </form-single>

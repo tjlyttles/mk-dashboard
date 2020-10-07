@@ -102,41 +102,73 @@
             </field>
 
             <field-layout>
-                <field-ref name="propertyHeader"/>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="assetTypeEnumId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="propertyHeader"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="salvageValue"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="assetTypeEnumId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="acquireCost"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="salvageValue"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="hoaFeeMonthly"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="acquireCost"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="propertyTaxesAnnually"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="hoaFeeMonthly"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="propertyInsuranceCostsAnnually"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="propertyTaxesAnnually"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="propertyInsuranceCostsAnnually"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
 
-                <field-ref name="mortgageHeader"/>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="lenderName"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="mortgageHeader"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="mortgageBalance"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="lenderName"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="mortgagePaymentMonthly"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="mortgageBalance"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="mortgagePaymentMonthly"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
 
                 <fields-not-referenced/>
 
                 <field-col-row>
-                    <field-col xs="12" sm="12" md="12" lg="12" style="text-right"><field-ref name="submitButton"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6" style="text-right"><field-ref name="submitButton"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
             </field-layout>
         </form-single>
