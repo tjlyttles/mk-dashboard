@@ -13,6 +13,7 @@
         <default-response url="../Property">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
         </default-response>
     </transition>
 
@@ -213,7 +214,7 @@
 
             <field name="employmentTipHeader">
                 <default-field>
-                    <label text="Please enter all employments for the past 2 years" style="margin-tb-1"/>
+                    <label text="Please enter all employments for the past 2 years." style="margin-tb-1"/>
                 </default-field>
             </field>
             <field name="employmentStatusEnumId">

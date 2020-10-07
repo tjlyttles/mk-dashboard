@@ -88,5 +88,24 @@
             <parameter name="partyId"/>
         </out-parameters>
     </service>
+    <service verb="create" noun="Property" type="java" location="com.mkdecision.dashboard.OrderServices" method="createProperty">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="assetTypeEnumId"/>
+            <parameter name="salvageValue" type="Double"/>
+            <parameter name="acquireCost" type="Double"/>
+            <parameter name="hoaFeeMonthly" type="Double"/>
+            <parameter name="propertyTaxesAnnually" type="Double"/>
+            <parameter name="propertyInsuranceCostsAnnually" type="Double"/>
+            <parameter name="lenderName"/>
+            <parameter name="mortgageBalance" type="Double"/>
+            <parameter name="mortgagePaymentMonthly" type="Double"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="assetId"/>
+        </out-parameters>
+    </service>
 
 </services>
