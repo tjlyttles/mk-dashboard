@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Agreement"
+        default-menu-include="false"
+        default-menu-index="5">
+
+    <parameter name="orderId"/>
+    <parameter name="orderPartSeqId"/>
+    <parameter name="partyId"/>
+    <parameter name="assetId"/>
+
+    <transition name="requestAgreement">
+        <default-response url="."/>
+    </transition>
+
+    <widgets>
+        <form-single name="AgreementForm" transition="requestAgreement">
+            <field name="orderId"><default-field><hidden/></default-field></field>
+            <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
+            <field name="partyId"><default-field><hidden/></default-field></field>
+            <field name="assetId"><default-field><hidden/></default-field></field>
+
+            <field name="agreementHeader">
+                <default-field>
+                    <label text="New Application" type="h4" style="margin-b-1"/>
+                    <label text="Agreements" type="h5" style="margin-b-1"/>
+                    <label text="Please read the disclosures below." style="margin-b-1"/>
+                    <container style="h-separator margin-tb-2"/>
+                </default-field>
+            </field>
+            <field name="disclaimerHeader">
+                <default-field>
+                    <label text="Text goes here" style="margin-b-1"/>
+                </default-field>
+            </field>
+
+            <field name="openButton">
+                <default-field title="Open">
+                    <submit/>
+                </default-field>
+            </field>
+            <field name="requestButton">
+                <default-field title="Request">
+                    <submit/>
+                </default-field>
+            </field>
+
+            <field-layout>
+                <field-ref name="agreementHeader"/>
+                <field-ref name="disclaimerHeader"/>
+
+                <fields-not-referenced/>
+
+                <field-col-row>
+                    <field-col xs="12" sm="12" md="12" lg="12" style="text-right">
+                        <field-ref name="openButton"/>
+                        <field-ref name="requestButton"/>
+                    </field-col>
+                </field-col-row>
+            </field-layout>
+        </form-single>
+    </widgets>
+
+</screen>
