@@ -266,7 +266,7 @@ class OrderServices {
 
         // create projected payment
         sf.sync().name("create#mantle.product.ProductParameterValue")
-                .parameter("productParameterId", "ProjectedPayment")
+                .parameter("productParameterId", "EstimatedPayment")
                 .parameter("productParameterSetId", productParameterSetId)
                 .parameter("parameterValue", estimatedAmount)
                 .call()
