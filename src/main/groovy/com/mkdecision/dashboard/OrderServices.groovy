@@ -116,13 +116,13 @@ class OrderServices {
         }
 
         // validate down payment
-        if (downPayment == null || downPayment <= 0 || downPayment > totalPurchasePrice) {
+        if (downPayment == null || downPayment < 0 || downPayment > totalPurchasePrice) {
             mf.addError(lf.localize("DASHBOARD_INVALID_DOWN_PAYMENT"))
             return new HashMap<String, Object>()
         }
 
         // validate loan fee
-        if (loanFee == null || loanFee <= 0) {
+        if (loanFee == null || loanFee < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_LOAN_FEE"))
             return new HashMap<String, Object>()
         }
