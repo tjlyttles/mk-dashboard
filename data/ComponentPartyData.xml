@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed">
+
+    <!-- Role types -->
+    <mantle.party.RoleType roleTypeId="Lender" description="Lender"/>
+    <mantle.party.RoleType roleTypeId="Borrower" description="Borrower"/>
+
+    <!-- Marital statuses -->
+    <moqui.basic.Enumeration enumId="MarsSingle" sequenceNum="1"/>
+    <moqui.basic.Enumeration enumId="MarsMarried" sequenceNum="2"/>
+    <moqui.basic.Enumeration enumId="MarsRegisteredPartnership" sequenceNum="3"/>
+    <moqui.basic.Enumeration enumId="MarsWidow" sequenceNum="4"/>
+    <moqui.basic.Enumeration enumId="MarsSeparated" sequenceNum="5"/>
+    <moqui.basic.Enumeration enumId="MarsDivorced" sequenceNum="6"/>
+
+</entity-facade-xml>
