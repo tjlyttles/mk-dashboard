@@ -39,6 +39,7 @@
                         <entity-options text="${description}" key="${enumId}">
                             <entity-find entity-name="moqui.basic.Enumeration">
                                 <econdition field-name="enumTypeId" value="AssetType"/>
+                                <order-by field-name="sequenceNum,description"/>
                             </entity-find>
                         </entity-options>
                     </drop-down>
