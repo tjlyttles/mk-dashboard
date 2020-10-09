@@ -72,7 +72,7 @@
 
             <field name="mortgageHeader">
                 <default-field>
-                    <label text="Identity Information" type="h5" style="margin-tb-1"/>
+                    <label text="Mortgage" type="h5" style="margin-tb-1"/>
                     <label text="Please enter mortgage information to continue." style="margin-tb-1"/>
                     <container style="h-separator margin-tb-1"/>
                 </default-field>
