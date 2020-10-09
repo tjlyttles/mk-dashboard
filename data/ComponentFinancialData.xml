@@ -13,4 +13,8 @@
     <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowAnnualPropertyTaxes" description="Annual Property Taxes"/>
     <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowHoaMonthlyFee" description="HOA Monthly Fee"/>
 
+    <!-- Role types -->
+    <mantle.party.RoleType roleTypeId="Lender" description="Lender"/>
+    <mantle.party.RoleType roleTypeId="Borrower" description="Borrower"/>
+
 </entity-facade-xml>
