@@ -13,4 +13,12 @@
     <moqui.basic.Enumeration enumId="MarsSeparated" sequenceNum="5"/>
     <moqui.basic.Enumeration enumId="MarsDivorced" sequenceNum="6"/>
 
+    <!-- Asset classes -->
+    <moqui.basic.Enumeration enumTypeId="AssetClass" enumId="AsClsProperty" description="Property"/>
+    <moqui.basic.Enumeration enumTypeId="AssetClass" parentEnumId="AsClsProperty" enumId="AsClsPropertySingle" description="Single family, detached" sequenceNum="1"/>
+    <moqui.basic.Enumeration enumTypeId="AssetClass" parentEnumId="AsClsProperty" enumId="AsClsPropertyTown" description="Townhome" sequenceNum="2"/>
+    <moqui.basic.Enumeration enumTypeId="AssetClass" parentEnumId="AsClsProperty" enumId="AsClsPropertyUnit" description="2-unit" sequenceNum="3"/>
+    <moqui.basic.Enumeration enumTypeId="AssetClass" parentEnumId="AsClsProperty" enumId="AsClsPropertyCondo" description="Condo" sequenceNum="4"/>
+    <moqui.basic.Enumeration enumTypeId="AssetClass" parentEnumId="AsClsProperty" enumId="AsClsPropertyOther" description="Other" sequenceNum="5"/>
+
 </entity-facade-xml>

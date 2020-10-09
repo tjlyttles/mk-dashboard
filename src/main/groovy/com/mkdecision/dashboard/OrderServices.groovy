@@ -486,7 +486,7 @@ class OrderServices {
         String orderId = (String) cs.getOrDefault("orderId", null)
         String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String partyId = (String) cs.getOrDefault("partyId", null)
-        String assetTypeEnumId = (String) cs.getOrDefault("assetTypeEnumId", null)
+        String assetClassEnumId = (String) cs.getOrDefault("assetClassEnumId", null)
         BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
         BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
         BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
@@ -500,7 +500,8 @@ class OrderServices {
 
         // create asset
         Map<String, Object> assetResp = sf.sync().name("create#mantle.product.asset.Asset")
-                .parameter("assetTypeEnumId", assetTypeEnumId)
+                .parameter("assetTypeEnumId", "AstTpRealEstate")
+                .parameter("assetClassEnumId", assetClassEnumId)
                 .parameter("salvageValue", salvageValue)
                 .parameter("acquireCost", acquireCost)
                 .parameter("ownerPartyId", partyId)
