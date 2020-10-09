@@ -226,14 +226,14 @@
             </field>
             <field name="loanFee">
                 <default-field>
-                    <display dynamic-transition="calculateLoanFee" depends-optional="true">
+                    <display dynamic-transition="calculateLoanFee" depends-optional="true" style="bg-grey-1">
                         <depends-on field="productId"/>
                     </display>
                 </default-field>
             </field>
             <field name="amount">
                 <default-field>
-                    <display dynamic-transition="calculateOrderAmount" depends-optional="true">
+                    <display dynamic-transition="calculateOrderAmount" depends-optional="true" style="bg-grey-1">
                         <depends-on field="totalPurchasePrice"/>
                         <depends-on field="downPayment"/>
                         <depends-on field="loanFee"/>
@@ -242,7 +242,7 @@
             </field>
             <field name="estimatedAmount">
                 <default-field>
-                    <display dynamic-transition="calculateEstimatedPayment" depends-optional="true">
+                    <display dynamic-transition="calculateEstimatedPayment" depends-optional="true" style="bg-grey-1">
                         <depends-on field="productId"/>
                         <depends-on field="totalPurchasePrice"/>
                         <depends-on field="downPayment"/>
