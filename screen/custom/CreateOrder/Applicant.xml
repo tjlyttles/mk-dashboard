@@ -109,7 +109,7 @@
             </field>
             <field name="birthDate">
                 <default-field title="Date of Birth">
-                    <date-time type="date" size="200"/>
+                    <date-time type="date" size="200" format="MM-DD-YYYY"/>
                 </default-field>
             </field>
             <field name="idTypeEnumId">
@@ -143,12 +143,12 @@
             </field>
             <field name="idIssueDate">
                 <default-field title="Issue Date (Optional)">
-                    <date-time type="date" size="200"/>
+                    <date-time type="date" size="200" format="MM-DD-YYYY"/>
                 </default-field>
             </field>
             <field name="idExpiryDate">
                 <default-field title="Expiration Date (Optional)">
-                    <date-time type="date" size="200"/>
+                    <date-time type="date" size="200" format="MM-DD-YYYY"/>
                 </default-field>
             </field>
             <field name="maritalStatusEnumId">
