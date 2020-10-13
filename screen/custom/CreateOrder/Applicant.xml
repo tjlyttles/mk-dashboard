@@ -109,7 +109,7 @@
             </field>
             <field name="birthDate">
                 <default-field title="Date of Birth">
-                    <date-time type="date" size="200"/>
+                    <date-time type="date" size="200" format="MM-DD-YYYY"/>
                 </default-field>
             </field>
             <field name="idTypeEnumId">
@@ -118,6 +118,7 @@
                         <entity-options text="${description}" key="${enumId}">
                             <entity-find entity-name="moqui.basic.Enumeration">
                                 <econdition field-name="enumTypeId" value="PartyIdType"/>
+                                <order-by field-name="sequenceNum,description"/>
                             </entity-find>
                         </entity-options>
                     </drop-down>
@@ -142,12 +143,12 @@
             </field>
             <field name="idIssueDate">
                 <default-field title="Issue Date (Optional)">
-                    <date-time type="date" size="200"/>
+                    <date-time type="date" size="200" format="MM-DD-YYYY"/>
                 </default-field>
             </field>
             <field name="idExpiryDate">
                 <default-field title="Expiration Date (Optional)">
-                    <date-time type="date" size="200"/>
+                    <date-time type="date" size="200" format="MM-DD-YYYY"/>
                 </default-field>
             </field>
             <field name="maritalStatusEnumId">
@@ -156,6 +157,7 @@
                         <entity-options text="${description}" key="${enumId}">
                             <entity-find entity-name="moqui.basic.Enumeration">
                                 <econdition field-name="enumTypeId" value="MaritalStatus"/>
+                                <order-by field-name="sequenceNum,description"/>
                             </entity-find>
                         </entity-options>
                     </drop-down>
@@ -223,6 +225,7 @@
                         <entity-options text="${description}" key="${enumId}">
                             <entity-find entity-name="moqui.basic.Enumeration">
                                 <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                <order-by field-name="sequenceNum,description"/>
                             </entity-find>
                         </entity-options>
                     </drop-down>

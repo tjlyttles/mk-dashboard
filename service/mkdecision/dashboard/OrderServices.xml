@@ -93,7 +93,7 @@
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
             <parameter name="partyId"/>
-            <parameter name="assetTypeEnumId"/>
+            <parameter name="assetClassEnumId"/>
             <parameter name="salvageValue" type="BigDecimal"/>
             <parameter name="acquireCost" type="BigDecimal"/>
             <parameter name="hoaFeeMonthly" type="BigDecimal"/>

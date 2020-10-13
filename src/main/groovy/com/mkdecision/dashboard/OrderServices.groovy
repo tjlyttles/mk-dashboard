@@ -116,13 +116,13 @@ class OrderServices {
         }
 
         // validate down payment
-        if (downPayment == null || downPayment <= 0 || downPayment > totalPurchasePrice) {
+        if (downPayment == null || downPayment < 0 || downPayment > totalPurchasePrice) {
             mf.addError(lf.localize("DASHBOARD_INVALID_DOWN_PAYMENT"))
             return new HashMap<String, Object>()
         }
 
         // validate loan fee
-        if (loanFee == null || loanFee <= 0) {
+        if (loanFee == null || loanFee < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_LOAN_FEE"))
             return new HashMap<String, Object>()
         }
@@ -486,7 +486,7 @@ class OrderServices {
         String orderId = (String) cs.getOrDefault("orderId", null)
         String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String partyId = (String) cs.getOrDefault("partyId", null)
-        String assetTypeEnumId = (String) cs.getOrDefault("assetTypeEnumId", null)
+        String assetClassEnumId = (String) cs.getOrDefault("assetClassEnumId", null)
         BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
         BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
         BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
@@ -500,7 +500,8 @@ class OrderServices {
 
         // create asset
         Map<String, Object> assetResp = sf.sync().name("create#mantle.product.asset.Asset")
-                .parameter("assetTypeEnumId", assetTypeEnumId)
+                .parameter("assetTypeEnumId", "AstTpRealEstate")
+                .parameter("assetClassEnumId", assetClassEnumId)
                 .parameter("salvageValue", salvageValue)
                 .parameter("acquireCost", acquireCost)
                 .parameter("ownerPartyId", partyId)
@@ -546,9 +547,9 @@ class OrderServices {
         Map<String, Object> lenderRelationshipResp = sf.sync().name("create#mantle.party.PartyRelationship")
                 .parameter("relationshipTypeEnumId", "PrtEmployee")
                 .parameter("fromPartyId", partyId)
-                .parameter("fromRoleTypeId", "Employee")
+                .parameter("fromRoleTypeId", "Borrower")
                 .parameter("toPartyId", lenderPartyId)
-                .parameter("toRoleTypeId", "OrgEmployer")
+                .parameter("toRoleTypeId", "Lender")
                 .parameter("fromDate", uf.getNowTimestamp())
                 .call()
         String lenderRelationshipId = lenderRelationshipResp.get("partyRelationshipId")

@@ -33,12 +33,14 @@
                     <container style="h-separator margin-tb-2"/>
                 </default-field>
             </field>
-            <field name="assetTypeEnumId">
+            <field name="assetClassEnumId">
                 <default-field title="Property Type">
                     <drop-down allow-empty="true">
                         <entity-options text="${description}" key="${enumId}">
                             <entity-find entity-name="moqui.basic.Enumeration">
-                                <econdition field-name="enumTypeId" value="AssetType"/>
+                                <econdition field-name="enumTypeId" value="AssetClass"/>
+                                <econdition field-name="parentEnumId" value="AsClsProperty"/>
+                                <order-by field-name="sequenceNum,description"/>
                             </entity-find>
                         </entity-options>
                     </drop-down>
@@ -72,7 +74,7 @@
 
             <field name="mortgageHeader">
                 <default-field>
-                    <label text="Identity Information" type="h5" style="margin-tb-1"/>
+                    <label text="Mortgage" type="h5" style="margin-tb-1"/>
                     <label text="Please enter mortgage information to continue." style="margin-tb-1"/>
                     <container style="h-separator margin-tb-1"/>
                 </default-field>
@@ -111,7 +113,7 @@
                 </field-col-row>
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="assetTypeEnumId"/></field-col>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="assetClassEnumId"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>

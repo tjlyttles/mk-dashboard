@@ -36,6 +36,9 @@
 
     <widgets>
         <section name="EligibilitySection">
+            <condition>
+                <expression>formId != null</expression>
+            </condition>
             <widgets>
                 <form-single name="EligibilityForm" extends="DbForm#${formId}" dynamic="true" transition="createOrder">
                     <field name="eligibilityHeader">
@@ -91,7 +94,44 @@
                 </form-single>
             </widgets>
             <fail-widgets>
-                <label text="No eligibility form set for the select product" style="text-warn"/>
+                <form-single name="NoEligibilityForm">
+                    <field name="eligibilityHeader">
+                        <default-field>
+                            <label text="New Application" type="h4" style="margin-b-1"/>
+                            <label text="Eligibility" type="h5" style="margin-tb-1"/>
+                            <label text="Please verify the applicant's eligibility." style="margin-b-1"/>
+                            <container style="h-separator margin-tb-2"/>
+                        </default-field>
+                    </field>
+                    <field name="errorField">
+                        <default-field>
+                            <label text="No eligibility form set for the select product." style="text-red margin-b-1"/>
+                        </default-field>
+                    </field>
+
+                    <field name="cancelButton">
+                        <default-field>
+                            <link url="cancelOrder" text="Cancel"/>
+                        </default-field>
+                    </field>
+
+                    <field-layout>
+                        <field-col-row>
+                            <field-col xs="0" sm="1" md="3" lg="3"/>
+                            <field-col xs="12" sm="10" md="6" lg="6">
+                                <field-ref name="eligibilityHeader"/>
+                                <fields-not-referenced/>
+                            </field-col>
+                            <field-col xs="0" sm="1" md="3" lg="3"/>
+                        </field-col-row>
+
+                        <field-col-row>
+                            <field-col xs="0" sm="1" md="3" lg="3"/>
+                            <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="cancelButton"/></field-col>
+                            <field-col xs="0" sm="1" md="3" lg="3"/>
+                        </field-col-row>
+                    </field-layout>
+                </form-single>
             </fail-widgets>
         </section>
     </widgets>
