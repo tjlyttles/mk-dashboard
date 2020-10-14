@@ -16,6 +16,47 @@
             <parameter name="estimatedAmount" type="BigDecimal"/>
         </in-parameters>
     </service>
+    <service verb="validate" noun="PrimaryApplicantFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validatePrimaryApplicantFields">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="firstName"/>
+            <parameter name="middleName"/>
+            <parameter name="lastName"/>
+            <parameter name="suffix"/>
+            <parameter name="address1"/>
+            <parameter name="unitNumber"/>
+            <parameter name="postalCode"/>
+            <parameter name="city"/>
+            <parameter name="stateProvinceGeoId"/>
+            <parameter name="socialSecurityNumber"/>
+            <parameter name="birthDate"/>
+            <parameter name="idTypeEnumId"/>
+            <parameter name="idIssuedBy"/>
+            <parameter name="idValue"/>
+            <parameter name="idIssueDate"/>
+            <parameter name="idExpiryDate"/>
+            <parameter name="maritalStatusEnumId"/>
+            <parameter name="contactNumber"/>
+            <parameter name="contactMechPurposeId"/>
+            <parameter name="email"/>
+            <parameter name="emailVerify"/>
+            <parameter name="occupation"/>
+            <parameter name="employmentStatusEnumId"/>
+            <parameter name="employerName"/>
+            <parameter name="jobTitle"/>
+            <parameter name="years" type="Integer"/>
+            <parameter name="months" type="Integer"/>
+            <parameter name="monthlyIncome" type="BigDecimal"/>
+            <parameter name="employerAddress1"/>
+            <parameter name="employerUnitNumber"/>
+            <parameter name="employerPostalCode"/>
+            <parameter name="employerCity"/>
+            <parameter name="employerStateProvinceGeoId"/>
+            <parameter name="employerContactNumber"/>
+            <parameter name="otherMonthlyIncome" type="BigDecimal"/>
+        </in-parameters>
+    </service>
     <service verb="create" noun="Order" type="java" location="com.mkdecision.dashboard.OrderServices" method="createOrder">
         <in-parameters>
             <parameter name="salesChannelEnumId"/>

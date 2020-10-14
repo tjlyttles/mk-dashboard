@@ -15,6 +15,9 @@ import org.moqui.impl.entity.EntityFacadeImpl
 import org.moqui.service.ServiceFacade
 import org.moqui.util.ContextStack
 
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+
 class OrderServices {
 
     static Map<String, Object> validateOrderFields(ExecutionContext ec) {
@@ -149,6 +152,121 @@ class OrderServices {
         return new HashMap<>()
     }
 
+    static Map<String, Object> validatePrimaryApplicantFields(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String firstName = (String) cs.getOrDefault("firstName", null)
+        String middleName = (String) cs.getOrDefault("middleName", null)
+        String lastName = (String) cs.getOrDefault("lastName", null)
+        String suffix = (String) cs.getOrDefault("suffix", null)
+        String address1 = (String) cs.getOrDefault("address1", null)
+        String unitNumber = (String) cs.getOrDefault("unitNumber", null)
+        String postalCode = (String) cs.getOrDefault("postalCode", null)
+        String city = (String) cs.getOrDefault("city", null)
+        String stateProvinceGeoId = (String) cs.getOrDefault("stateProvinceGeoId", null)
+        String socialSecurityNumber = (String) cs.getOrDefault("socialSecurityNumber", null)
+        String birthDate = (String) cs.getOrDefault("birthDate", null)
+        String idTypeEnumId = (String) cs.getOrDefault("idTypeEnumId", null)
+        String idIssuedBy = (String) cs.getOrDefault("idIssuedBy", null)
+        String idValue = (String) cs.getOrDefault("idValue", null)
+        String idIssueDate = (String) cs.getOrDefault("idIssueDate", null)
+        String idExpiryDate = (String) cs.getOrDefault("idExpiryDate", null)
+        String maritalStatusEnumId = (String) cs.getOrDefault("maritalStatusEnumId", null)
+        String contactNumber = (String) cs.getOrDefault("contactNumber", null)
+        String contactMechPurposeId = (String) cs.getOrDefault("contactMechPurposeId", null)
+        String email = (String) cs.getOrDefault("email", null)
+        String emailVerify = (String) cs.getOrDefault("emailVerify", null)
+        String occupation = (String) cs.getOrDefault("occupation", null)
+        String employmentStatusEnumId = (String) cs.getOrDefault("employmentStatusEnumId", null)
+        String employerName = (String) cs.getOrDefault("employerName", null)
+        String jobTitle = (String) cs.getOrDefault("jobTitle", null)
+        Integer years = (Integer) cs.getOrDefault("years", null)
+        Integer months = (Integer) cs.getOrDefault("months", null)
+        BigDecimal monthlyIncome = (BigDecimal) cs.getOrDefault("monthlyIncome", null)
+        String employerAddress1 = (String) cs.getOrDefault("employerAddress1", null)
+        String employerUnitNumber = (String) cs.getOrDefault("employerUnitNumber", null)
+        String employerPostalCode = (String) cs.getOrDefault("employerPostalCode", null)
+        String employerCity = (String) cs.getOrDefault("employerCity", null)
+        String employerStateProvinceGeoId = (String) cs.getOrDefault("employerStateProvinceGeoId", null)
+        String employerContactNumber = (String) cs.getOrDefault("employerContactNumber", null)
+        BigDecimal otherMonthlyIncome = (BigDecimal) cs.getOrDefault("otherMonthlyIncome", null)
+
+        // validate first name
+        if (StringUtils.isBlank(firstName)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_FIRST_NAME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate last name
+        if (StringUtils.isBlank(lastName)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_LAST_NAME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate residential address
+        if (StringUtils.isBlank(address1)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_RESIDENCE_ADDR"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate city
+        if (StringUtils.isBlank(city)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_CITY"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate postal code
+        if (StringUtils.isBlank(postalCode)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_POSTAL_CODE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate social security number
+        if (StringUtils.isBlank(socialSecurityNumber)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_SSN"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate date of birth
+        Date dob = lf.parseDate(birthDate, "MM-dd-yyyy")
+        Date minDob = DateUtils.addYears(new Date(), -18)
+        if (dob == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_DOB"))
+            return new HashMap<String, Object>()
+        } else if (dob.after(minDob)) {
+            mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate contact number
+        if (StringUtils.isBlank(contactNumber)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PHONE_NUMBER"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate email address
+        if (StringUtils.isBlank(email)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL"))
+            return new HashMap<String, Object>()
+        } else if(!StringUtils.equals(email, emailVerify)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL_VERIFY"))
+            return new HashMap<String, Object>()
+        }
+
+        // return the output parameters
+        return new HashMap<>()
+    }
+
     static Map<String, Object> createOrder(ExecutionContext ec) {
 
         // shortcuts for convenience
@@ -171,7 +289,7 @@ class OrderServices {
         BigDecimal amount = (BigDecimal) cs.getOrDefault("amount", null)
         BigDecimal estimatedAmount = (BigDecimal) cs.getOrDefault("estimatedAmount", null)
 
-        // validate order fields
+        // validate fields
         sf.sync().name("mkdecision.dashboard.OrderServices.validate#OrderFields")
                 .parameters(cs)
                 .call();
@@ -332,7 +450,13 @@ class OrderServices {
         String employerContactNumber = (String) cs.getOrDefault("employerContactNumber", null)
         BigDecimal otherMonthlyIncome = (BigDecimal) cs.getOrDefault("otherMonthlyIncome", null)
 
-        // TODO: Add validations
+        // validate fields
+        sf.sync().name("mkdecision.dashboard.OrderServices.validate#PrimaryApplicantFields")
+                .parameters(cs)
+                .call();
+        if (mf.hasError()) {
+            return new HashMap<String, Object>();
+        }
 
         // create person
         Map<String, Object> personResp = sf.sync().name("mantle.party.PartyServices.create#Person")
@@ -341,7 +465,7 @@ class OrderServices {
                 .parameter("middleName", middleName)
                 .parameter("lastName", lastName)
                 .parameter("suffix", suffix)
-                .parameter("birthDate", lf.parseDate(birthDate, null))
+                .parameter("birthDate", lf.parseDate(birthDate, "MM-dd-yyyy"))
                 .parameter("maritalStatusEnumId", maritalStatusEnumId)
                 .parameter("employmentStatusEnumId", employmentStatusEnumId)
                 .parameter("occupation", occupation)
@@ -387,8 +511,8 @@ class OrderServices {
                     .parameter("partyIdTypeEnumId", idTypeEnumId)
                     .parameter("idValue", idValue)
                     .parameter("issuedBy", idIssuedBy)
-                    .parameter("issueDate", lf.parseDate(idIssueDate, null))
-                    .parameter("expireDate", lf.parseDate(idExpiryDate, null))
+                    .parameter("issueDate", lf.parseDate(idIssueDate, "MM-dd-yyyy"))
+                    .parameter("expireDate", lf.parseDate(idExpiryDate, "MM-dd-yyyy"))
                     .call()
         }
 
