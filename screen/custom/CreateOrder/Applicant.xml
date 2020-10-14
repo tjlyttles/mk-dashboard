@@ -181,6 +181,7 @@
                         <entity-options text="${description}" key="${contactMechPurposeId}">
                             <entity-find entity-name="mantle.party.contact.ContactMechPurpose">
                                 <econdition field-name="contactMechTypeEnumId" value="CmtTelecomNumber"/>
+                                <econdition field-name="contactMechPurposeId" operator="in" from="['PhoneHome', 'PhoneMobile', 'PhoneWork']"/>
                             </entity-find>
                         </entity-options>
                     </drop-down>
