@@ -58,9 +58,14 @@ class OrderServices {
         }
 
         // validate sales representative
-        boolean isFinanceManager = uf.getUserGroupIdSet().contains("FinanceManager")
         String userPartyId = uf.getUserAccount().getString("partyId")
-        if (isFinanceManager) {
+        long financeManagerCount = ef.find("mantle.product.store.ProductStoreParty")
+                .condition("productStoreId", productStoreId)
+                .condition("partyId", userPartyId)
+                .condition("roleTypeId", "FinanceManager")
+                .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
+                .count()
+        if (financeManagerCount > 0) {
             long salesRepCount = ef.find("mantle.product.store.ProductStoreParty")
                     .condition("productStoreId", productStoreId)
                     .condition("partyId", salesRepresentativeId)
