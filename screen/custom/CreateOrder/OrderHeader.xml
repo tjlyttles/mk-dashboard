@@ -160,6 +160,7 @@
                         <entity-options key="${enumId}" text="${description}">
                             <entity-find entity-name="moqui.basic.EnumAndGroup">
                                 <econdition field-name="enumGroupEnumId" value="RequestChannelTypes"/>
+                                <econdition field-name="enumId" value="ScPos"/>
                                 <order-by field-name="description"/>
                             </entity-find>
                         </entity-options>

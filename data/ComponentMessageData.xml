@@ -11,7 +11,17 @@
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_AMOUNT" locale="en" localized="Invalid amount."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ESTIMATED_AMOUNT" locale="en" localized="Invalid estimated amount."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ELIGIBILITY_FORM" locale="en" localized="No eligibility form setup for the selected product."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_FIRST_NAME" locale="en" localized="Invalid first name."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_LAST_NAME" locale="en" localized="Invalid last name."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_RESIDENCE_ADDR" locale="en" localized="Invalid residential address."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_CITY" locale="en" localized="Invalid city."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_POSTAL_CODE" locale="en" localized="Invalid postal code."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_SSN" locale="en" localized="Invalid social security number."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_DOB" locale="en" localized="Invalid date of birth."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PHONE_NUMBER" locale="en" localized="Invalid phone number."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMAIL" locale="en" localized="Invalid email address."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMAIL_VERIFY" locale="en" localized="Invalid email address verification."/>
 
     <moqui.basic.LocalizedMessage original="DASHBOARD_APPLICANT_NOT_ELIGIBLE" locale="en" localized="Applicant is not eligible to place an order."/>
-    
+
 </entity-facade-xml>

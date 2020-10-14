@@ -116,8 +116,8 @@
                 <default-field title="ID Type (Optional)">
                     <drop-down allow-empty="true">
                         <entity-options text="${description}" key="${enumId}">
-                            <entity-find entity-name="moqui.basic.Enumeration">
-                                <econdition field-name="enumTypeId" value="PartyIdType"/>
+                            <entity-find entity-name="moqui.basic.EnumAndGroup">
+                                <econdition field-name="enumGroupEnumId" value="DefaultDashboardIdGroup"/>
                                 <order-by field-name="sequenceNum,description"/>
                             </entity-find>
                         </entity-options>
@@ -181,6 +181,7 @@
                         <entity-options text="${description}" key="${contactMechPurposeId}">
                             <entity-find entity-name="mantle.party.contact.ContactMechPurpose">
                                 <econdition field-name="contactMechTypeEnumId" value="CmtTelecomNumber"/>
+                                <econdition field-name="contactMechPurposeId" operator="in" from="['PhoneHome', 'PhoneMobile', 'PhoneWork']"/>
                             </entity-find>
                         </entity-options>
                     </drop-down>
