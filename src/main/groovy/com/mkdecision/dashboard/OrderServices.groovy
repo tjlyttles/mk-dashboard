@@ -689,6 +689,7 @@ class OrderServices {
                 .parameter("entryTypeEnumId", "MkEntryExpense")
                 .parameter("financialFlowTypeEnumId", "MkFinFlowMortgage")
                 .parameter("partyRelationshipId", lenderRelationshipId)
+                .parameter("balance", mortgageBalance)
                 .parameter("amount", mortgagePaymentMonthly)
                 .call()
 
