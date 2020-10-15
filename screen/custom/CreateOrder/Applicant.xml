@@ -104,7 +104,7 @@
             </field>
             <field name="socialSecurityNumber">
                 <default-field>
-                    <text-line/>
+                    <text-line mask="###-##-####"/>
                 </default-field>
             </field>
             <field name="birthDate">

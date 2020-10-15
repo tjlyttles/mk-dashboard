@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
 
     <service verb="validate" noun="OrderFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateOrderFields">
         <in-parameters>
@@ -12,7 +11,7 @@
             <parameter name="totalPurchasePrice" type="BigDecimal"/>
             <parameter name="downPayment" type="BigDecimal"/>
             <parameter name="loanFee" type="BigDecimal"/>
-            <parameter name="amount"/>
+            <parameter name="amount" type="BigDecimal"/>
             <parameter name="estimatedAmount" type="BigDecimal"/>
         </in-parameters>
     </service>
@@ -89,17 +88,17 @@
         <in-parameters>
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
-            <parameter name="firstName"/>
-            <parameter name="middleName"/>
-            <parameter name="lastName"/>
+            <parameter name="firstName"><matches regexp="^[- A-Za-z']+$" message="Please enter a first name."/></parameter>
+            <parameter name="middleName"><matches regexp="^[- A-Za-z']+$" message="Please enter a middle initial using only letters."/></parameter>
+            <parameter name="lastName"><matches regexp="^[- A-Za-z']+$" message="Please enter a last name."/></parameter>
             <parameter name="suffix"/>
-            <parameter name="address1"/>
+            <parameter name="address1"><matches regexp="^[- #a-zA-Z0-9.]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, and - or #."/></parameter>
             <parameter name="unitNumber"/>
-            <parameter name="postalCode"/>
-            <parameter name="city"/>
+            <parameter name="postalCode"><matches regexp="\d{5}" message="Please enter a valid ZIP code."/></parameter>
+            <parameter name="city"><matches regexp="^[- A-Za-z'.]+$" message="Please enter a city using only letters, spaces, periods, apostrophes or hyphens."/></parameter>
             <parameter name="stateProvinceGeoId"/>
-            <parameter name="socialSecurityNumber"/>
-            <parameter name="birthDate"/>
+            <parameter name="socialSecurityNumber"><matches regexp="^\d{3}-\d{2}-\d{4}$" message="Please enter a valid social security number."/></parameter>
+            <parameter name="birthDate" type="Date"/>
             <parameter name="idTypeEnumId"/>
             <parameter name="idIssuedBy"/>
             <parameter name="idValue"/>
@@ -108,7 +107,7 @@
             <parameter name="maritalStatusEnumId"/>
             <parameter name="contactNumber"/>
             <parameter name="contactMechPurposeId"/>
-            <parameter name="email"/>
+            <parameter name="email"><text-email/></parameter>
             <parameter name="emailVerify"/>
             <parameter name="occupation"/>
             <parameter name="employmentStatusEnumId"/>
