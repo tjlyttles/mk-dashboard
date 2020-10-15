@@ -630,7 +630,7 @@ class OrderServices {
         // create asset
         Map<String, Object> assetResp = sf.sync().name("create#mantle.product.asset.Asset")
                 .parameter("assetTypeEnumId", "AstTpRealEstate")
-                .parameter("assetClassEnumId", assetClassEnumId)
+                .parameter("classEnumId", assetClassEnumId)
                 .parameter("salvageValue", salvageValue)
                 .parameter("acquireCost", acquireCost)
                 .parameter("ownerPartyId", partyId)
