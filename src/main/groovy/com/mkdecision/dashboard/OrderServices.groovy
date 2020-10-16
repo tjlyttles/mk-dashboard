@@ -340,12 +340,20 @@ class OrderServices {
         String productParameterSetId = (String) productParameterSetResp.get("productParameterSetId")
 
         // create order item
-        sf.sync().name("mantle.order.OrderServices.create#OrderItem")
+        Map<String, Object> orderItemResp = sf.sync().name("mantle.order.OrderServices.create#OrderItem")
                 .parameter("orderId", orderId)
                 .parameter("orderPartSeqId", orderPartSeqId)
                 .parameter("productId", productId)
                 .parameter("productParameterSetId", productParameterSetId)
                 .parameter("unitAmount", amount)
+                .call()
+        String orderItemSeqId = (String) orderItemResp.get("orderItemSeqId")
+
+        // create order item form response
+        sf.sync().name("create#mantle.order.OrderItemFormResponse")
+                .parameter("orderId", orderId)
+                .parameter("orderItemSeqId", orderItemSeqId)
+                .parameter("formResponseId", formResponseId)
                 .call()
 
         // create product category
