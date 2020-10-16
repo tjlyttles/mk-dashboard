@@ -19,6 +19,14 @@
         </default-response>
     </transition>
 
+    <actions>
+        <entity-find entity-name="mantle.party.PartyToAndRelationship" list="mortgageList">
+            <econdition field-name="fromPartyId" from="partyId"/>
+            <econdition field-name="fromPartyId" from="partyId"/>
+            <econdition field-name="fromRoleTypeId" from="Borrower"/>
+        </entity-find>
+    </actions>
+
     <widgets>
         <form-single name="PropertyForm" transition="createProperty">
             <field name="orderId"><default-field><hidden/></default-field></field>
@@ -96,6 +104,15 @@
                 </default-field>
             </field>
 
+            <field name="fff">
+                <default-field>
+                    <section-iterate name="f" list="f" entry="f">
+                        <widgets>
+
+                        </widgets>
+                    </section-iterate>
+                </default-field>
+            </field>
 
             <field name="submitButton">
                 <default-field title="Continue">

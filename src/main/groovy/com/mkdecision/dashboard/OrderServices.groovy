@@ -718,7 +718,7 @@ class OrderServices {
 
         // create lender relation
         Map<String, Object> lenderRelationshipResp = sf.sync().name("create#mantle.party.PartyRelationship")
-                .parameter("relationshipTypeEnumId", "PrtEmployee")
+                .parameter("relationshipTypeEnumId", "PrtMortgage")
                 .parameter("fromPartyId", partyId)
                 .parameter("fromRoleTypeId", "Borrower")
                 .parameter("toPartyId", lenderPartyId)

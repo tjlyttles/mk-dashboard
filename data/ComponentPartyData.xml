@@ -5,6 +5,9 @@
     <mantle.party.RoleType roleTypeId="Lender" description="Lender"/>
     <mantle.party.RoleType roleTypeId="Borrower" description="Borrower"/>
 
+    <!-- Relationship types -->
+    <moqui.basic.Enumeration enumId="PrtMortgage" enumTypeId="PartyRelationshipType" description="Mortgage"/>
+
     <!-- Marital statuses -->
     <moqui.basic.Enumeration enumId="MarsSingle" sequenceNum="1"/>
     <moqui.basic.Enumeration enumId="MarsMarried" sequenceNum="2"/>
