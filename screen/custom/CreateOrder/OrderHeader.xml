@@ -75,20 +75,23 @@
     </transition>
     <transition name="getStoreProducts">
         <actions>
-            <entity-find entity-name="mantle.product.category.ProductCategoryMember" list="productCategoryMemberList">
-                <econdition field-name="productCategoryId"/>
-                <date-filter/>
-            </entity-find>
-            <set field="productIdSet" from="new TreeSet(productCategoryMemberList*.productId)"/>
-            <entity-find entity-name="mkdecision.dashboard.ProductStoreProductDetail" list="productList">
+            <entity-find-count entity-name="mantle.product.store.ProductStoreCategory" count-field="productStoreCategoryCount">
                 <econdition field-name="productStoreId"/>
-                <econdition field-name="productId" operator="in" from="productIdSet"/>
-            </entity-find>
+                <econdition field-name="productCategoryId"/>
+                <econdition field-name="storeCategoryTypeEnumId" value="PsctFinanceableProducts"/>
+                <date-filter/>
+            </entity-find-count>
 
             <set field="resultList" from="[]"/>
-            <iterate list="productList" entry="product">
-                <script>resultList.add([value:product.productId, label:(product.productName)])</script>
-            </iterate>
+            <if condition="productStoreCategoryCount > 0">
+                <entity-find entity-name="mantle.product.category.ProductCategoryMemberProduct" list="productList">
+                    <econdition field-name="productCategoryId"/>
+                    <date-filter/>
+                </entity-find>
+                <iterate list="productList" entry="product">
+                    <script>resultList.add([value:product.productId, label:(product.productName)])</script>
+                </iterate>
+            </if>
             <script>ec.web.sendJsonResponse(resultList)</script>
         </actions>
         <default-response type="none"/>

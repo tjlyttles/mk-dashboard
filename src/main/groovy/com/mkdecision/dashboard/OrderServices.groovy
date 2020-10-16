@@ -107,16 +107,6 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
-        // validate product
-        long productCount = ef.find("mkdecision.dashboard.ProductStoreProductDetail")
-                .condition("productStoreId", productStoreId)
-                .condition("productId", productId)
-                .count()
-        if (productCount == 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT"))
-            return new HashMap<String, Object>()
-        }
-
         // validate total purchase price
         if (totalPurchasePrice == null || totalPurchasePrice <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_TOTAL_PURCHASE_PRICE"))
@@ -258,7 +248,7 @@ class OrderServices {
         if (StringUtils.isBlank(email)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL"))
             return new HashMap<String, Object>()
-        } else if(!StringUtils.equals(email, emailVerify)) {
+        } else if (!StringUtils.equals(email, emailVerify)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL_VERIFY"))
             return new HashMap<String, Object>()
         }
@@ -283,6 +273,7 @@ class OrderServices {
         String salesRepresentativeId = (String) cs.getOrDefault("salesRepresentativeId", null)
         String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
         String productId = (String) cs.getOrDefault("productId", null)
+        String formResponseId = (String) cs.getOrDefault("formResponseId", null)
         BigDecimal totalPurchasePrice = (BigDecimal) cs.getOrDefault("totalPurchasePrice", null)
         BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
         BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
@@ -307,21 +298,20 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
-        // add eligibility answers to map
-        Map<String, String> answerMap = new HashMap<>();
-        for (int i = 1; i <= 10; i++) {
-            String fieldName = String.format("eligibilityQuestion%d", i);
-            answerMap.put(fieldName, (String) cs.getOrDefault(fieldName, null))
-        }
-
         // validate form fields
+        String formId = form.getString("formId")
         EntityList fieldList = ef.find("moqui.screen.form.DbFormField")
-                .condition("formId", form.getString("formId"))
+                .condition("formId", formId)
                 .list()
         for (EntityValue field : fieldList) {
-            String fieldName = field.getString("fieldName")
-            String answer = answerMap.get(fieldName);
-            if (answer == null || answer != "true") {
+            long answerCount = ef.find("moqui.screen.form.FormResponseAnswer")
+                    .condition("formResponseId", formResponseId)
+                    .condition("formId", formId)
+                    .condition("fieldName", field.getString("fieldName"))
+                    .condition("valueText", "true")
+                    .count();
+            String isRequired = field.getString("isRequired")
+            if ((StringUtils.isBlank(isRequired) || isRequired == "Y") || answerCount == 0) {
                 mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
                 return new HashMap<String, Object>()
             }
