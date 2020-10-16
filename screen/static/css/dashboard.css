@@ -18,3 +18,11 @@
 
 .h-separator { border-bottom: 1px solid rgb(211, 212, 216); }
 .v-separator { border-right: 1px solid rgb(211, 212, 216); }
+
+/* Quasar overrides */
+.q-field--auto-height.q-field--dense .q-field__control, .q-field--auto-height.q-field--dense .q-field__native {
+    min-height: 50px !important;
+}
+.q-field--dense .q-field__control, .q-field--dense .q-field__marginal {
+    height: 50px !important;
+}
