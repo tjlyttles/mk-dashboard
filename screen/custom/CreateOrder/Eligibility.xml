@@ -17,11 +17,13 @@
     <parameter name="estimatedAmount"/>
 
     <transition name="createOrder">
-        <service-call name="org.moqui.impl.ScreenServices.create#FormResponse" out-map="context">
-            <field-map field-name="formId" from="formId"/>
-            <field-map field-name="responseMap" from="ec.web.parameters"/>
-        </service-call>
-        <service-call name="mkdecision.dashboard.OrderServices.create#Order" in-map="context" out-map="context"/>
+        <actions>
+            <service-call name="org.moqui.impl.ScreenServices.create#FormResponse" out-map="context">
+                <field-map field-name="formId" from="formId"/>
+                <field-map field-name="responseMap" from="ec.web.parameters"/>
+            </service-call>
+            <service-call name="mkdecision.dashboard.OrderServices.create#Order" in-map="context" out-map="context"/>
+        </actions>
         <default-response url="../Applicant">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>

@@ -126,7 +126,7 @@ class OrderServices {
         }
 
         // validate amount
-        BigDecimal amountBigDecimal = new BigDecimal(amount);
+        BigDecimal amountBigDecimal = new BigDecimal(amount)
         if (amountBigDecimal == null || amountBigDecimal != ((totalPurchasePrice + loanFee) - downPayment)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_AMOUNT"))
             return new HashMap<String, Object>()
@@ -283,16 +283,16 @@ class OrderServices {
         // validate fields
         sf.sync().name("mkdecision.dashboard.OrderServices.validate#OrderFields")
                 .parameters(cs)
-                .call();
+                .call()
         if (mf.hasError()) {
-            return new HashMap<String, Object>();
+            return new HashMap<String, Object>()
         }
 
         // find product form
         EntityList formList = ef.find("mantle.product.ProductDbForm")
                 .condition("productId", productId)
-                .list();
-        EntityValue form = formList.isEmpty() ? null : formList.getFirst();
+                .list()
+        EntityValue form = formList.isEmpty() ? null : formList.getFirst()
         if (form == null) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ELIGIBILITY_FORM"))
             return new HashMap<String, Object>()
@@ -309,9 +309,8 @@ class OrderServices {
                     .condition("formId", formId)
                     .condition("fieldName", field.getString("fieldName"))
                     .condition("valueText", "true")
-                    .count();
-            String isRequired = field.getString("isRequired")
-            if ((StringUtils.isBlank(isRequired) || isRequired == "Y") || answerCount == 0) {
+                    .count()
+            if (answerCount == 0) {
                 mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
                 return new HashMap<String, Object>()
             }
@@ -347,7 +346,7 @@ class OrderServices {
                 .parameter("productId", productId)
                 .parameter("productParameterSetId", productParameterSetId)
                 .parameter("unitAmount", amount)
-                .call();
+                .call()
 
         // create product category
         sf.sync().name("create#mantle.product.ProductParameterValue")
@@ -443,9 +442,9 @@ class OrderServices {
         // validate fields
         sf.sync().name("mkdecision.dashboard.OrderServices.validate#PrimaryApplicantFields")
                 .parameters(cs)
-                .call();
+                .call()
         if (mf.hasError()) {
-            return new HashMap<String, Object>();
+            return new HashMap<String, Object>()
         }
 
         // create person
@@ -575,7 +574,7 @@ class OrderServices {
                 .parameter("orderId", orderId)
                 .parameter("orderPartSeqId", orderPartSeqId)
                 .parameter("customerPartyId", partyId)
-                .call();
+                .call()
 
         // create order party
         sf.sync().name("create#mantle.order.OrderPartParty")
