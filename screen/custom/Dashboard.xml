@@ -18,7 +18,7 @@
     
     <widgets>
         <container>
-            <link url="createOrder" text="Create Order" icon="fa fa-plus" style="q-btn--rectangle q-btn--rounded margin-all-05"/>
+            <link url="createOrder" text="New Order" icon="fa fa-plus" style="q-btn--rectangle q-btn--rounded margin-all-05"/>
 
             <form-list name="OrderList" list="orderList" list-entry="order" header-dialog="true" select-columns="true" saved-finds="true">
                 <row-actions>
