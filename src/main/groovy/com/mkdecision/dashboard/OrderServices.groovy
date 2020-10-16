@@ -165,12 +165,12 @@ class OrderServices {
         String city = (String) cs.getOrDefault("city", null)
         String stateProvinceGeoId = (String) cs.getOrDefault("stateProvinceGeoId", null)
         String socialSecurityNumber = (String) cs.getOrDefault("socialSecurityNumber", null)
-        String birthDate = (String) cs.getOrDefault("birthDate", null)
+        Date birthDate = (Date) cs.getOrDefault("birthDate", null)
         String idTypeEnumId = (String) cs.getOrDefault("idTypeEnumId", null)
         String idIssuedBy = (String) cs.getOrDefault("idIssuedBy", null)
         String idValue = (String) cs.getOrDefault("idValue", null)
-        String idIssueDate = (String) cs.getOrDefault("idIssueDate", null)
-        String idExpiryDate = (String) cs.getOrDefault("idExpiryDate", null)
+        Date idIssueDate = (Date) cs.getOrDefault("idIssueDate", null)
+        Date idExpiryDate = (Date) cs.getOrDefault("idExpiryDate", null)
         String maritalStatusEnumId = (String) cs.getOrDefault("maritalStatusEnumId", null)
         String contactNumber = (String) cs.getOrDefault("contactNumber", null)
         String contactMechPurposeId = (String) cs.getOrDefault("contactMechPurposeId", null)
@@ -228,12 +228,11 @@ class OrderServices {
         }
 
         // validate date of birth
-        Date dob = lf.parseDate(birthDate, "MM-dd-yyyy")
-        Date minDob = DateUtils.addYears(new Date(), -18)
-        if (dob == null) {
+        Date minBirthDate = DateUtils.addYears(new Date(), -18)
+        if (birthDate == null) {
             mf.addError(lf.localize("DASHBOARD_INVALID_DOB"))
             return new HashMap<String, Object>()
-        } else if (dob.after(minDob)) {
+        } else if (birthDate.after(minBirthDate)) {
             mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
             return new HashMap<String, Object>()
         }
@@ -421,12 +420,12 @@ class OrderServices {
         String city = (String) cs.getOrDefault("city", null)
         String stateProvinceGeoId = (String) cs.getOrDefault("stateProvinceGeoId", null)
         String socialSecurityNumber = (String) cs.getOrDefault("socialSecurityNumber", null)
-        String birthDate = (String) cs.getOrDefault("birthDate", null)
+        Date birthDate = (Date) cs.getOrDefault("birthDate", null)
         String idTypeEnumId = (String) cs.getOrDefault("idTypeEnumId", null)
         String idIssuedBy = (String) cs.getOrDefault("idIssuedBy", null)
         String idValue = (String) cs.getOrDefault("idValue", null)
-        String idIssueDate = (String) cs.getOrDefault("idIssueDate", null)
-        String idExpiryDate = (String) cs.getOrDefault("idExpiryDate", null)
+        Date idIssueDate = (Date) cs.getOrDefault("idIssueDate", null)
+        Date idExpiryDate = (Date) cs.getOrDefault("idExpiryDate", null)
         String maritalStatusEnumId = (String) cs.getOrDefault("maritalStatusEnumId", null)
         String contactNumber = (String) cs.getOrDefault("contactNumber", null)
         String contactMechPurposeId = (String) cs.getOrDefault("contactMechPurposeId", null)
@@ -462,7 +461,7 @@ class OrderServices {
                 .parameter("middleName", middleName)
                 .parameter("lastName", lastName)
                 .parameter("suffix", suffix)
-                .parameter("birthDate", lf.parseDate(birthDate, "MM-dd-yyyy"))
+                .parameter("birthDate", birthDate)
                 .parameter("maritalStatusEnumId", maritalStatusEnumId)
                 .parameter("employmentStatusEnumId", employmentStatusEnumId)
                 .parameter("occupation", occupation)
@@ -508,8 +507,8 @@ class OrderServices {
                     .parameter("partyIdTypeEnumId", idTypeEnumId)
                     .parameter("idValue", idValue)
                     .parameter("issuedBy", idIssuedBy)
-                    .parameter("issueDate", lf.parseDate(idIssueDate, "MM-dd-yyyy"))
-                    .parameter("expireDate", lf.parseDate(idExpiryDate, "MM-dd-yyyy"))
+                    .parameter("issueDate", idIssueDate)
+                    .parameter("expireDate", idExpiryDate)
                     .call()
         }
 

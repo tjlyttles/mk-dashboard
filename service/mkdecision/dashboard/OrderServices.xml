@@ -29,12 +29,12 @@
             <parameter name="city"/>
             <parameter name="stateProvinceGeoId"/>
             <parameter name="socialSecurityNumber"/>
-            <parameter name="birthDate"/>
+            <parameter name="birthDate" type="Date" format="MM-dd-yyyy"/>
             <parameter name="idTypeEnumId"/>
             <parameter name="idIssuedBy"/>
             <parameter name="idValue"/>
-            <parameter name="idIssueDate"/>
-            <parameter name="idExpiryDate"/>
+            <parameter name="idIssueDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="idExpiryDate" type="Date" format="MM-dd-yyyy"/>
             <parameter name="maritalStatusEnumId"/>
             <parameter name="contactNumber"/>
             <parameter name="contactMechPurposeId"/>
@@ -103,7 +103,7 @@
             <parameter name="socialSecurityNumber">
                 <matches regexp="^\d{3}-\d{2}-\d{4}$" message="Please enter a valid social security number."/>
             </parameter>
-            <parameter name="birthDate" type="Date"/>
+            <parameter name="birthDate" type="Date" format="MM-dd-yyyy"/>
             <parameter name="idTypeEnumId"/>
             <parameter name="idIssuedBy"/>
             <parameter name="idValue"/>
@@ -112,8 +112,12 @@
             <parameter name="maritalStatusEnumId"/>
             <parameter name="contactNumber"/>
             <parameter name="contactMechPurposeId"/>
-            <parameter name="email"><text-email/></parameter>
-            <parameter name="emailVerify"/>
+            <parameter name="email">
+                <text-email/>
+            </parameter>
+            <parameter name="emailVerify">
+                <text-email/>
+            </parameter>
             <parameter name="occupation"/>
             <parameter name="employmentStatusEnumId"/>
             <parameter name="employerName"/>
