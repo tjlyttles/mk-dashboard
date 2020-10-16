@@ -209,15 +209,15 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
-        // validate city
-        if (StringUtils.isBlank(city)) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_CITY"))
-            return new HashMap<String, Object>()
-        }
-
         // validate postal code
         if (StringUtils.isBlank(postalCode)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_POSTAL_CODE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate city
+        if (StringUtils.isBlank(city)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_CITY"))
             return new HashMap<String, Object>()
         }
 
@@ -249,6 +249,54 @@ class OrderServices {
             return new HashMap<String, Object>()
         } else if (!StringUtils.equals(email, emailVerify)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL_VERIFY"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate occupation
+        if (StringUtils.isBlank(occupation)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_OCCUPATION"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate employer name
+        if (StringUtils.isBlank(employerName)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYER_NAME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate job title
+        if (StringUtils.isBlank(jobTitle)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_JOB_TITLE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate duration
+        if (years == null || years < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
+            return new HashMap<String, Object>()
+        } else if (months == null || months < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
+            return new HashMap<String, Object>()
+        } else if (years == 0 && months == 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate monthly income
+        if (monthlyIncome == null || monthlyIncome < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_MONTHLY_INCOME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate employer postal code
+        if (StringUtils.isBlank(employerPostalCode)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYER_POSTAL_CODE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate employer city
+        if (StringUtils.isBlank(employerCity)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYER_CITY"))
             return new HashMap<String, Object>()
         }
 
