@@ -18,11 +18,13 @@ class ProductServices {
 
         // get the parameters
         String productId = (String) cs.getOrDefault("productId", null)
+        String productStoreId = (String) cs.getOrDefault("productStoreId", null)
         String productParameterId = (String) cs.getOrDefault("productParameterId", null)
 
         // get the loan fee parameters
         EntityList parameterList = ef.find("mantle.product.ProductParameterOption")
                 .condition("productId", productId)
+                .condition("productStoreId", productStoreId)
                 .condition("productParameterId", productParameterId)
                 .list();
         EntityValue parameter = parameterList.isEmpty() ? null : parameterList.getFirst();
