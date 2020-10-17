@@ -5,6 +5,10 @@
         default-menu-include="false"
         default-menu-index="2">
 
+    <parameter name="orderId"/>
+    <parameter name="orderPartSeqId"/>
+    <parameter name="partyId"/>
+    <parameter name="assetId"/>
     <parameter name="salesChannelEnumId"/>
     <parameter name="productStoreId"/>
     <parameter name="salesRepresentativeId"/>
@@ -14,23 +18,40 @@
     <parameter name="downPayment"/>
     <parameter name="loanFee"/>
     <parameter name="amount"/>
-    <parameter name="estimatedAmount"/>
+    <parameter name="estimatedPayment"/>
 
-    <transition name="createOrder">
+    <transition name="storeOrder">
         <actions>
             <service-call name="org.moqui.impl.ScreenServices.create#FormResponse" out-map="context">
                 <field-map field-name="formId" from="formId"/>
                 <field-map field-name="responseMap" from="ec.web.parameters"/>
             </service-call>
-            <service-call name="mkdecision.dashboard.OrderServices.create#Order" in-map="context" out-map="context"/>
+            <service-call name="mkdecision.dashboard.OrderServices.store#Order" in-map="context" out-map="context"/>
         </actions>
         <default-response url="../Applicant">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="assetId"/>
         </default-response>
     </transition>
-    <transition name="cancelOrder">
-        <default-response url="../../Dashboard"/>
+    <transition name="viewOrderHeader">
+        <default-response url="../OrderHeader">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="assetId"/>
+            <parameter name="salesChannelEnumId"/>
+            <parameter name="productStoreId"/>
+            <parameter name="salesRepresentativeId"/>
+            <parameter name="productCategoryId"/>
+            <parameter name="productId"/>
+            <parameter name="totalPurchasePrice"/>
+            <parameter name="downPayment"/>
+            <parameter name="loanFee"/>
+            <parameter name="amount"/>
+            <parameter name="estimatedPayment"/>
+        </default-response>
     </transition>
     
     <actions>
@@ -46,7 +67,7 @@
                 <expression>formId != null</expression>
             </condition>
             <widgets>
-                <form-single name="EligibilityForm" extends="DbForm#${formId}" dynamic="true" transition="createOrder">
+                <form-single name="EligibilityForm" extends="DbForm#${formId}" dynamic="true" transition="storeOrder">
                     <field name="eligibilityHeader">
                         <default-field>
                             <label text="New Application" type="h4" style="margin-b-1"/>
@@ -56,6 +77,10 @@
                         </default-field>
                     </field>
 
+                    <field name="orderId"><default-field><hidden/></default-field></field>
+                    <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
+                    <field name="partyId"><default-field><hidden/></default-field></field>
+                    <field name="assetId"><default-field><hidden/></default-field></field>
                     <field name="formLocation"><default-field><hidden default-value="DbForm#${formId}"/></default-field></field>
                     <field name="formId" from="formId"><default-field><hidden/></default-field></field>
                     <field name="salesChannelEnumId"><default-field><hidden/></default-field></field>
@@ -67,16 +92,16 @@
                     <field name="downPayment"><default-field><hidden/></default-field></field>
                     <field name="loanFee"><default-field><hidden/></default-field></field>
                     <field name="amount"><default-field><hidden/></default-field></field>
-                    <field name="estimatedAmount"><default-field><hidden/></default-field></field>
+                    <field name="estimatedPayment"><default-field><hidden/></default-field></field>
 
-                    <field name="cancelButton">
-                        <default-field>
-                            <link url="cancelOrder" text="Cancel"/>
+                    <field name="backButton">
+                        <default-field container-style="dark-link">
+                            <link url="viewOrderHeader" text="Back" btn-type="default"/>
                         </default-field>
                     </field>
                     <field name="submitButton">
-                        <default-field title="Continue">
-                            <submit/>
+                        <default-field container-style="text-primary">
+                            <submit text="Continue"/>
                         </default-field>
                     </field>
 
@@ -92,7 +117,7 @@
 
                         <field-col-row>
                             <field-col xs="0" sm="1" md="3" lg="3"/>
-                            <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="cancelButton"/></field-col>
+                            <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="backButton"/></field-col>
                             <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="submitButton"/></field-col>
                             <field-col xs="0" sm="1" md="3" lg="3"/>
                         </field-col-row>
@@ -115,9 +140,9 @@
                         </default-field>
                     </field>
 
-                    <field name="cancelButton">
-                        <default-field>
-                            <link url="cancelOrder" text="Cancel"/>
+                    <field name="backButton">
+                        <default-field container-style="dark-link">
+                            <link url="viewOrderHeader" text="Back" btn-type="default"/>
                         </default-field>
                     </field>
 
@@ -131,9 +156,11 @@
                             <field-col xs="0" sm="1" md="3" lg="3"/>
                         </field-col-row>
 
+                        <fields-not-referenced/>
+
                         <field-col-row>
                             <field-col xs="0" sm="1" md="3" lg="3"/>
-                            <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="cancelButton"/></field-col>
+                            <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="backButton"/></field-col>
                             <field-col xs="0" sm="1" md="3" lg="3"/>
                         </field-col-row>
                     </field-layout>

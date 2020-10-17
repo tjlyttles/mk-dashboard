@@ -39,7 +39,7 @@ class OrderServices {
         BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
         BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
         String amount = (String) cs.getOrDefault("amount", null)
-        BigDecimal estimatedAmount = (BigDecimal) cs.getOrDefault("estimatedAmount", null)
+        BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
 
         // validate product store
         EntityFacadeImpl efi = (EntityFacadeImpl) ef
@@ -133,7 +133,7 @@ class OrderServices {
         }
 
         // validate estimated amount
-        if (estimatedAmount == null || estimatedAmount <= 0) {
+        if (estimatedPayment == null || estimatedPayment <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ESTIMATED_AMOUNT"))
             return new HashMap<String, Object>()
         }
@@ -387,7 +387,7 @@ class OrderServices {
         return new HashMap<>()
     }
 
-    static Map<String, Object> createOrder(ExecutionContext ec) {
+    static Map<String, Object> storeOrder(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -398,6 +398,8 @@ class OrderServices {
         L10nFacade lf = ec.getL10n()
 
         // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String salesChannelEnumId = (String) cs.getOrDefault("salesChannelEnumId", null)
         String productStoreId = (String) cs.getOrDefault("productStoreId", null)
         String salesRepresentativeId = (String) cs.getOrDefault("salesRepresentativeId", null)
@@ -408,7 +410,7 @@ class OrderServices {
         BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
         BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
         BigDecimal amount = (BigDecimal) cs.getOrDefault("amount", null)
-        BigDecimal estimatedAmount = (BigDecimal) cs.getOrDefault("estimatedAmount", null)
+        BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
 
         // validate fields
         sf.sync().name("mkdecision.dashboard.OrderServices.validate#OrderFields")
@@ -446,80 +448,197 @@ class OrderServices {
             }
         }
 
-        // create order header
-        Map<String, Object> orderHeaderResp = sf.sync().name("mantle.order.OrderServices.create#Order")
-                .parameter("salesChannelEnumId", salesChannelEnumId)
-                .parameter("enteredByPartyId", uf.getUserAccount().getString("partyId"))
-                .parameter("productStoreId", productStoreId)
-                .call()
-        String orderId = (String) orderHeaderResp.get("orderId")
-        String orderPartSeqId = (String) orderHeaderResp.get("orderPartSeqId")
+        // store order
+        boolean updateOrder = StringUtils.isNotBlank(orderId) && StringUtils.isNotBlank(orderPartSeqId);
+        if (updateOrder) {
 
-        // create order party
-        sf.sync().name("create#mantle.order.OrderPartParty")
-                .parameter("orderId", orderId)
-                .parameter("orderPartSeqId", orderPartSeqId)
-                .parameter("partyId", salesRepresentativeId)
-                .parameter("roleTypeId", "SalesRepresentative")
-                .call()
+            // update order header
+            sf.sync().name("mantle.order.OrderServices.update#OrderHeader")
+                    .parameter("orderId", orderId)
+                    .parameter("salesChannelEnumId", salesChannelEnumId)
+                    .parameter("productStoreId", productStoreId)
+                    .call()
 
-        // create product parameter set
-        Map<String, Object> productParameterSetResp = sf.sync().name("create#mantle.product.ProductParameterSet")
-                .parameter("productId", productId)
-                .call()
-        String productParameterSetId = (String) productParameterSetResp.get("productParameterSetId")
+            // delete order party
+            sf.sync().name("delete#mantle.order.OrderPartParty")
+                    .parameter("orderId", orderId)
+                    .parameter("orderPartSeqId", orderPartSeqId)
+                    .parameter("partyId", "*")
+                    .parameter("roleTypeId", "SalesRepresentative")
+                    .call()
 
-        // create order item
-        Map<String, Object> orderItemResp = sf.sync().name("mantle.order.OrderServices.create#OrderItem")
-                .parameter("orderId", orderId)
-                .parameter("orderPartSeqId", orderPartSeqId)
-                .parameter("productId", productId)
-                .parameter("productParameterSetId", productParameterSetId)
-                .parameter("unitAmount", amount)
-                .call()
-        String orderItemSeqId = (String) orderItemResp.get("orderItemSeqId")
+            // create order party
+            sf.sync().name("create#mantle.order.OrderPartParty")
+                    .parameter("orderId", orderId)
+                    .parameter("orderPartSeqId", orderPartSeqId)
+                    .parameter("partyId", salesRepresentativeId)
+                    .parameter("roleTypeId", "SalesRepresentative")
+                    .call()
 
-        // create order item form response
-        sf.sync().name("create#mantle.order.OrderItemFormResponse")
-                .parameter("orderId", orderId)
-                .parameter("orderItemSeqId", orderItemSeqId)
-                .parameter("formResponseId", formResponseId)
-                .call()
+            // find order item
+            EntityValue orderItem = ef.find("mantle.order.OrderItem")
+                    .condition("orderId", orderId)
+                    .condition("orderPartSeqId", orderPartSeqId)
+                    .orderBy("-lastUpdatedStamp")
+                    .list()
+                    .getFirst()
+            String orderItemSeqId = orderItem.getString("orderItemSeqId")
+            String productParameterSetId = orderItem.getString("productParameterSetId")
 
-        // create product category
-        sf.sync().name("create#mantle.product.ProductParameterValue")
-                .parameter("productParameterId", "ProductCategory")
-                .parameter("productParameterSetId", productParameterSetId)
-                .parameter("parameterValue", productCategoryId)
-                .call()
+            // update order item
+            sf.sync().name("mantle.order.OrderServices.update#OrderItem")
+                    .parameter("orderId", orderId)
+                    .parameter("orderPartSeqId", orderPartSeqId)
+                    .parameter("orderItemSeqId", orderItemSeqId)
+                    .parameter("productId", productId)
+                    .parameter("unitAmount", amount)
+                    .call()
 
-        // create purchase price
-        sf.sync().name("create#mantle.product.ProductParameterValue")
-                .parameter("productParameterId", "TotalPurchasePrice")
-                .parameter("productParameterSetId", productParameterSetId)
-                .parameter("parameterValue", totalPurchasePrice)
-                .call()
+            // delete order item form response
+            sf.sync().name("delete#mantle.order.OrderItemFormResponse")
+                    .parameter("orderId", orderId)
+                    .parameter("orderItemSeqId", orderItemSeqId)
+                    .parameter("formResponseId", "*")
+                    .call()
 
-        // create down payment
-        sf.sync().name("create#mantle.product.ProductParameterValue")
-                .parameter("productParameterId", "DownPayment")
-                .parameter("productParameterSetId", productParameterSetId)
-                .parameter("parameterValue", downPayment)
-                .call()
+            // create order item form response
+            sf.sync().name("update#mantle.order.OrderItemFormResponse")
+                    .parameter("orderId", orderId)
+                    .parameter("orderItemSeqId", orderItemSeqId)
+                    .parameter("formResponseId", formResponseId)
+                    .call()
 
-        // create loan fee
-        sf.sync().name("create#mantle.product.ProductParameterValue")
-                .parameter("productParameterId", "LoanFee")
-                .parameter("productParameterSetId", productParameterSetId)
-                .parameter("parameterValue", loanFee)
-                .call()
+            // update product category
+            EntityValue productCategoryParam = ef.find("mantle.product.ProductParameterValue")
+                    .condition("productParameterId", "ProductCategory")
+                    .condition("productParameterSetId", productParameterSetId)
+                    .list()
+                    .getFirst()
+            sf.sync().name("update#mantle.product.ProductParameterValue")
+                    .parameter("productParameterValueId", productCategoryParam.getString("productParameterValueId"))
+                    .parameter("parameterValue", productCategoryId)
+                    .call()
 
-        // create projected payment
-        sf.sync().name("create#mantle.product.ProductParameterValue")
-                .parameter("productParameterId", "EstimatedPayment")
-                .parameter("productParameterSetId", productParameterSetId)
-                .parameter("parameterValue", estimatedAmount)
-                .call()
+            // update total purchase price
+            EntityValue totalPurchasePriceParam = ef.find("mantle.product.ProductParameterValue")
+                    .condition("productParameterId", "TotalPurchasePrice")
+                    .condition("productParameterSetId", productParameterSetId)
+                    .list()
+                    .getFirst()
+            sf.sync().name("update#mantle.product.ProductParameterValue")
+                    .parameter("productParameterValueId", totalPurchasePriceParam.getString("productParameterValueId"))
+                    .parameter("parameterValue", totalPurchasePrice)
+                    .call()
+
+            // update down payment
+            EntityValue downPaymentParam = ef.find("mantle.product.ProductParameterValue")
+                    .condition("productParameterId", "DownPayment")
+                    .condition("productParameterSetId", productParameterSetId)
+                    .list()
+                    .getFirst()
+            sf.sync().name("update#mantle.product.ProductParameterValue")
+                    .parameter("productParameterValueId", downPaymentParam.getString("productParameterValueId"))
+                    .parameter("parameterValue", downPayment)
+                    .call()
+
+            // update loan fee
+            EntityValue loanFeeParam = ef.find("mantle.product.ProductParameterValue")
+                    .condition("productParameterId", "LoanFee")
+                    .condition("productParameterSetId", productParameterSetId)
+                    .list()
+                    .getFirst()
+            sf.sync().name("update#mantle.product.ProductParameterValue")
+                    .parameter("productParameterValueId", loanFeeParam.getString("productParameterValueId"))
+                    .parameter("parameterValue", loanFee)
+                    .call()
+
+            // update estimated amount
+            EntityValue estimatedPaymentParam = ef.find("mantle.product.ProductParameterValue")
+                    .condition("productParameterId", "EstimatedPayment")
+                    .condition("productParameterSetId", productParameterSetId)
+                    .list()
+                    .getFirst()
+            sf.sync().name("update#mantle.product.ProductParameterValue")
+                    .parameter("productParameterValueId", estimatedPaymentParam.getString("productParameterValueId"))
+                    .parameter("parameterValue", estimatedPayment)
+                    .call()
+        } else {
+
+            // create order header
+            Map<String, Object> orderHeaderResp = sf.sync().name("mantle.order.OrderServices.create#Order")
+                    .parameter("salesChannelEnumId", salesChannelEnumId)
+                    .parameter("enteredByPartyId", uf.getUserAccount().getString("partyId"))
+                    .parameter("productStoreId", productStoreId)
+                    .call()
+            orderId = (String) orderHeaderResp.get("orderId")
+            orderPartSeqId = (String) orderHeaderResp.get("orderPartSeqId")
+
+            // create order party
+            sf.sync().name("create#mantle.order.OrderPartParty")
+                    .parameter("orderId", orderId)
+                    .parameter("orderPartSeqId", orderPartSeqId)
+                    .parameter("partyId", salesRepresentativeId)
+                    .parameter("roleTypeId", "SalesRepresentative")
+                    .call()
+
+            // create product parameter set
+            Map<String, Object> productParameterSetResp = sf.sync().name("create#mantle.product.ProductParameterSet")
+                    .parameter("productId", productId)
+                    .call()
+            String productParameterSetId = (String) productParameterSetResp.get("productParameterSetId")
+
+            // create order item
+            Map<String, Object> orderItemResp = sf.sync().name("mantle.order.OrderServices.create#OrderItem")
+                    .parameter("orderId", orderId)
+                    .parameter("orderPartSeqId", orderPartSeqId)
+                    .parameter("productId", productId)
+                    .parameter("productParameterSetId", productParameterSetId)
+                    .parameter("unitAmount", amount)
+                    .call()
+            String orderItemSeqId = (String) orderItemResp.get("orderItemSeqId")
+
+            // create order item form response
+            sf.sync().name("create#mantle.order.OrderItemFormResponse")
+                    .parameter("orderId", orderId)
+                    .parameter("orderItemSeqId", orderItemSeqId)
+                    .parameter("formResponseId", formResponseId)
+                    .call()
+
+            // create product category
+            sf.sync().name("create#mantle.product.ProductParameterValue")
+                    .parameter("productParameterId", "ProductCategory")
+                    .parameter("productParameterSetId", productParameterSetId)
+                    .parameter("parameterValue", productCategoryId)
+                    .call()
+
+            // create total purchase price
+            sf.sync().name("create#mantle.product.ProductParameterValue")
+                    .parameter("productParameterId", "TotalPurchasePrice")
+                    .parameter("productParameterSetId", productParameterSetId)
+                    .parameter("parameterValue", totalPurchasePrice)
+                    .call()
+
+            // create down payment
+            sf.sync().name("create#mantle.product.ProductParameterValue")
+                    .parameter("productParameterId", "DownPayment")
+                    .parameter("productParameterSetId", productParameterSetId)
+                    .parameter("parameterValue", downPayment)
+                    .call()
+
+            // create loan fee
+            sf.sync().name("create#mantle.product.ProductParameterValue")
+                    .parameter("productParameterId", "LoanFee")
+                    .parameter("productParameterSetId", productParameterSetId)
+                    .parameter("parameterValue", loanFee)
+                    .call()
+
+            // create estimated payment
+            sf.sync().name("create#mantle.product.ProductParameterValue")
+                    .parameter("productParameterId", "EstimatedPayment")
+                    .parameter("productParameterSetId", productParameterSetId)
+                    .parameter("parameterValue", estimatedPayment)
+                    .call()
+        }
 
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()

@@ -5,8 +5,10 @@
         default-menu-include="false"
         default-menu-index="3">
 
-    <parameter name="orderId"/>
-    <parameter name="orderPartSeqId"/>
+    <parameter name="orderId" required="true"/>
+    <parameter name="orderPartSeqId" required="true"/>
+    <parameter name="partyId"/>
+    <parameter name="assetId"/>
 
     <transition name="createPrimaryApplicant">
         <service-call name="mkdecision.dashboard.OrderServices.create#PrimaryApplicant" in-map="context" out-map="context"/>
@@ -16,11 +18,21 @@
             <parameter name="partyId"/>
         </default-response>
     </transition>
+    <transition name="viewOrderHeader">
+        <default-response url="../OrderHeader">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="assetId"/>
+        </default-response>
+    </transition>
 
     <widgets>
         <form-single name="ApplicantForm" transition="createPrimaryApplicant">
             <field name="orderId"><default-field><hidden/></default-field></field>
             <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
+            <field name="partyId"><default-field><hidden/></default-field></field>
+            <field name="assetId"><default-field><hidden/></default-field></field>
 
             <field name="applicantHeader">
                 <default-field>
@@ -318,8 +330,13 @@
             </field>
 
             <field name="submitButton">
-                <default-field title="Continue">
-                    <submit/>
+                <default-field container-style="text-primary">
+                    <submit text="Continue"/>
+                </default-field>
+            </field>
+            <field name="backButton">
+                <default-field container-style="dark-link">
+                    <link url="viewOrderHeader" text="Back" btn-type="default"/>
                 </default-field>
             </field>
 
@@ -515,7 +532,8 @@
 
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6" style="text-right"><field-ref name="submitButton"/></field-col>
+                    <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="backButton"/></field-col>
+                    <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="submitButton"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
             </field-layout>

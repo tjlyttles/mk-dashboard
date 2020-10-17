@@ -5,9 +5,18 @@
         default-menu-include="false"
         default-menu-index="1">
 
+    <parameter name="orderId"/>
+    <parameter name="orderPartSeqId"/>
+    <parameter name="partyId"/>
+    <parameter name="assetId"/>
+
     <transition name="checkEligibility">
         <service-call name="mkdecision.dashboard.OrderServices.validate#OrderFields" in-map="context"/>
         <default-response url="../Eligibility">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="assetId"/>
             <parameter name="salesChannelEnumId"/>
             <parameter name="productStoreId"/>
             <parameter name="salesRepresentativeId"/>
@@ -17,7 +26,7 @@
             <parameter name="downPayment"/>
             <parameter name="loanFee"/>
             <parameter name="amount"/>
-            <parameter name="estimatedAmount"/>
+            <parameter name="estimatedPayment"/>
         </default-response>
     </transition>
     <transition name="cancelOrder">
@@ -146,10 +155,76 @@
             <date-filter/>
         </entity-find>
         <set field="productStoreIdSet" from="new TreeSet(partyProductStoreList*.productStoreId)"/>
+
+        <if condition="orderId != null &amp;&amp; orderPartSeqId != null">
+            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+            <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+            <set field="salesChannelEnumId" from="orderHeader?.salesChannelEnumId ?: ''"/>
+            <set field="productStoreId" from="orderHeader?.productStoreId ?: ''"/>
+
+            <entity-find entity-name="mantle.order.OrderPartParty" list="salesRepresentativeList">
+                <econdition field-name="orderId" from="orderId"/>
+                <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
+                <econdition field-name="roleTypeId" value="SalesRepresentative"/>
+                <order-by field-name="-lastUpdatedStamp"/>
+            </entity-find>
+            <set field="salesRepresentativeId" from="salesRepresentativeList?.getFirst()?.partyId ?: ''"/>
+
+            <entity-find entity-name="mantle.order.OrderItem" list="orderItemList">
+                <econdition field-name="orderId" from="orderId"/>
+                <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
+                <order-by field-name="-lastUpdatedStamp"/>
+            </entity-find>
+            <set field="orderItemSeqId" from="orderItemList?.getFirst()?.orderItemSeqId ?: ''"/>
+            <set field="productParameterSetId" from="orderItemList?.getFirst()?.productParameterSetId ?: ''"/>
+            <set field="productId" from="orderItemList?.getFirst()?.productId ?: ''"/>
+            <set field="amount" from="orderItemList?.getFirst()?.unitAmount ?: ''"/>
+
+            <entity-find entity-name="mantle.product.ProductParameterValue" list="productCategoryParamList">
+                <econdition field-name="productParameterId" value="ProductCategory"/>
+                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+            </entity-find>
+            <set field="productCategoryId" from="productCategoryParamList?.getFirst()?.parameterValue ?: ''"/>
+
+            <entity-find entity-name="mantle.product.ProductParameterValue" list="productCategoryParamList">
+                <econdition field-name="productParameterId" value="ProductCategory"/>
+                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+            </entity-find>
+            <set field="productCategoryId" from="productCategoryParamList?.getFirst()?.parameterValue ?: ''"/>
+
+            <entity-find entity-name="mantle.product.ProductParameterValue" list="totalPurchasePriceParamList">
+                <econdition field-name="productParameterId" value="TotalPurchasePrice"/>
+                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+            </entity-find>
+            <set field="totalPurchasePrice" from="totalPurchasePriceParamList?.getFirst()?.parameterValue ?: ''"/>
+
+            <entity-find entity-name="mantle.product.ProductParameterValue" list="downPaymentParamList">
+                <econdition field-name="productParameterId" value="DownPayment"/>
+                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+            </entity-find>
+            <set field="downPayment" from="downPaymentParamList?.getFirst()?.parameterValue ?: ''"/>
+
+            <entity-find entity-name="mantle.product.ProductParameterValue" list="loanFeeParamList">
+                <econdition field-name="productParameterId" value="LoanFee"/>
+                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+            </entity-find>
+            <set field="loanFee" from="loanFeeParamList?.getFirst()?.parameterValue ?: ''"/>
+
+            <entity-find entity-name="mantle.product.ProductParameterValue" list="estimatedPaymentParamList">
+                <econdition field-name="productParameterId" value="EstimatedPayment"/>
+                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+            </entity-find>
+            <set field="estimatedPayment" from="estimatedPaymentParamList?.getFirst()?.parameterValue ?: ''"/>
+        </if>
     </actions>
 
     <widgets>
         <form-single name="OrderForm" transition="checkEligibility">
+            <field name="orderId"><default-field><hidden/></default-field></field>
+            <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
+            <field name="partyId"><default-field><hidden/></default-field></field>
+            <field name="assetId"><default-field><hidden/></default-field></field>
+
             <field name="applicationHeader">
                 <default-field>
                     <label text="New Application" type="h4" style="margin-b-1"/>
@@ -173,7 +248,7 @@
             </field>
             <field name="productStoreId">
                 <default-field title="Referrer">
-                    <drop-down>
+                    <drop-down allow-empty="true">
                         <entity-options key="${productStoreId}" text="${productStoreId}: ${storeName}">
                             <entity-find entity-name="mantle.product.store.ProductStore">
                                 <econdition field-name="productStoreId" operator="in" from="productStoreIdSet"/>
@@ -185,7 +260,7 @@
             </field>
             <field name="salesRepresentativeId">
                 <default-field title="Sales Representative">
-                    <drop-down style="">
+                    <drop-down allow-empty="true">
                         <dynamic-options transition="getStoreSalesReps">
                             <depends-on field="productStoreId"/>
                         </dynamic-options>
@@ -202,7 +277,7 @@
             </field>
             <field name="productCategoryId">
                 <default-field title="Merchandise">
-                    <drop-down>
+                    <drop-down allow-empty="true">
                         <dynamic-options transition="getStoreProductCategories">
                             <depends-on field="productStoreId"/>
                         </dynamic-options>
@@ -246,7 +321,7 @@
                     </display>
                 </default-field>
             </field>
-            <field name="estimatedAmount">
+            <field name="estimatedPayment">
                 <default-field>
                     <display dynamic-transition="calculateEstimatedPayment" depends-optional="true" style="bg-grey-1">
                         <depends-on field="productId"/>
@@ -327,9 +402,11 @@
                 </field-col-row>
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="estimatedAmount"/></field-col>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="estimatedPayment"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
+
+                <fields-not-referenced/>
 
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
