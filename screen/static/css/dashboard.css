@@ -12,12 +12,18 @@
 
 .padding-all-0 { padding: 0em; }
 .padding-all-1 { padding: 1em; }
-.padding-tb-1 { padding: 1em 0 1em 0; }
 .padding-tb-05 { padding: 0.5em 0 0.5em 0; }
+.padding-tb-1 { padding: 1em 0 1em 0; }
+.padding-lr-05 { padding: 0 0.5em 0 0.5em; }
 .padding-lr-1 { padding: 0 1em 0 1em; }
+
 
 .h-separator { border-bottom: 1px solid rgb(211, 212, 216); }
 .v-separator { border-right: 1px solid rgb(211, 212, 216); }
+
+/* Quasar hacks */
+.nested-form-field .q-ma-sm { margin: 8px 0px !important; }
+.dark-link .q-link { color:black; }
 
 /* Quasar overrides */
 .q-field--auto-height.q-field--dense .q-field__control, .q-field--auto-height.q-field--dense .q-field__native {
