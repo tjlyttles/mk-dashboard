@@ -37,36 +37,38 @@
     </transition>
 
     <actions>
-        <entity-find-one entity-name="mantle.product.asset.Asset" value-field="asset"/>
-        <entity-find entity-name="mk.close.FinancialFlow" list="hoaMonthlyFeeFinFlowList">
-            <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
-            <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowHoaMonthlyFee"/>
-            <econdition field-name="partyId" from="partyId"/>
-            <econdition field-name="assetId" from="assetId"/>
-        </entity-find>
-        <set field="hoaMonthlyFeeFinFlow" from="hoaMonthlyFeeFinFlowList?.getFirst()"/>
+        <if condition="assetId != null">
+            <entity-find-one entity-name="mantle.product.asset.Asset" value-field="asset"/>
+            <entity-find entity-name="mk.close.FinancialFlow" list="hoaMonthlyFeeFinFlowList">
+                <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowHoaMonthlyFee"/>
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="assetId" from="assetId"/>
+            </entity-find>
+            <set field="hoaFeeMonthly" from="hoaMonthlyFeeFinFlowList?.getFirst()?.amount ?: ''"/>
 
-        <entity-find entity-name="mk.close.FinancialFlow" list="annualPropertyTaxFinFlowList">
-            <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
-            <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowAnnualPropertyTaxes"/>
-            <econdition field-name="partyId" from="partyId"/>
-            <econdition field-name="assetId" from="assetId"/>
-        </entity-find>
-        <set field="annualPropertyTaxFinFlow" from="annualPropertyTaxFinFlowList?.getFirst()"/>
+            <entity-find entity-name="mk.close.FinancialFlow" list="annualPropertyTaxFinFlowList">
+                <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowAnnualPropertyTaxes"/>
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="assetId" from="assetId"/>
+            </entity-find>
+            <set field="propertyTaxesAnnually" from="annualPropertyTaxFinFlowList?.getFirst()?.amount ?: ''"/>
 
-        <entity-find entity-name="mk.close.FinancialFlow" list="annualInsuranceCostFinFlowList">
-            <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
-            <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowAnnualInsuranceCosts"/>
-            <econdition field-name="partyId" from="partyId"/>
-            <econdition field-name="assetId" from="assetId"/>
-        </entity-find>
-        <set field="annualInsuranceCostFinFlow" from="annualInsuranceCostFinFlowList?.getFirst()"/>
+            <entity-find entity-name="mk.close.FinancialFlow" list="annualInsuranceCostFinFlowList">
+                <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowAnnualInsuranceCosts"/>
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="assetId" from="assetId"/>
+            </entity-find>
+            <set field="propertyInsuranceCostsAnnually" from="annualInsuranceCostFinFlowList?.getFirst()?.amount ?: ''"/>
 
-        <entity-find entity-name="mantle.party.PartyToAndRelationship" list="mortgageRelationList">
-            <econdition field-name="relationshipTypeEnumId" value="PrtMortgage"/>
-            <econdition field-name="fromPartyId" from="partyId"/>
-            <econdition field-name="fromRoleTypeId" value="Borrower"/>
-        </entity-find>
+            <entity-find entity-name="mantle.party.PartyToAndRelationship" list="mortgageRelationList">
+                <econdition field-name="relationshipTypeEnumId" value="PrtMortgage"/>
+                <econdition field-name="fromPartyId" from="partyId"/>
+                <econdition field-name="fromRoleTypeId" value="Borrower"/>
+            </entity-find>
+        </if>
     </actions>
 
     <widgets>
@@ -109,17 +111,17 @@
             </field>
             <field name="hoaFeeMonthly">
                 <default-field title="HOA Fee Monthly">
-                    <text-line default-value="${hoaMonthlyFeeFinFlow?.amount ?: ''}"/>
+                    <text-line/>
                 </default-field>
             </field>
             <field name="propertyTaxesAnnually">
                 <default-field title="Property Taxes Annually">
-                    <text-line default-value="${annualPropertyTaxFinFlow?.amount ?: ''}"/>
+                    <text-line/>
                 </default-field>
             </field>
             <field name="propertyInsuranceCostsAnnually">
                 <default-field title="Property Insurance Costs Annually">
-                    <text-line default-value="${annualInsuranceCostFinFlow?.amount ?: ''}"/>
+                    <text-line/>
                 </default-field>
             </field>
 
