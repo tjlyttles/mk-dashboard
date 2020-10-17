@@ -41,8 +41,6 @@
     <!-- Applicants -->
     <service verb="validate" noun="PrimaryApplicantFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validatePrimaryApplicantFields">
         <in-parameters>
-            <parameter name="orderId"/>
-            <parameter name="orderPartSeqId"/>
             <parameter name="firstName"/>
             <parameter name="middleName"/>
             <parameter name="lastName"/>
@@ -77,13 +75,24 @@
             <parameter name="employerCity"/>
             <parameter name="employerStateProvinceGeoId"/>
             <parameter name="employerContactNumber"/>
-            <parameter name="otherMonthlyIncome" type="BigDecimal"/>
+            <parameter name="rentIncome" type="BigDecimal"/>
+            <parameter name="retirementIncome" type="BigDecimal"/>
+            <parameter name="investmentIncome" type="BigDecimal"/>
+            <parameter name="bonusIncome" type="BigDecimal"/>
+            <parameter name="socialSecurityIncome" type="BigDecimal"/>
+            <parameter name="disabilityIncome" type="BigDecimal"/>
+            <parameter name="studentIncome" type="BigDecimal"/>
+            <parameter name="unemploymentIncome" type="BigDecimal"/>
+            <parameter name="alimonyIncome" type="BigDecimal"/>
+            <parameter name="childSupportIncome" type="BigDecimal"/>
+            <parameter name="otherIncome" type="BigDecimal"/>
         </in-parameters>
     </service>
-    <service verb="create" noun="PrimaryApplicant" type="java" location="com.mkdecision.dashboard.OrderServices" method="createPrimaryApplicant">
+    <service verb="store" noun="PrimaryApplicant" type="java" location="com.mkdecision.dashboard.OrderServices" method="storePrimaryApplicant">
         <in-parameters>
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
             <parameter name="firstName">
                 <matches regexp="^[- A-Za-z']+$" message="Please enter a first name."/>
             </parameter>
@@ -112,8 +121,8 @@
             <parameter name="idTypeEnumId"/>
             <parameter name="idIssuedBy"/>
             <parameter name="idValue"/>
-            <parameter name="idIssueDate"/>
-            <parameter name="idExpiryDate"/>
+            <parameter name="idIssueDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="idExpiryDate" type="Date" format="MM-dd-yyyy"/>
             <parameter name="maritalStatusEnumId"/>
             <parameter name="contactNumber"/>
             <parameter name="contactMechPurposeId"/>
@@ -136,11 +145,29 @@
             <parameter name="employerCity"/>
             <parameter name="employerStateProvinceGeoId"/>
             <parameter name="employerContactNumber"/>
-            <parameter name="otherMonthlyIncome" type="BigDecimal"/>
+            <parameter name="rentIncome" type="BigDecimal"/>
+            <parameter name="retirementIncome" type="BigDecimal"/>
+            <parameter name="investmentIncome" type="BigDecimal"/>
+            <parameter name="bonusIncome" type="BigDecimal"/>
+            <parameter name="socialSecurityIncome" type="BigDecimal"/>
+            <parameter name="disabilityIncome" type="BigDecimal"/>
+            <parameter name="studentIncome" type="BigDecimal"/>
+            <parameter name="unemploymentIncome" type="BigDecimal"/>
+            <parameter name="alimonyIncome" type="BigDecimal"/>
+            <parameter name="childSupportIncome" type="BigDecimal"/>
+            <parameter name="otherIncome" type="BigDecimal"/>
         </in-parameters>
         <out-parameters>
             <parameter name="partyId"/>
         </out-parameters>
+    </service>
+    <service verb="delete" noun="Employment" type="java" location="com.mkdecision.dashboard.OrderServices" method="deleteEmployment">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="partyRelationshipId"/>
+        </in-parameters>
     </service>
 
     <!-- Property -->
