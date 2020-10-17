@@ -304,6 +304,89 @@ class OrderServices {
         return new HashMap<>()
     }
 
+    static Map<String, Object> validatePropertyFields(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String partyId = (String) cs.getOrDefault("partyId", null)
+        String assetId = (String) cs.getOrDefault("assetId", null)
+        String classEnumId = (String) cs.getOrDefault("classEnumId", null)
+        BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
+        BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
+        BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
+        BigDecimal propertyTaxesAnnually = (BigDecimal) cs.getOrDefault("propertyTaxesAnnually", null)
+        BigDecimal propertyInsuranceCostsAnnually = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsAnnually", null)
+        String lenderName = (String) cs.getOrDefault("lenderName", null)
+        BigDecimal mortgageBalance = (BigDecimal) cs.getOrDefault("mortgageBalance", null)
+        BigDecimal mortgagePaymentMonthly = (BigDecimal) cs.getOrDefault("mortgagePaymentMonthly", null)
+
+        // validate asset class
+        if (StringUtils.isBlank(classEnumId)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ASSET_CLASS"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate salvage value
+        if (salvageValue == null || salvageValue <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_SALVAGE_VALUE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate acquire cost
+        if (acquireCost == null || acquireCost <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ACQUIRE_COST"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate HOA monthly fee
+        if (hoaFeeMonthly == null || hoaFeeMonthly <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_HOA_FEE_MONTHLY"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate property tax annually
+        if (propertyTaxesAnnually == null || propertyTaxesAnnually <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_TAX_ANNUALLY"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate property insurance cost annually
+        if (propertyInsuranceCostsAnnually == null || propertyInsuranceCostsAnnually <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_INSURANCE_COST_ANNUALLY"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate lender name
+        if (StringUtils.isBlank(lenderName) && (mortgageBalance != null || mortgagePaymentMonthly != null)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_LENDER_NAME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate mortgage balance
+        if (mortgageBalance != null && mortgageBalance <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE_BALANCE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate mortgage payment monthly
+        if (mortgagePaymentMonthly != null && mortgagePaymentMonthly <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE_PAYMENT_MONTHLY"))
+            return new HashMap<String, Object>()
+        }
+
+        // return the output parameters
+        return new HashMap<>()
+    }
+
     static Map<String, Object> createOrder(ExecutionContext ec) {
 
         // shortcuts for convenience
@@ -645,7 +728,7 @@ class OrderServices {
         return outParams
     }
 
-    static Map<String, Object> createProperty(ExecutionContext ec) {
+    static Map<String, Object> storeProperty(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -659,7 +742,8 @@ class OrderServices {
         String orderId = (String) cs.getOrDefault("orderId", null)
         String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String partyId = (String) cs.getOrDefault("partyId", null)
-        String assetClassEnumId = (String) cs.getOrDefault("assetClassEnumId", null)
+        String assetId = (String) cs.getOrDefault("assetId", null)
+        String classEnumId = (String) cs.getOrDefault("classEnumId", null)
         BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
         BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
         BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
@@ -669,77 +753,177 @@ class OrderServices {
         BigDecimal mortgageBalance = (BigDecimal) cs.getOrDefault("mortgageBalance", null)
         BigDecimal mortgagePaymentMonthly = (BigDecimal) cs.getOrDefault("mortgagePaymentMonthly", null)
 
-        // TODO: Add validations
-
-        // create asset
-        Map<String, Object> assetResp = sf.sync().name("create#mantle.product.asset.Asset")
-                .parameter("assetTypeEnumId", "AstTpRealEstate")
-                .parameter("classEnumId", assetClassEnumId)
-                .parameter("salvageValue", salvageValue)
-                .parameter("acquireCost", acquireCost)
-                .parameter("ownerPartyId", partyId)
+        // validate fields
+        sf.sync().name("mkdecision.dashboard.OrderServices.validate#PropertyFields")
+                .parameters(cs)
                 .call()
-        String assetId = (String) assetResp.get("assetId")
+        if (mf.hasError()) {
+            return new HashMap<String, Object>()
+        }
 
-        // create HOA monthly fee
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("entryTypeEnumId", "MkEntryExpense")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowHoaMonthlyFee")
-                .parameter("assetId", assetId)
-                .parameter("amount", hoaFeeMonthly)
-                .call()
+        // store asset
+        boolean updateAsset = StringUtils.isNotBlank(assetId);
+        if (updateAsset) {
 
-        // create annual property taxes
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("entryTypeEnumId", "MkEntryExpense")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowAnnualPropertyTaxes")
-                .parameter("assetId", assetId)
-                .parameter("amount", propertyTaxesAnnually)
-                .call()
+            // update asset
+            sf.sync().name("update#mantle.product.asset.Asset")
+                    .parameter("assetId", assetId)
+                    .parameter("classEnumId", classEnumId)
+                    .parameter("salvageValue", salvageValue)
+                    .parameter("acquireCost", acquireCost)
+                    .call()
 
-        // create annual property taxes
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("entryTypeEnumId", "MkEntryExpense")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowAnnualInsuranceCosts")
-                .parameter("assetId", assetId)
-                .parameter("amount", propertyInsuranceCostsAnnually)
-                .call()
+            // update HOA monthly fee
+            EntityValue hoaMonthlyFeeFinFlow = ef.find("mk.close.FinancialFlow")
+                    .condition("entryTypeEnumId", "MkEntryExpense")
+                    .condition("financialFlowTypeEnumId", "MkFinFlowHoaMonthlyFee")
+                    .condition("partyId", partyId)
+                    .condition("assetId", assetId)
+                    .list()
+                    .getFirst();
+            sf.sync().name("update#mk.close.FinancialFlow")
+                    .parameter("financialFlowId", hoaMonthlyFeeFinFlow.getString("financialFlowId"))
+                    .parameter("amount", hoaFeeMonthly)
+                    .call()
+
+            // update annual property taxes
+            EntityValue annualPropertyTaxFinFlow = ef.find("mk.close.FinancialFlow")
+                    .condition("entryTypeEnumId", "MkEntryExpense")
+                    .condition("financialFlowTypeEnumId", "MkFinFlowAnnualPropertyTaxes")
+                    .condition("partyId", partyId)
+                    .condition("assetId", assetId)
+                    .list()
+                    .getFirst();
+            sf.sync().name("update#mk.close.FinancialFlow")
+                    .parameter("financialFlowId", annualPropertyTaxFinFlow.getString("financialFlowId"))
+                    .parameter("amount", propertyTaxesAnnually)
+                    .call()
+
+            // update annual insurance costs
+            EntityValue annualInsuranceCostFinFlow = ef.find("mk.close.FinancialFlow")
+                    .condition("entryTypeEnumId", "MkEntryExpense")
+                    .condition("financialFlowTypeEnumId", "MkFinFlowAnnualInsuranceCosts")
+                    .condition("partyId", partyId)
+                    .condition("assetId", assetId)
+                    .list()
+                    .getFirst();
+            sf.sync().name("update#mk.close.FinancialFlow")
+                    .parameter("financialFlowId", annualInsuranceCostFinFlow.getString("financialFlowId"))
+                    .parameter("amount", propertyTaxesAnnually)
+                    .call()
+        } else {
+
+            // create asset
+            Map<String, Object> assetResp = sf.sync().name("create#mantle.product.asset.Asset")
+                    .parameter("assetId", assetId)
+                    .parameter("assetTypeEnumId", "AstTpRealEstate")
+                    .parameter("classEnumId", classEnumId)
+                    .parameter("salvageValue", salvageValue)
+                    .parameter("acquireCost", acquireCost)
+                    .parameter("ownerPartyId", partyId)
+                    .call()
+            assetId = (String) assetResp.get("assetId")
+
+            // create HOA monthly fee
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryExpense")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowHoaMonthlyFee")
+                    .parameter("assetId", assetId)
+                    .parameter("amount", hoaFeeMonthly)
+                    .call()
+
+            // create annual property taxes
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryExpense")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowAnnualPropertyTaxes")
+                    .parameter("assetId", assetId)
+                    .parameter("amount", propertyTaxesAnnually)
+                    .call()
+
+            // create annual insurance costs
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryExpense")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowAnnualInsuranceCosts")
+                    .parameter("assetId", assetId)
+                    .parameter("amount", propertyInsuranceCostsAnnually)
+                    .call()
+        }
 
         // create lender
-        Map<String, Object> lenderResp = sf.sync().name("mantle.party.PartyServices.create#Organization")
-                .parameter("partyTypeEnumId", "PtyOrganization")
-                .parameter("organizationName", lenderName)
-                .parameter("roleTypeId", "Lender")
-                .call()
-        String lenderPartyId = (String) lenderResp.get("partyId")
+        if (StringUtils.isNotBlank(lenderName)) {
 
-        // create lender relation
-        Map<String, Object> lenderRelationshipResp = sf.sync().name("create#mantle.party.PartyRelationship")
-                .parameter("relationshipTypeEnumId", "PrtMortgage")
-                .parameter("fromPartyId", partyId)
-                .parameter("fromRoleTypeId", "Borrower")
-                .parameter("toPartyId", lenderPartyId)
-                .parameter("toRoleTypeId", "Lender")
-                .parameter("fromDate", uf.getNowTimestamp())
-                .call()
-        String lenderRelationshipId = lenderRelationshipResp.get("partyRelationshipId")
+            // create lender
+            Map<String, Object> lenderResp = sf.sync().name("mantle.party.PartyServices.create#Organization")
+                    .parameter("partyTypeEnumId", "PtyOrganization")
+                    .parameter("organizationName", lenderName)
+                    .parameter("roleTypeId", "Lender")
+                    .call()
+            String lenderPartyId = (String) lenderResp.get("partyId")
 
-        // create mortgage
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("entryTypeEnumId", "MkEntryExpense")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowMortgage")
-                .parameter("partyRelationshipId", lenderRelationshipId)
-                .parameter("balance", mortgageBalance)
-                .parameter("amount", mortgagePaymentMonthly)
-                .call()
+            // create lender relation
+            Map<String, Object> lenderRelationshipResp = sf.sync().name("create#mantle.party.PartyRelationship")
+                    .parameter("relationshipTypeEnumId", "PrtMortgage")
+                    .parameter("fromPartyId", partyId)
+                    .parameter("fromRoleTypeId", "Borrower")
+                    .parameter("toPartyId", lenderPartyId)
+                    .parameter("toRoleTypeId", "Lender")
+                    .parameter("fromDate", uf.getNowTimestamp())
+                    .call()
+            String lenderRelationshipId = lenderRelationshipResp.get("partyRelationshipId")
+
+            // create mortgage
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryExpense")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowMortgage")
+                    .parameter("partyRelationshipId", lenderRelationshipId)
+                    .parameter("balance", mortgageBalance)
+                    .parameter("amount", mortgagePaymentMonthly)
+                    .call()
+        }
 
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()
         outParams.put("assetId", assetId)
         return outParams
+    }
+
+    static Map<String, Object> deleteMortgage(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String partyId = (String) cs.getOrDefault("partyId", null)
+        String partyRelationshipId = (String) cs.getOrDefault("partyRelationshipId", null)
+
+        // find relationship
+        EntityValue relationship = ef.find("mantle.party.PartyRelationship")
+                .condition("partyRelationshipId", partyRelationshipId)
+                .one()
+
+        // validate relationship
+        if (relationship == null || !StringUtils.equals(partyId, relationship.getString("fromPartyId")) || !StringUtils.equals(relationship.getString("relationshipTypeEnumId"), "PrtMortgage")) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE"))
+            return new HashMap<String, Object>()
+        }
+
+        // delete relationship
+        sf.sync().name("delete#mantle.party.PartyRelationship")
+                .parameter("partyRelationshipId", partyRelationshipId)
+                .call()
+
+        // return the output parameters
+        return new HashMap<>()
     }
 }
