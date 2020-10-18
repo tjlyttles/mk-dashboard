@@ -5,16 +5,24 @@
         default-menu-include="false"
         default-menu-index="5">
 
-    <parameter name="orderId"/>
-    <parameter name="orderPartSeqId"/>
-    <parameter name="partyId"/>
-    <parameter name="assetId"/>
+    <parameter name="orderId" required="true"/>
+    <parameter name="orderPartSeqId" required="true"/>
+    <parameter name="partyId" required="true"/>
+    <parameter name="assetId" required="true"/>
 
     <transition name="openOrder">
         <default-response url="../../Dashboard"/>
     </transition>
     <transition name="requestAgreement">
         <default-response url="."/>
+    </transition>
+    <transition name="viewProperty">
+        <default-response url="../Property">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="assetId"/>
+        </default-response>
     </transition>
 
     <widgets>
@@ -51,6 +59,11 @@
                     <submit/>
                 </default-field>
             </field>
+            <field name="backButton">
+                <default-field container-style="dark-link">
+                    <link url="viewProperty" text="Back" btn-type="default"/>
+                </default-field>
+            </field>
 
             <field-layout>
                 <field-col-row>
@@ -66,7 +79,8 @@
 
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6" style="text-right"><field-ref name="buttons"/></field-col>
+                    <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="backButton"/></field-col>
+                    <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="buttons"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
             </field-layout>

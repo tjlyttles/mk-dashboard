@@ -5,6 +5,7 @@
     <service verb="get" noun="ProductParameterValue" type="java" location="com.mkdecision.dashboard.ProductServices" method="getProductParameterValue">
         <in-parameters>
             <parameter name="productId"/>
+            <parameter name="productStoreId"/>
             <parameter name="productParameterId"/>
         </in-parameters>
         <out-parameters>

@@ -20,19 +20,6 @@
         <alias name="middleName" entity-alias="PERS" field="middleName"/>
         <alias name="lastName" entity-alias="PERS" field="lastName"/>
     </view-entity>
-    <view-entity entity-name="ProductStoreProductDetail" package="mkdecision.dashboard">
-        <member-entity entity-alias="PSP" entity-name="mantle.product.store.ProductStoreProduct"/>
-        <member-entity entity-alias="PRD" entity-name="mantle.product.Product" join-from-alias="PSP">
-            <key-map field-name="productId"/>
-        </member-entity>
-        <member-entity entity-alias="STR" entity-name="mantle.product.store.ProductStore" join-from-alias="PSP">
-            <key-map field-name="productStoreId"/>
-        </member-entity>
-
-        <alias-all entity-alias="PRD"/>
-        <alias name="productStoreId" entity-alias="PSP" field="productStoreId"/>
-        <alias name="storeName" entity-alias="STR" field="storeName"/>
-    </view-entity>
     <view-entity entity-name="ProductStoreCategoryDetail" package="mkdecision.dashboard">
         <member-entity entity-alias="PSCT" entity-name="mantle.product.store.ProductStoreCategory"/>
         <member-entity entity-alias="PCAT" entity-name="mantle.product.category.ProductCategory" join-from-alias="PSCT">
