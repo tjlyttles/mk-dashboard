@@ -95,7 +95,7 @@
             <row-col lg="6" style="text-right">
                 <section-iterate name="TransitionIterator" list="transitionList" entry="transition">
                     <widgets>
-                        <link url="updateOrderStatus" text="${transition.transitionName}" parameter-map="[orderId: orderId, statusId: transition.toStatusId]"/>
+                        <link url="updateOrderStatus" text="${transition.transitionName}" parameter-map="[orderId: orderId, statusId: transition.toStatusId]" btn-type="success"/>
                     </widgets>
                 </section-iterate>
             </row-col>
