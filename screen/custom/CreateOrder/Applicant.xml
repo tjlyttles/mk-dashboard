@@ -201,17 +201,17 @@
 
             <set field="totalNonEmploymentIncome" from="0" type="BigDecimal"/>
             <script><![CDATA[
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(rentIncome == null ? BigDecimal.ZERO : new BigDecimal(rentIncome))
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(retirementIncome == null ? BigDecimal.ZERO : new BigDecimal(retirementIncome))
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(investmentIncome == null ? BigDecimal.ZERO : new BigDecimal(investmentIncome))
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(bonusIncome == null ? BigDecimal.ZERO : new BigDecimal(bonusIncome))
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(socialSecurityIncome == null ? BigDecimal.ZERO : new BigDecimal(socialSecurityIncome))
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(disabilityIncome == null ? BigDecimal.ZERO : new BigDecimal(disabilityIncome))
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(studentIncome == null ? BigDecimal.ZERO : new BigDecimal(studentIncome))
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(unemploymentIncome == null ? BigDecimal.ZERO : new BigDecimal(unemploymentIncome))
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(alimonyIncome == null ? BigDecimal.ZERO : new BigDecimal(alimonyIncome))
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(childSupportIncome == null ? BigDecimal.ZERO : new BigDecimal(childSupportIncome))
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(otherIncome == null ? BigDecimal.ZERO : new BigDecimal(otherIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(rentIncome == null || rentIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(rentIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(retirementIncome == null || retirementIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(retirementIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(investmentIncome == null || investmentIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(investmentIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(bonusIncome == null || bonusIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(bonusIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(socialSecurityIncome == null || socialSecurityIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(socialSecurityIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(disabilityIncome == null || disabilityIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(disabilityIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(studentIncome == null || studentIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(studentIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(unemploymentIncome == null || unemploymentIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(unemploymentIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(alimonyIncome == null || alimonyIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(alimonyIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(childSupportIncome == null || childSupportIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(childSupportIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(otherIncome == null || otherIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(otherIncome))
             ]]></script>
         </if>
     </actions>
@@ -570,7 +570,7 @@
             </field>
             <field name="employmentNumberHeader">
                 <default-field>
-                    <label text="Employment ${employmentRelationList.size() + 1}" style="margin-tb-1"/>
+                    <label text="Employment ${(employmentRelationList?.size() ?: 0) + 1}" style="margin-tb-1"/>
                 </default-field>
             </field>
             <field name="employmentStatusEnumId">

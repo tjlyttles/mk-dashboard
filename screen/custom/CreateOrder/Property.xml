@@ -193,7 +193,7 @@
             </field>
             <field name="mortgageNumberHeader">
                 <default-field>
-                    <label text="Mortgage ${mortgageRelationList.size() + 1}" style="margin-tb-1"/>
+                    <label text="Mortgage ${(mortgageRelationList?.size() ?: 0) + 1}" style="margin-tb-1"/>
                 </default-field>
             </field>
             <field name="lenderName">
