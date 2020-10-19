@@ -1,17 +1,36 @@
 .text-light-grey { color: rgb(117, 117, 117); }
 
 .margin-all-0 { margin: 0em; }
+.margin-all-05 { margin: 0.5em; }
 .margin-all-1 { margin: 1em; }
+.margin-tb-05 { margin: 0.5em 0 0.5em 0; }
 .margin-tb-1 { margin: 1em 0 1em 0; }
 .margin-tb-2 { margin: 2em 0 2em 0; }
 .margin-lr-1 { margin: 0 1em 0 1em; }
 .margin-b-1 { margin-bottom: 1em; }
 .margin-b-2 { margin-bottom: 2em; }
+.margin-l-05 { margin-left: 0.5em; }
+.margin-r-05 { margin-right: 0.5em; }
 
 .padding-all-0 { padding: 0em; }
 .padding-all-1 { padding: 1em; }
+.padding-tb-05 { padding: 0.5em 0 0.5em 0; }
 .padding-tb-1 { padding: 1em 0 1em 0; }
+.padding-lr-05 { padding: 0 0.5em 0 0.5em; }
 .padding-lr-1 { padding: 0 1em 0 1em; }
+
 
 .h-separator { border-bottom: 1px solid rgb(211, 212, 216); }
 .v-separator { border-right: 1px solid rgb(211, 212, 216); }
+
+/* Quasar hacks */
+.nested-form-field .q-ma-sm { margin: 8px 0px !important; }
+.dark-link .q-link { color:black; }
+
+/* Quasar overrides */
+.q-field--auto-height.q-field--dense .q-field__control, .q-field--auto-height.q-field--dense .q-field__native {
+    min-height: 50px !important;
+}
+.q-field--dense .q-field__control, .q-field--dense .q-field__marginal {
+    height: 50px !important;
+}

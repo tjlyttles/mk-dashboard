@@ -39,7 +39,7 @@ class OrderServices {
         BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
         BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
         String amount = (String) cs.getOrDefault("amount", null)
-        BigDecimal estimatedAmount = (BigDecimal) cs.getOrDefault("estimatedAmount", null)
+        BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
 
         // validate product store
         EntityFacadeImpl efi = (EntityFacadeImpl) ef
@@ -107,16 +107,6 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
-        // validate product
-        long productCount = ef.find("mkdecision.dashboard.ProductStoreProductDetail")
-                .condition("productStoreId", productStoreId)
-                .condition("productId", productId)
-                .count()
-        if (productCount == 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT"))
-            return new HashMap<String, Object>()
-        }
-
         // validate total purchase price
         if (totalPurchasePrice == null || totalPurchasePrice <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_TOTAL_PURCHASE_PRICE"))
@@ -136,20 +126,280 @@ class OrderServices {
         }
 
         // validate amount
-        BigDecimal amountBigDecimal = new BigDecimal(amount);
+        BigDecimal amountBigDecimal = new BigDecimal(amount)
         if (amountBigDecimal == null || amountBigDecimal != ((totalPurchasePrice + loanFee) - downPayment)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_AMOUNT"))
             return new HashMap<String, Object>()
         }
 
         // validate estimated amount
-        if (estimatedAmount == null || estimatedAmount <= 0) {
+        if (estimatedPayment == null || estimatedPayment <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ESTIMATED_AMOUNT"))
             return new HashMap<String, Object>()
         }
 
         // return the output parameters
         return new HashMap<>()
+    }
+
+    static Map<String, Object> storeOrder(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String salesChannelEnumId = (String) cs.getOrDefault("salesChannelEnumId", null)
+        String productStoreId = (String) cs.getOrDefault("productStoreId", null)
+        String salesRepresentativeId = (String) cs.getOrDefault("salesRepresentativeId", null)
+        String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
+        String productId = (String) cs.getOrDefault("productId", null)
+        String formResponseId = (String) cs.getOrDefault("formResponseId", null)
+        BigDecimal totalPurchasePrice = (BigDecimal) cs.getOrDefault("totalPurchasePrice", null)
+        BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
+        BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
+        BigDecimal amount = (BigDecimal) cs.getOrDefault("amount", null)
+        BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
+
+        // validate fields
+        sf.sync().name("mkdecision.dashboard.OrderServices.validate#OrderFields")
+                .parameters(cs)
+                .call()
+        if (mf.hasError()) {
+            return new HashMap<String, Object>()
+        }
+
+        // find product form
+        EntityList formList = ef.find("mantle.product.ProductDbForm")
+                .condition("productId", productId)
+                .list()
+        EntityValue form = formList.isEmpty() ? null : formList.getFirst()
+        if (form == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ELIGIBILITY_FORM"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate form fields
+        String formId = form.getString("formId")
+        EntityList fieldList = ef.find("moqui.screen.form.DbFormField")
+                .condition("formId", formId)
+                .list()
+        for (EntityValue field : fieldList) {
+            long answerCount = ef.find("moqui.screen.form.FormResponseAnswer")
+                    .condition("formResponseId", formResponseId)
+                    .condition("formId", formId)
+                    .condition("fieldName", field.getString("fieldName"))
+                    .condition("valueText", "true")
+                    .count()
+            if (answerCount == 0) {
+                mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
+                return new HashMap<String, Object>()
+            }
+        }
+
+        // store order
+        boolean updateOrder = StringUtils.isNotBlank(orderId) && StringUtils.isNotBlank(orderPartSeqId);
+        if (updateOrder) {
+
+            // update order header
+            sf.sync().name("mantle.order.OrderServices.update#OrderHeader")
+                    .parameter("orderId", orderId)
+                    .parameter("salesChannelEnumId", salesChannelEnumId)
+                    .parameter("productStoreId", productStoreId)
+                    .call()
+
+            // delete order party
+            sf.sync().name("delete#mantle.order.OrderPartParty")
+                    .parameter("orderId", orderId)
+                    .parameter("orderPartSeqId", orderPartSeqId)
+                    .parameter("partyId", "*")
+                    .parameter("roleTypeId", "SalesRepresentative")
+                    .call()
+
+            // create order party
+            sf.sync().name("create#mantle.order.OrderPartParty")
+                    .parameter("orderId", orderId)
+                    .parameter("orderPartSeqId", orderPartSeqId)
+                    .parameter("partyId", salesRepresentativeId)
+                    .parameter("roleTypeId", "SalesRepresentative")
+                    .call()
+
+            // find order item
+            EntityValue orderItem = ef.find("mantle.order.OrderItem")
+                    .condition("orderId", orderId)
+                    .condition("orderPartSeqId", orderPartSeqId)
+                    .orderBy("-lastUpdatedStamp")
+                    .list()
+                    .getFirst()
+            String orderItemSeqId = orderItem.getString("orderItemSeqId")
+            String productParameterSetId = orderItem.getString("productParameterSetId")
+
+            // update order item
+            sf.sync().name("mantle.order.OrderServices.update#OrderItem")
+                    .parameter("orderId", orderId)
+                    .parameter("orderPartSeqId", orderPartSeqId)
+                    .parameter("orderItemSeqId", orderItemSeqId)
+                    .parameter("productId", productId)
+                    .parameter("unitAmount", amount)
+                    .call()
+
+            // delete order item form response
+            sf.sync().name("delete#mantle.order.OrderItemFormResponse")
+                    .parameter("orderId", orderId)
+                    .parameter("orderItemSeqId", orderItemSeqId)
+                    .parameter("formResponseId", "*")
+                    .call()
+
+            // create order item form response
+            sf.sync().name("update#mantle.order.OrderItemFormResponse")
+                    .parameter("orderId", orderId)
+                    .parameter("orderItemSeqId", orderItemSeqId)
+                    .parameter("formResponseId", formResponseId)
+                    .call()
+
+            // update product category
+            EntityValue productCategoryParam = ef.find("mantle.product.ProductParameterValue")
+                    .condition("productParameterId", "ProductCategory")
+                    .condition("productParameterSetId", productParameterSetId)
+                    .list()
+                    .getFirst()
+            sf.sync().name("update#mantle.product.ProductParameterValue")
+                    .parameter("productParameterValueId", productCategoryParam.getString("productParameterValueId"))
+                    .parameter("parameterValue", productCategoryId)
+                    .call()
+
+            // update total purchase price
+            EntityValue totalPurchasePriceParam = ef.find("mantle.product.ProductParameterValue")
+                    .condition("productParameterId", "TotalPurchasePrice")
+                    .condition("productParameterSetId", productParameterSetId)
+                    .list()
+                    .getFirst()
+            sf.sync().name("update#mantle.product.ProductParameterValue")
+                    .parameter("productParameterValueId", totalPurchasePriceParam.getString("productParameterValueId"))
+                    .parameter("parameterValue", totalPurchasePrice)
+                    .call()
+
+            // update down payment
+            EntityValue downPaymentParam = ef.find("mantle.product.ProductParameterValue")
+                    .condition("productParameterId", "DownPayment")
+                    .condition("productParameterSetId", productParameterSetId)
+                    .list()
+                    .getFirst()
+            sf.sync().name("update#mantle.product.ProductParameterValue")
+                    .parameter("productParameterValueId", downPaymentParam.getString("productParameterValueId"))
+                    .parameter("parameterValue", downPayment)
+                    .call()
+
+            // update loan fee
+            EntityValue loanFeeParam = ef.find("mantle.product.ProductParameterValue")
+                    .condition("productParameterId", "LoanFee")
+                    .condition("productParameterSetId", productParameterSetId)
+                    .list()
+                    .getFirst()
+            sf.sync().name("update#mantle.product.ProductParameterValue")
+                    .parameter("productParameterValueId", loanFeeParam.getString("productParameterValueId"))
+                    .parameter("parameterValue", loanFee)
+                    .call()
+
+            // update estimated amount
+            EntityValue estimatedPaymentParam = ef.find("mantle.product.ProductParameterValue")
+                    .condition("productParameterId", "EstimatedPayment")
+                    .condition("productParameterSetId", productParameterSetId)
+                    .list()
+                    .getFirst()
+            sf.sync().name("update#mantle.product.ProductParameterValue")
+                    .parameter("productParameterValueId", estimatedPaymentParam.getString("productParameterValueId"))
+                    .parameter("parameterValue", estimatedPayment)
+                    .call()
+        } else {
+
+            // create order header
+            Map<String, Object> orderHeaderResp = sf.sync().name("mantle.order.OrderServices.create#Order")
+                    .parameter("salesChannelEnumId", salesChannelEnumId)
+                    .parameter("enteredByPartyId", uf.getUserAccount().getString("partyId"))
+                    .parameter("productStoreId", productStoreId)
+                    .call()
+            orderId = (String) orderHeaderResp.get("orderId")
+            orderPartSeqId = (String) orderHeaderResp.get("orderPartSeqId")
+
+            // create order party
+            sf.sync().name("create#mantle.order.OrderPartParty")
+                    .parameter("orderId", orderId)
+                    .parameter("orderPartSeqId", orderPartSeqId)
+                    .parameter("partyId", salesRepresentativeId)
+                    .parameter("roleTypeId", "SalesRepresentative")
+                    .call()
+
+            // create product parameter set
+            Map<String, Object> productParameterSetResp = sf.sync().name("create#mantle.product.ProductParameterSet")
+                    .parameter("productId", productId)
+                    .call()
+            String productParameterSetId = (String) productParameterSetResp.get("productParameterSetId")
+
+            // create order item
+            Map<String, Object> orderItemResp = sf.sync().name("mantle.order.OrderServices.create#OrderItem")
+                    .parameter("orderId", orderId)
+                    .parameter("orderPartSeqId", orderPartSeqId)
+                    .parameter("productId", productId)
+                    .parameter("productParameterSetId", productParameterSetId)
+                    .parameter("unitAmount", amount)
+                    .call()
+            String orderItemSeqId = (String) orderItemResp.get("orderItemSeqId")
+
+            // create order item form response
+            sf.sync().name("create#mantle.order.OrderItemFormResponse")
+                    .parameter("orderId", orderId)
+                    .parameter("orderItemSeqId", orderItemSeqId)
+                    .parameter("formResponseId", formResponseId)
+                    .call()
+
+            // create product category
+            sf.sync().name("create#mantle.product.ProductParameterValue")
+                    .parameter("productParameterId", "ProductCategory")
+                    .parameter("productParameterSetId", productParameterSetId)
+                    .parameter("parameterValue", productCategoryId)
+                    .call()
+
+            // create total purchase price
+            sf.sync().name("create#mantle.product.ProductParameterValue")
+                    .parameter("productParameterId", "TotalPurchasePrice")
+                    .parameter("productParameterSetId", productParameterSetId)
+                    .parameter("parameterValue", totalPurchasePrice)
+                    .call()
+
+            // create down payment
+            sf.sync().name("create#mantle.product.ProductParameterValue")
+                    .parameter("productParameterId", "DownPayment")
+                    .parameter("productParameterSetId", productParameterSetId)
+                    .parameter("parameterValue", downPayment)
+                    .call()
+
+            // create loan fee
+            sf.sync().name("create#mantle.product.ProductParameterValue")
+                    .parameter("productParameterId", "LoanFee")
+                    .parameter("productParameterSetId", productParameterSetId)
+                    .parameter("parameterValue", loanFee)
+                    .call()
+
+            // create estimated payment
+            sf.sync().name("create#mantle.product.ProductParameterValue")
+                    .parameter("productParameterId", "EstimatedPayment")
+                    .parameter("productParameterSetId", productParameterSetId)
+                    .parameter("parameterValue", estimatedPayment)
+                    .call()
+        }
+
+        // return the output parameters
+        Map<String, Object> outParams = new HashMap<>()
+        outParams.put("orderId", orderId)
+        outParams.put("orderPartSeqId", orderPartSeqId)
+        return outParams
     }
 
     static Map<String, Object> validatePrimaryApplicantFields(ExecutionContext ec) {
@@ -163,8 +413,6 @@ class OrderServices {
         L10nFacade lf = ec.getL10n()
 
         // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String firstName = (String) cs.getOrDefault("firstName", null)
         String middleName = (String) cs.getOrDefault("middleName", null)
         String lastName = (String) cs.getOrDefault("lastName", null)
@@ -175,12 +423,12 @@ class OrderServices {
         String city = (String) cs.getOrDefault("city", null)
         String stateProvinceGeoId = (String) cs.getOrDefault("stateProvinceGeoId", null)
         String socialSecurityNumber = (String) cs.getOrDefault("socialSecurityNumber", null)
-        String birthDate = (String) cs.getOrDefault("birthDate", null)
+        Date birthDate = (Date) cs.getOrDefault("birthDate", null)
         String idTypeEnumId = (String) cs.getOrDefault("idTypeEnumId", null)
         String idIssuedBy = (String) cs.getOrDefault("idIssuedBy", null)
         String idValue = (String) cs.getOrDefault("idValue", null)
-        String idIssueDate = (String) cs.getOrDefault("idIssueDate", null)
-        String idExpiryDate = (String) cs.getOrDefault("idExpiryDate", null)
+        Date idIssueDate = (Date) cs.getOrDefault("idIssueDate", null)
+        Date idExpiryDate = (Date) cs.getOrDefault("idExpiryDate", null)
         String maritalStatusEnumId = (String) cs.getOrDefault("maritalStatusEnumId", null)
         String contactNumber = (String) cs.getOrDefault("contactNumber", null)
         String contactMechPurposeId = (String) cs.getOrDefault("contactMechPurposeId", null)
@@ -199,7 +447,17 @@ class OrderServices {
         String employerCity = (String) cs.getOrDefault("employerCity", null)
         String employerStateProvinceGeoId = (String) cs.getOrDefault("employerStateProvinceGeoId", null)
         String employerContactNumber = (String) cs.getOrDefault("employerContactNumber", null)
-        BigDecimal otherMonthlyIncome = (BigDecimal) cs.getOrDefault("otherMonthlyIncome", null)
+        BigDecimal rentIncome = (BigDecimal) cs.getOrDefault("rentIncome", null)
+        BigDecimal retirementIncome = (BigDecimal) cs.getOrDefault("retirementIncome", null)
+        BigDecimal investmentIncome = (BigDecimal) cs.getOrDefault("investmentIncome", null)
+        BigDecimal bonusIncome = (BigDecimal) cs.getOrDefault("bonusIncome", null)
+        BigDecimal socialSecurityIncome = (BigDecimal) cs.getOrDefault("socialSecurityIncome", null)
+        BigDecimal disabilityIncome = (BigDecimal) cs.getOrDefault("disabilityIncome", null)
+        BigDecimal studentIncome = (BigDecimal) cs.getOrDefault("studentIncome", null)
+        BigDecimal unemploymentIncome = (BigDecimal) cs.getOrDefault("unemploymentIncome", null)
+        BigDecimal alimonyIncome = (BigDecimal) cs.getOrDefault("alimonyIncome", null)
+        BigDecimal childSupportIncome = (BigDecimal) cs.getOrDefault("childSupportIncome", null)
+        BigDecimal otherIncome = (BigDecimal) cs.getOrDefault("otherIncome", null)
 
         // validate first name
         if (StringUtils.isBlank(firstName)) {
@@ -219,15 +477,15 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
-        // validate city
-        if (StringUtils.isBlank(city)) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_CITY"))
-            return new HashMap<String, Object>()
-        }
-
         // validate postal code
         if (StringUtils.isBlank(postalCode)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_POSTAL_CODE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate city
+        if (StringUtils.isBlank(city)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_CITY"))
             return new HashMap<String, Object>()
         }
 
@@ -238,12 +496,11 @@ class OrderServices {
         }
 
         // validate date of birth
-        Date dob = lf.parseDate(birthDate, "MM-dd-yyyy")
-        Date minDob = DateUtils.addYears(new Date(), -18)
-        if (dob == null) {
+        Date minBirthDate = DateUtils.addYears(new Date(), -18)
+        if (birthDate == null) {
             mf.addError(lf.localize("DASHBOARD_INVALID_DOB"))
             return new HashMap<String, Object>()
-        } else if (dob.after(minDob)) {
+        } else if (birthDate.after(minBirthDate)) {
             mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
             return new HashMap<String, Object>()
         }
@@ -258,8 +515,122 @@ class OrderServices {
         if (StringUtils.isBlank(email)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL"))
             return new HashMap<String, Object>()
-        } else if(!StringUtils.equals(email, emailVerify)) {
+        } else if (!StringUtils.equals(email, emailVerify)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL_VERIFY"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate occupation
+        if (StringUtils.isBlank(occupation)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_OCCUPATION"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate employer name
+        if (StringUtils.isBlank(employerName)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYER_NAME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate job title
+        if (StringUtils.isBlank(jobTitle)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_JOB_TITLE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate duration
+        if (years == null || years < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
+            return new HashMap<String, Object>()
+        } else if (months == null || months < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
+            return new HashMap<String, Object>()
+        } else if (years == 0 && months == 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate monthly income
+        if (monthlyIncome == null || monthlyIncome < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_MONTHLY_INCOME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate employer postal code
+        if (StringUtils.isBlank(employerPostalCode)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYER_POSTAL_CODE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate employer city
+        if (StringUtils.isBlank(employerCity)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYER_CITY"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate rent income
+        if (rentIncome != null && rentIncome < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_RENT_INCOME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate retirement income
+        if (retirementIncome != null && retirementIncome < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_RETIREMENT_INCOME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate investment income
+        if (investmentIncome != null && investmentIncome < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_INVESTMENT_INCOME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate bonus income
+        if (bonusIncome != null && bonusIncome < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_BONUS_INCOME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate social security income
+        if (socialSecurityIncome != null && socialSecurityIncome < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_SOCIAL_SECURITY_INCOME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate disability income
+        if (disabilityIncome != null && disabilityIncome < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_DISABILITY_INCOME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate student income
+        if (studentIncome != null && studentIncome < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_STUDENT_INCOME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate unemployment income
+        if (unemploymentIncome != null && unemploymentIncome < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_UNEMPLOYMENT_INCOME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate alimony income
+        if (alimonyIncome != null && alimonyIncome < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ALIMONY_INCOME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate child support income
+        if (childSupportIncome != null && childSupportIncome < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_CHILD_SUPPORT_INCOME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate other income
+        if (otherIncome != null && otherIncome < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_OTHER_INCOME"))
             return new HashMap<String, Object>()
         }
 
@@ -267,141 +638,7 @@ class OrderServices {
         return new HashMap<>()
     }
 
-    static Map<String, Object> createOrder(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
-        MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
-
-        // get the parameters
-        String salesChannelEnumId = (String) cs.getOrDefault("salesChannelEnumId", null)
-        String productStoreId = (String) cs.getOrDefault("productStoreId", null)
-        String salesRepresentativeId = (String) cs.getOrDefault("salesRepresentativeId", null)
-        String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
-        String productId = (String) cs.getOrDefault("productId", null)
-        BigDecimal totalPurchasePrice = (BigDecimal) cs.getOrDefault("totalPurchasePrice", null)
-        BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
-        BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
-        BigDecimal amount = (BigDecimal) cs.getOrDefault("amount", null)
-        BigDecimal estimatedAmount = (BigDecimal) cs.getOrDefault("estimatedAmount", null)
-
-        // validate fields
-        sf.sync().name("mkdecision.dashboard.OrderServices.validate#OrderFields")
-                .parameters(cs)
-                .call();
-        if (mf.hasError()) {
-            return new HashMap<String, Object>();
-        }
-
-        // find product form
-        EntityList formList = ef.find("mantle.product.ProductDbForm")
-                .condition("productId", productId)
-                .list();
-        EntityValue form = formList.isEmpty() ? null : formList.getFirst();
-        if (form == null) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_ELIGIBILITY_FORM"))
-            return new HashMap<String, Object>()
-        }
-
-        // add eligibility answers to map
-        Map<String, String> answerMap = new HashMap<>();
-        for (int i = 1; i <= 10; i++) {
-            String fieldName = String.format("eligibilityQuestion%d", i);
-            answerMap.put(fieldName, (String) cs.getOrDefault(fieldName, null))
-        }
-
-        // validate form fields
-        EntityList fieldList = ef.find("moqui.screen.form.DbFormField")
-                .condition("formId", form.getString("formId"))
-                .list()
-        for (EntityValue field : fieldList) {
-            String fieldName = field.getString("fieldName")
-            String answer = answerMap.get(fieldName);
-            if (answer == null || answer != "true") {
-                mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
-                return new HashMap<String, Object>()
-            }
-        }
-
-        // create order header
-        Map<String, Object> orderHeaderResp = sf.sync().name("mantle.order.OrderServices.create#Order")
-                .parameter("salesChannelEnumId", salesChannelEnumId)
-                .parameter("enteredByPartyId", uf.getUserAccount().getString("partyId"))
-                .parameter("productStoreId", productStoreId)
-                .call()
-        String orderId = (String) orderHeaderResp.get("orderId")
-        String orderPartSeqId = (String) orderHeaderResp.get("orderPartSeqId")
-
-        // create order party
-        sf.sync().name("create#mantle.order.OrderPartParty")
-                .parameter("orderId", orderId)
-                .parameter("orderPartSeqId", orderPartSeqId)
-                .parameter("partyId", salesRepresentativeId)
-                .parameter("roleTypeId", "SalesRepresentative")
-                .call()
-
-        // create product parameter set
-        Map<String, Object> productParameterSetResp = sf.sync().name("create#mantle.product.ProductParameterSet")
-                .parameter("productId", productId)
-                .call()
-        String productParameterSetId = (String) productParameterSetResp.get("productParameterSetId")
-
-        // create order item
-        sf.sync().name("mantle.order.OrderServices.create#OrderItem")
-                .parameter("orderId", orderId)
-                .parameter("orderPartSeqId", orderPartSeqId)
-                .parameter("productId", productId)
-                .parameter("productParameterSetId", productParameterSetId)
-                .parameter("unitAmount", amount)
-                .call();
-
-        // create product category
-        sf.sync().name("create#mantle.product.ProductParameterValue")
-                .parameter("productParameterId", "ProductCategory")
-                .parameter("productParameterSetId", productParameterSetId)
-                .parameter("parameterValue", productCategoryId)
-                .call()
-
-        // create purchase price
-        sf.sync().name("create#mantle.product.ProductParameterValue")
-                .parameter("productParameterId", "TotalPurchasePrice")
-                .parameter("productParameterSetId", productParameterSetId)
-                .parameter("parameterValue", totalPurchasePrice)
-                .call()
-
-        // create down payment
-        sf.sync().name("create#mantle.product.ProductParameterValue")
-                .parameter("productParameterId", "DownPayment")
-                .parameter("productParameterSetId", productParameterSetId)
-                .parameter("parameterValue", downPayment)
-                .call()
-
-        // create loan fee
-        sf.sync().name("create#mantle.product.ProductParameterValue")
-                .parameter("productParameterId", "LoanFee")
-                .parameter("productParameterSetId", productParameterSetId)
-                .parameter("parameterValue", loanFee)
-                .call()
-
-        // create projected payment
-        sf.sync().name("create#mantle.product.ProductParameterValue")
-                .parameter("productParameterId", "EstimatedPayment")
-                .parameter("productParameterSetId", productParameterSetId)
-                .parameter("parameterValue", estimatedAmount)
-                .call()
-
-        // return the output parameters
-        Map<String, Object> outParams = new HashMap<>()
-        outParams.put("orderId", orderId)
-        outParams.put("orderPartSeqId", orderPartSeqId)
-        return outParams
-    }
-
-    static Map<String, Object> createPrimaryApplicant(ExecutionContext ec) {
+    static Map<String, Object> storePrimaryApplicant(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -414,6 +651,7 @@ class OrderServices {
         // get the parameters
         String orderId = (String) cs.getOrDefault("orderId", null)
         String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String partyId = (String) cs.getOrDefault("partyId", null)
         String firstName = (String) cs.getOrDefault("firstName", null)
         String middleName = (String) cs.getOrDefault("middleName", null)
         String lastName = (String) cs.getOrDefault("lastName", null)
@@ -424,12 +662,12 @@ class OrderServices {
         String city = (String) cs.getOrDefault("city", null)
         String stateProvinceGeoId = (String) cs.getOrDefault("stateProvinceGeoId", null)
         String socialSecurityNumber = (String) cs.getOrDefault("socialSecurityNumber", null)
-        String birthDate = (String) cs.getOrDefault("birthDate", null)
+        Date birthDate = (Date) cs.getOrDefault("birthDate", null)
         String idTypeEnumId = (String) cs.getOrDefault("idTypeEnumId", null)
         String idIssuedBy = (String) cs.getOrDefault("idIssuedBy", null)
         String idValue = (String) cs.getOrDefault("idValue", null)
-        String idIssueDate = (String) cs.getOrDefault("idIssueDate", null)
-        String idExpiryDate = (String) cs.getOrDefault("idExpiryDate", null)
+        Date idIssueDate = (Date) cs.getOrDefault("idIssueDate", null)
+        Date idExpiryDate = (Date) cs.getOrDefault("idExpiryDate", null)
         String maritalStatusEnumId = (String) cs.getOrDefault("maritalStatusEnumId", null)
         String contactNumber = (String) cs.getOrDefault("contactNumber", null)
         String contactMechPurposeId = (String) cs.getOrDefault("contactMechPurposeId", null)
@@ -448,29 +686,113 @@ class OrderServices {
         String employerCity = (String) cs.getOrDefault("employerCity", null)
         String employerStateProvinceGeoId = (String) cs.getOrDefault("employerStateProvinceGeoId", null)
         String employerContactNumber = (String) cs.getOrDefault("employerContactNumber", null)
-        BigDecimal otherMonthlyIncome = (BigDecimal) cs.getOrDefault("otherMonthlyIncome", null)
+        BigDecimal rentIncome = (BigDecimal) cs.getOrDefault("rentIncome", null)
+        BigDecimal retirementIncome = (BigDecimal) cs.getOrDefault("retirementIncome", null)
+        BigDecimal investmentIncome = (BigDecimal) cs.getOrDefault("investmentIncome", null)
+        BigDecimal bonusIncome = (BigDecimal) cs.getOrDefault("bonusIncome", null)
+        BigDecimal socialSecurityIncome = (BigDecimal) cs.getOrDefault("socialSecurityIncome", null)
+        BigDecimal disabilityIncome = (BigDecimal) cs.getOrDefault("disabilityIncome", null)
+        BigDecimal studentIncome = (BigDecimal) cs.getOrDefault("studentIncome", null)
+        BigDecimal unemploymentIncome = (BigDecimal) cs.getOrDefault("unemploymentIncome", null)
+        BigDecimal alimonyIncome = (BigDecimal) cs.getOrDefault("alimonyIncome", null)
+        BigDecimal childSupportIncome = (BigDecimal) cs.getOrDefault("childSupportIncome", null)
+        BigDecimal otherIncome = (BigDecimal) cs.getOrDefault("otherIncome", null)
 
         // validate fields
         sf.sync().name("mkdecision.dashboard.OrderServices.validate#PrimaryApplicantFields")
                 .parameters(cs)
-                .call();
+                .call()
         if (mf.hasError()) {
-            return new HashMap<String, Object>();
+            return new HashMap<String, Object>()
         }
 
-        // create person
-        Map<String, Object> personResp = sf.sync().name("mantle.party.PartyServices.create#Person")
-                .parameter("partyTypeEnumId", "PtyPerson")
-                .parameter("firstName", firstName)
-                .parameter("middleName", middleName)
-                .parameter("lastName", lastName)
-                .parameter("suffix", suffix)
-                .parameter("birthDate", lf.parseDate(birthDate, "MM-dd-yyyy"))
-                .parameter("maritalStatusEnumId", maritalStatusEnumId)
-                .parameter("employmentStatusEnumId", employmentStatusEnumId)
-                .parameter("occupation", occupation)
-                .call()
-        String partyId = (String) personResp.get("partyId")
+        // store party
+        boolean updateParty = StringUtils.isNotBlank(partyId);
+        if (updateParty) {
+
+            // update person
+            sf.sync().name("update#mantle.party.Person")
+                    .parameter("partyId", partyId)
+                    .parameter("firstName", firstName)
+                    .parameter("middleName", middleName)
+                    .parameter("lastName", lastName)
+                    .parameter("suffix", suffix)
+                    .parameter("birthDate", birthDate)
+                    .parameter("maritalStatusEnumId", maritalStatusEnumId)
+                    .parameter("employmentStatusEnumId", employmentStatusEnumId)
+                    .parameter("occupation", occupation)
+                    .call()
+
+            // delete contact mechanisms
+            EntityList partyContactMechList = ef.find("mantle.party.contact.PartyContactMech")
+                    .condition("partyId", partyId)
+                    .list()
+            for (EntityValue partyContactMech : partyContactMechList) {
+                sf.sync().name("delete#mantle.party.contact.PartyContactMech")
+                        .parameter("partyId", partyId)
+                        .parameter("contactMechId", partyContactMech.get("contactMechId"))
+                        .parameter("contactMechPurposeId", partyContactMech.get("contactMechPurposeId"))
+                        .parameter("fromDate", partyContactMech.get("fromDate"))
+                        .call()
+                sf.sync().name("delete#mantle.party.contact.TelecomNumber")
+                        .parameter("contactMechId", partyContactMech.getString("contactMechId"))
+                        .call()
+                sf.sync().name("delete#mantle.party.contact.PostalAddress")
+                        .parameter("contactMechId", partyContactMech.getString("contactMechId"))
+                        .call()
+                sf.sync().name("delete#mantle.party.contact.ContactMech")
+                        .parameter("contactMechId", partyContactMech.getString("contactMechId"))
+                        .call()
+            }
+
+            // delete non-employment incomes
+            EntityList financialFlowList = ef.find("mk.close.FinancialFlow")
+                    .condition("partyId", partyId)
+                    .condition("entryTypeEnumId", "MkEntryIncome")
+                    .condition("financialFlowTypeEnumId", EntityCondition.ComparisonOperator.NOT_EQUAL, "MkFinFlowTotalMonthlyIncome")
+                    .list()
+            for (EntityValue financialFlow : financialFlowList) {
+                sf.sync().name("delete#mk.close.FinancialFlow")
+                        .parameter("financialFlowId", financialFlow.getString("financialFlowId"))
+                        .call()
+            }
+
+            // delete identifications
+            sf.sync().name("delete#mantle.party.PartyIdentification")
+                    .parameter("partyId", partyId)
+                    .parameter("partyIdTypeEnumId", "*")
+                    .call()
+        } else {
+
+            // create person
+            Map<String, Object> personResp = sf.sync().name("mantle.party.PartyServices.create#Person")
+                    .parameter("partyTypeEnumId", "PtyPerson")
+                    .parameter("firstName", firstName)
+                    .parameter("middleName", middleName)
+                    .parameter("lastName", lastName)
+                    .parameter("suffix", suffix)
+                    .parameter("birthDate", birthDate)
+                    .parameter("maritalStatusEnumId", maritalStatusEnumId)
+                    .parameter("employmentStatusEnumId", employmentStatusEnumId)
+                    .parameter("occupation", occupation)
+                    .call()
+            partyId = (String) personResp.get("partyId")
+
+            // update order part party
+            sf.sync().name("update#mantle.order.OrderPart")
+                    .parameter("orderId", orderId)
+                    .parameter("orderPartSeqId", orderPartSeqId)
+                    .parameter("customerPartyId", partyId)
+                    .call()
+
+            // create order party
+            sf.sync().name("create#mantle.order.OrderPartParty")
+                    .parameter("orderId", orderId)
+                    .parameter("orderPartSeqId", orderPartSeqId)
+                    .parameter("partyId", partyId)
+                    .parameter("roleTypeId", "PrimaryApplicant")
+                    .call()
+        }
 
         // create postal address
         sf.sync().name("mantle.party.ContactServices.create#PostalAddress")
@@ -511,89 +833,180 @@ class OrderServices {
                     .parameter("partyIdTypeEnumId", idTypeEnumId)
                     .parameter("idValue", idValue)
                     .parameter("issuedBy", idIssuedBy)
-                    .parameter("issueDate", lf.parseDate(idIssueDate, "MM-dd-yyyy"))
-                    .parameter("expireDate", lf.parseDate(idExpiryDate, "MM-dd-yyyy"))
+                    .parameter("issueDate", idIssueDate)
+                    .parameter("expireDate", idExpiryDate)
                     .call()
         }
 
         // create employer
-        Map<String, Object> employerResp = sf.sync().name("mantle.party.PartyServices.create#Organization")
-                .parameter("partyTypeEnumId", "PtyOrganization")
-                .parameter("organizationName", employerName)
-                .parameter("roleTypeId", "OrgEmployer")
-                .call()
-        String employerPartyId = (String) employerResp.get("partyId")
+        if (StringUtils.isNotBlank(employerName)) {
 
-        // create employer telecom number
-        if (StringUtils.isNotBlank(employerContactNumber)) {
-            sf.sync().name("mantle.party.ContactServices.create#TelecomNumber")
-                    .parameter("partyId", employerPartyId)
-                    .parameter("contactNumber", employerContactNumber)
-                    .parameter("contactMechPurposeId", "PhonePrimary")
+            // create employer
+            Map<String, Object> employerResp = sf.sync().name("mantle.party.PartyServices.create#Organization")
+                    .parameter("partyTypeEnumId", "PtyOrganization")
+                    .parameter("organizationName", employerName)
+                    .parameter("roleTypeId", "OrgEmployer")
+                    .call()
+            String employerPartyId = (String) employerResp.get("partyId")
+
+            // create employer telecom number
+            if (StringUtils.isNotBlank(employerContactNumber)) {
+                sf.sync().name("mantle.party.ContactServices.create#TelecomNumber")
+                        .parameter("partyId", employerPartyId)
+                        .parameter("contactNumber", employerContactNumber)
+                        .parameter("contactMechPurposeId", "PhonePrimary")
+                        .call()
+            }
+
+            // create employer postal address
+            if (StringUtils.isNotBlank(employerAddress1)) {
+                sf.sync().name("mantle.party.ContactServices.create#PostalAddress")
+                        .parameter("partyId", employerPartyId)
+                        .parameter("address1", employerAddress1)
+                        .parameter("unitNumber", employerUnitNumber)
+                        .parameter("city", employerCity)
+                        .parameter("postalCode", employerPostalCode)
+                        .parameter("stateProvinceGeoId", employerStateProvinceGeoId)
+                        .parameter("contactMechPurposeId", "PostalPrimary")
+                        .call()
+            }
+
+            // calculate employment start date
+            Date employmentStartDate = new Date()
+            employmentStartDate = DateUtils.addYears(employmentStartDate, -years)
+            employmentStartDate = DateUtils.addMonths(employmentStartDate, -months)
+
+            // create employment relation
+            Map<String, Object> employmentRelationshipResp = sf.sync().name("create#mantle.party.PartyRelationship")
+                    .parameter("relationshipTypeEnumId", "PrtEmployee")
+                    .parameter("fromPartyId", partyId)
+                    .parameter("fromRoleTypeId", "Employee")
+                    .parameter("toPartyId", employerPartyId)
+                    .parameter("toRoleTypeId", "OrgEmployer")
+                    .parameter("fromDate", employmentStartDate)
+                    .parameter("relationshipName", jobTitle)
+                    .call()
+            String employmentRelationshipId = employmentRelationshipResp.get("partyRelationshipId")
+
+            // create monthly income
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryIncome")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowTotalMonthlyIncome")
+                    .parameter("partyRelationshipId", employmentRelationshipId)
+                    .parameter("amount", monthlyIncome)
                     .call()
         }
 
-        // create employer postal address
-        if (StringUtils.isNotBlank(employerAddress1)) {
-            sf.sync().name("mantle.party.ContactServices.create#PostalAddress")
-                    .parameter("partyId", employerPartyId)
-                    .parameter("address1", employerAddress1)
-                    .parameter("unitNumber", employerUnitNumber)
-                    .parameter("city", employerCity)
-                    .parameter("postalCode", employerPostalCode)
-                    .parameter("stateProvinceGeoId", employerStateProvinceGeoId)
-                    .parameter("contactMechPurposeId", "PostalPrimary")
+        // create rent income
+        if (rentIncome != null) {
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryIncome")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowRent")
+                    .parameter("amount", rentIncome)
                     .call()
         }
 
-        // calculate employment start date
-        Date employmentStartDate = new Date()
-        employmentStartDate = DateUtils.addYears(employmentStartDate, -years)
-        employmentStartDate = DateUtils.addMonths(employmentStartDate, -months)
+        // create retirement income
+        if (retirementIncome != null) {
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryIncome")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowRetirement")
+                    .parameter("amount", retirementIncome)
+                    .call()
+        }
 
-        // create employment relation
-        Map<String, Object> employmentRelationshipResp = sf.sync().name("create#mantle.party.PartyRelationship")
-                .parameter("relationshipTypeEnumId", "PrtEmployee")
-                .parameter("fromPartyId", partyId)
-                .parameter("fromRoleTypeId", "Employee")
-                .parameter("toPartyId", employerPartyId)
-                .parameter("toRoleTypeId", "OrgEmployer")
-                .parameter("fromDate", employmentStartDate)
-                .parameter("relationshipName", jobTitle)
-                .call()
-        String employmentRelationshipId = employmentRelationshipResp.get("partyRelationshipId")
+        // create investment income
+        if (investmentIncome != null) {
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryIncome")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowInvestment")
+                    .parameter("amount", investmentIncome)
+                    .call()
+        }
 
-        // create monthly income
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("entryTypeEnumId", "MkEntryIncome")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowTotalMonthlyIncome")
-                .parameter("partyRelationshipId", employmentRelationshipId)
-                .parameter("amount", monthlyIncome)
-                .call()
+        // create bonus income
+        if (bonusIncome != null) {
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryIncome")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowBonus")
+                    .parameter("amount", bonusIncome)
+                    .call()
+        }
 
-        // create other monthly income
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("entryTypeEnumId", "MkEntryIncome")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowOther")
-                .parameter("amount", otherMonthlyIncome)
-                .call()
+        // create social security income
+        if (socialSecurityIncome != null) {
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryIncome")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowSocialSecurity")
+                    .parameter("amount", socialSecurityIncome)
+                    .call()
+        }
 
-        // update order part party
-        sf.sync().name("update#mantle.order.OrderPart")
-                .parameter("orderId", orderId)
-                .parameter("orderPartSeqId", orderPartSeqId)
-                .parameter("customerPartyId", partyId)
-                .call();
+        // create disability income
+        if (disabilityIncome != null) {
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryIncome")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowDisability")
+                    .parameter("amount", disabilityIncome)
+                    .call()
+        }
 
-        // create order party
-        sf.sync().name("create#mantle.order.OrderPartParty")
-                .parameter("orderId", orderId)
-                .parameter("orderPartSeqId", orderPartSeqId)
-                .parameter("partyId", partyId)
-                .parameter("roleTypeId", "PrimaryApplicant")
-                .call()
+        // create student income
+        if (studentIncome != null) {
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryIncome")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowStudent")
+                    .parameter("amount", studentIncome)
+                    .call()
+        }
+
+        // create unemployment income
+        if (unemploymentIncome != null) {
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryIncome")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowUnemployment")
+                    .parameter("amount", unemploymentIncome)
+                    .call()
+        }
+
+        // create alimony income
+        if (alimonyIncome != null) {
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryIncome")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowAlimony")
+                    .parameter("amount", alimonyIncome)
+                    .call()
+        }
+
+        // create child support income
+        if (childSupportIncome != null) {
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryIncome")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowChildSupport")
+                    .parameter("amount", childSupportIncome)
+                    .call()
+        }
+
+        // create other income
+        if (otherIncome != null) {
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryIncome")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowOther")
+                    .parameter("amount", otherIncome)
+                    .call()
+        }
 
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()
@@ -601,7 +1014,7 @@ class OrderServices {
         return outParams
     }
 
-    static Map<String, Object> createProperty(ExecutionContext ec) {
+    static Map<String, Object> deleteEmployment(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -615,7 +1028,46 @@ class OrderServices {
         String orderId = (String) cs.getOrDefault("orderId", null)
         String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String partyId = (String) cs.getOrDefault("partyId", null)
-        String assetClassEnumId = (String) cs.getOrDefault("assetClassEnumId", null)
+        String partyRelationshipId = (String) cs.getOrDefault("partyRelationshipId", null)
+
+        // find relationship
+        EntityValue relationship = ef.find("mantle.party.PartyRelationship")
+                .condition("partyRelationshipId", partyRelationshipId)
+                .one()
+
+        // validate relationship
+        if (relationship == null || !StringUtils.equals(partyId, relationship.getString("fromPartyId")) || !StringUtils.equals(relationship.getString("relationshipTypeEnumId"), "PrtEmployee")) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT"))
+            return new HashMap<String, Object>()
+        }
+
+        // TODO: Cleanup employment?
+
+        // delete relationship
+        sf.sync().name("delete#mantle.party.PartyRelationship")
+                .parameter("partyRelationshipId", partyRelationshipId)
+                .call()
+
+        // return the output parameters
+        return new HashMap<>()
+    }
+
+    static Map<String, Object> validatePropertyFields(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String partyId = (String) cs.getOrDefault("partyId", null)
+        String assetId = (String) cs.getOrDefault("assetId", null)
+        String classEnumId = (String) cs.getOrDefault("classEnumId", null)
         BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
         BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
         BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
@@ -625,17 +1077,133 @@ class OrderServices {
         BigDecimal mortgageBalance = (BigDecimal) cs.getOrDefault("mortgageBalance", null)
         BigDecimal mortgagePaymentMonthly = (BigDecimal) cs.getOrDefault("mortgagePaymentMonthly", null)
 
-        // TODO: Add validations
+        // validate asset class
+        if (StringUtils.isBlank(classEnumId)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ASSET_CLASS"))
+            return new HashMap<String, Object>()
+        }
 
-        // create asset
-        Map<String, Object> assetResp = sf.sync().name("create#mantle.product.asset.Asset")
-                .parameter("assetTypeEnumId", "AstTpRealEstate")
-                .parameter("assetClassEnumId", assetClassEnumId)
-                .parameter("salvageValue", salvageValue)
-                .parameter("acquireCost", acquireCost)
-                .parameter("ownerPartyId", partyId)
+        // validate salvage value
+        if (salvageValue == null || salvageValue <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_SALVAGE_VALUE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate acquire cost
+        if (acquireCost == null || acquireCost <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ACQUIRE_COST"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate HOA monthly fee
+        if (hoaFeeMonthly == null || hoaFeeMonthly <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_HOA_FEE_MONTHLY"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate property tax annually
+        if (propertyTaxesAnnually == null || propertyTaxesAnnually <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_TAX_ANNUALLY"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate property insurance cost annually
+        if (propertyInsuranceCostsAnnually == null || propertyInsuranceCostsAnnually <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_INSURANCE_COST_ANNUALLY"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate lender name
+        if (StringUtils.isBlank(lenderName) && (mortgageBalance != null || mortgagePaymentMonthly != null)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_LENDER_NAME"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate mortgage balance
+        if (mortgageBalance != null && mortgageBalance <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE_BALANCE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate mortgage payment monthly
+        if (mortgagePaymentMonthly != null && mortgagePaymentMonthly <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE_PAYMENT_MONTHLY"))
+            return new HashMap<String, Object>()
+        }
+
+        // return the output parameters
+        return new HashMap<>()
+    }
+
+    static Map<String, Object> storeProperty(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String partyId = (String) cs.getOrDefault("partyId", null)
+        String assetId = (String) cs.getOrDefault("assetId", null)
+        String classEnumId = (String) cs.getOrDefault("classEnumId", null)
+        BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
+        BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
+        BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
+        BigDecimal propertyTaxesAnnually = (BigDecimal) cs.getOrDefault("propertyTaxesAnnually", null)
+        BigDecimal propertyInsuranceCostsAnnually = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsAnnually", null)
+        String lenderName = (String) cs.getOrDefault("lenderName", null)
+        BigDecimal mortgageBalance = (BigDecimal) cs.getOrDefault("mortgageBalance", null)
+        BigDecimal mortgagePaymentMonthly = (BigDecimal) cs.getOrDefault("mortgagePaymentMonthly", null)
+
+        // validate fields
+        sf.sync().name("mkdecision.dashboard.OrderServices.validate#PropertyFields")
+                .parameters(cs)
                 .call()
-        String assetId = (String) assetResp.get("assetId")
+        if (mf.hasError()) {
+            return new HashMap<String, Object>()
+        }
+
+        // store asset
+        boolean updateAsset = StringUtils.isNotBlank(assetId);
+        if (updateAsset) {
+
+            // update asset
+            sf.sync().name("update#mantle.product.asset.Asset")
+                    .parameter("assetId", assetId)
+                    .parameter("classEnumId", classEnumId)
+                    .parameter("salvageValue", salvageValue)
+                    .parameter("acquireCost", acquireCost)
+                    .call()
+
+            // delete asset expenses
+            EntityList financialFlowList = ef.find("mk.close.FinancialFlow")
+                    .condition("partyId", partyId)
+                    .condition("entryTypeEnumId", "MkEntryExpense")
+                    .condition("assetId", assetId)
+                    .list()
+            for (EntityValue financialFlow : financialFlowList) {
+                sf.sync().name("delete#mk.close.FinancialFlow")
+                        .parameter("financialFlowId", financialFlow.getString("financialFlowId"))
+                        .call()
+            }
+        } else {
+
+            // create asset
+            Map<String, Object> assetResp = sf.sync().name("create#mantle.product.asset.Asset")
+                    .parameter("assetId", assetId)
+                    .parameter("assetTypeEnumId", "AstTpRealEstate")
+                    .parameter("classEnumId", classEnumId)
+                    .parameter("salvageValue", salvageValue)
+                    .parameter("acquireCost", acquireCost)
+                    .parameter("ownerPartyId", partyId)
+                    .call()
+            assetId = (String) assetResp.get("assetId")
+        }
 
         // create HOA monthly fee
         sf.sync().name("create#mk.close.FinancialFlow")
@@ -655,7 +1223,7 @@ class OrderServices {
                 .parameter("amount", propertyTaxesAnnually)
                 .call()
 
-        // create annual property taxes
+        // create annual insurance costs
         sf.sync().name("create#mk.close.FinancialFlow")
                 .parameter("partyId", partyId)
                 .parameter("entryTypeEnumId", "MkEntryExpense")
@@ -665,36 +1233,79 @@ class OrderServices {
                 .call()
 
         // create lender
-        Map<String, Object> lenderResp = sf.sync().name("mantle.party.PartyServices.create#Organization")
-                .parameter("partyTypeEnumId", "PtyOrganization")
-                .parameter("organizationName", lenderName)
-                .parameter("roleTypeId", "Lender")
-                .call()
-        String lenderPartyId = (String) lenderResp.get("partyId")
+        if (StringUtils.isNotBlank(lenderName)) {
 
-        // create lender relation
-        Map<String, Object> lenderRelationshipResp = sf.sync().name("create#mantle.party.PartyRelationship")
-                .parameter("relationshipTypeEnumId", "PrtEmployee")
-                .parameter("fromPartyId", partyId)
-                .parameter("fromRoleTypeId", "Borrower")
-                .parameter("toPartyId", lenderPartyId)
-                .parameter("toRoleTypeId", "Lender")
-                .parameter("fromDate", uf.getNowTimestamp())
-                .call()
-        String lenderRelationshipId = lenderRelationshipResp.get("partyRelationshipId")
+            // create lender
+            Map<String, Object> lenderResp = sf.sync().name("mantle.party.PartyServices.create#Organization")
+                    .parameter("partyTypeEnumId", "PtyOrganization")
+                    .parameter("organizationName", lenderName)
+                    .parameter("roleTypeId", "Lender")
+                    .call()
+            String lenderPartyId = (String) lenderResp.get("partyId")
 
-        // create mortgage
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("entryTypeEnumId", "MkEntryExpense")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowMortgage")
-                .parameter("partyRelationshipId", lenderRelationshipId)
-                .parameter("amount", mortgagePaymentMonthly)
-                .call()
+            // create lender relation
+            Map<String, Object> lenderRelationshipResp = sf.sync().name("create#mantle.party.PartyRelationship")
+                    .parameter("relationshipTypeEnumId", "PrtMortgage")
+                    .parameter("fromPartyId", partyId)
+                    .parameter("fromRoleTypeId", "Borrower")
+                    .parameter("toPartyId", lenderPartyId)
+                    .parameter("toRoleTypeId", "Lender")
+                    .parameter("fromDate", uf.getNowTimestamp())
+                    .call()
+            String lenderRelationshipId = lenderRelationshipResp.get("partyRelationshipId")
+
+            // create mortgage
+            sf.sync().name("create#mk.close.FinancialFlow")
+                    .parameter("partyId", partyId)
+                    .parameter("entryTypeEnumId", "MkEntryExpense")
+                    .parameter("financialFlowTypeEnumId", "MkFinFlowMortgage")
+                    .parameter("partyRelationshipId", lenderRelationshipId)
+                    .parameter("balance", mortgageBalance)
+                    .parameter("amount", mortgagePaymentMonthly)
+                    .call()
+        }
 
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()
         outParams.put("assetId", assetId)
         return outParams
+    }
+
+    static Map<String, Object> deleteMortgage(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String partyId = (String) cs.getOrDefault("partyId", null)
+        String partyRelationshipId = (String) cs.getOrDefault("partyRelationshipId", null)
+
+        // find relationship
+        EntityValue relationship = ef.find("mantle.party.PartyRelationship")
+                .condition("partyRelationshipId", partyRelationshipId)
+                .one()
+
+        // validate relationship
+        if (relationship == null || !StringUtils.equals(partyId, relationship.getString("fromPartyId")) || !StringUtils.equals(relationship.getString("relationshipTypeEnumId"), "PrtMortgage")) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE"))
+            return new HashMap<String, Object>()
+        }
+
+        // TODO: Cleanup mortgage?
+
+        // delete relationship
+        sf.sync().name("delete#mantle.party.PartyRelationship")
+                .parameter("partyRelationshipId", partyRelationshipId)
+                .call()
+
+        // return the output parameters
+        return new HashMap<>()
     }
 }

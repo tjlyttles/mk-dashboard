@@ -5,13 +5,30 @@
         default-menu-include="false"
         default-menu-index="4">
 
-    <parameter name="orderId"/>
-    <parameter name="orderPartSeqId"/>
-    <parameter name="partyId"/>
+    <parameter name="orderId" required="true"/>
+    <parameter name="orderPartSeqId" required="true"/>
+    <parameter name="partyId" required="true"/>
+    <parameter name="assetId"/>
 
-    <transition name="createProperty">
-        <service-call name="mkdecision.dashboard.OrderServices.create#Property" in-map="context" out-map="context"/>
-        <default-response url="../Agreement">
+    <transition name="storeProperty">
+        <service-call name="mkdecision.dashboard.OrderServices.store#Property" in-map="context" out-map="context"/>
+        <conditional-response url="../Agreement">
+            <condition>
+                <expression>continueButton != null</expression>
+            </condition>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="assetId"/>
+        </conditional-response>
+        <default-response url="."/>
+    </transition>
+    <transition name="deleteMortgage">
+        <service-call name="mkdecision.dashboard.OrderServices.delete#Mortgage" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="viewApplicant">
+        <default-response url="../Applicant">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
             <parameter name="partyId"/>
@@ -19,11 +36,47 @@
         </default-response>
     </transition>
 
+    <actions>
+        <if condition="assetId != null">
+            <entity-find-one entity-name="mantle.product.asset.Asset" value-field="asset"/>
+            <entity-find entity-name="mk.close.FinancialFlow" list="hoaMonthlyFeeFinFlowList">
+                <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowHoaMonthlyFee"/>
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="assetId" from="assetId"/>
+            </entity-find>
+            <set field="hoaFeeMonthly" from="hoaMonthlyFeeFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <entity-find entity-name="mk.close.FinancialFlow" list="annualPropertyTaxFinFlowList">
+                <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowAnnualPropertyTaxes"/>
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="assetId" from="assetId"/>
+            </entity-find>
+            <set field="propertyTaxesAnnually" from="annualPropertyTaxFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <entity-find entity-name="mk.close.FinancialFlow" list="annualInsuranceCostFinFlowList">
+                <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowAnnualInsuranceCosts"/>
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="assetId" from="assetId"/>
+            </entity-find>
+            <set field="propertyInsuranceCostsAnnually" from="annualInsuranceCostFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <entity-find entity-name="mantle.party.PartyToAndRelationship" list="mortgageRelationList">
+                <econdition field-name="relationshipTypeEnumId" value="PrtMortgage"/>
+                <econdition field-name="fromPartyId" from="partyId"/>
+                <econdition field-name="fromRoleTypeId" value="Borrower"/>
+            </entity-find>
+        </if>
+    </actions>
+
     <widgets>
-        <form-single name="PropertyForm" transition="createProperty">
+        <form-single name="PropertyForm" map="asset" transition="storeProperty">
             <field name="orderId"><default-field><hidden/></default-field></field>
             <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
             <field name="partyId"><default-field><hidden/></default-field></field>
+            <field name="assetId"><default-field><hidden/></default-field></field>
 
             <field name="propertyHeader">
                 <default-field>
@@ -33,7 +86,7 @@
                     <container style="h-separator margin-tb-2"/>
                 </default-field>
             </field>
-            <field name="assetClassEnumId">
+            <field name="classEnumId">
                 <default-field title="Property Type">
                     <drop-down allow-empty="true">
                         <entity-options text="${description}" key="${enumId}">
@@ -79,41 +132,112 @@
                     <container style="h-separator margin-tb-1"/>
                 </default-field>
             </field>
+            <field name="mortgageRelations">
+                <default-field>
+                    <section-iterate name="MortgageRelationIterator" list="mortgageRelationList" entry="mortgageRelation">
+                        <actions>
+                            <entity-find-one entity-name="mk.close.FinancialFlow" value-field="financialFlow">
+                                <field-map field-name="partyId" from="mortgageRelation.fromPartyId"/>
+                                <field-map field-name="financialFlowTypeEnumId" value="MkFinFlowMortgage"/>
+                                <field-map field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                                <field-map field-name="partyRelationshipId" from="mortgageRelation.partyRelationshipId"/>
+                            </entity-find-one>
+                        </actions>
+                        <widgets>
+                            <form-single name="MortgageRelation">
+                                <field name="relationshipHeader">
+                                    <default-field>
+                                        <label text="Mortgage ${sectionEntryIndex + 1}" style="margin-tb-1"/>
+                                    </default-field>
+                                </field>
+                                <field name="relationshipAction">
+                                    <default-field>
+                                        <link text="Remove Mortgage" btn-type="danger" url="deleteMortgage" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, assetId: assetId, partyRelationshipId: mortgageRelation.partyRelationshipId]" />
+                                    </default-field>
+                                </field>
+                                <field name="lenderName">
+                                    <default-field>
+                                        <display text="${mortgageRelation.organizationName}" style="bg-grey-1"/>
+                                    </default-field>
+                                </field>
+                                <field name="mortgageBalance">
+                                    <default-field>
+                                        <display text="${financialFlow.balance}" style="bg-grey-1"/>
+                                    </default-field>
+                                </field>
+                                <field name="mortgagePaymentMonthly">
+                                    <default-field>
+                                        <display text="${financialFlow.amount}" style="bg-grey-1"/>
+                                    </default-field>
+                                </field>
+
+                                <field-layout>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="6" sm="6" md="6" lg="6" style="margin-all-0"><field-ref name="relationshipHeader"/></field-col>
+                                        <field-col xs="6" sm="6" md="6" lg="6" style="margin-all-0 text-right"><field-ref name="relationshipAction"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="lenderName"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="mortgageBalance"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="mortgagePaymentMonthly"/></field-col>
+                                    </field-col-row>
+                                </field-layout>
+                            </form-single>
+                        </widgets>
+                    </section-iterate>
+                </default-field>
+            </field>
+            <field name="mortgageNumberHeader">
+                <default-field>
+                    <label text="Mortgage ${mortgageRelationList.size() + 1}" style="margin-tb-1"/>
+                </default-field>
+            </field>
             <field name="lenderName">
-                <default-field title="Lender Name">
+                <default-field>
                     <text-line/>
                 </default-field>
             </field>
             <field name="mortgageBalance">
-                <default-field title="Mortgage Balance">
+                <default-field>
                     <text-line/>
                 </default-field>
             </field>
             <field name="mortgagePaymentMonthly">
-                <default-field title="Mortgage Payment Monthly">
+                <default-field>
                     <text-line/>
                     <label text="Exclude property taxes, insurance, or HOA fees" style="text-caption"/>
                 </default-field>
             </field>
 
-
             <field name="submitButton">
-                <default-field title="Continue">
-                    <submit/>
+                <default-field container-style="text-primary">
+                    <submit text="Add Mortgage"/>
+                </default-field>
+            </field>
+            <field name="continueButton">
+                <default-field container-style="text-primary">
+                    <submit text="Continue"/>
+                </default-field>
+            </field>
+            <field name="backButton">
+                <default-field container-style="dark-link">
+                    <link url="viewApplicant" text="Back" btn-type="default"/>
                 </default-field>
             </field>
 
             <field-layout>
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6">
-                        <field-ref name="propertyHeader"/>
-                    </field-col>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="propertyHeader"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="assetClassEnumId"/></field-col>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="classEnumId"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
@@ -144,9 +268,17 @@
 
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6">
-                        <field-ref name="mortgageHeader"/>
-                    </field-col>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="mortgageHeader"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="mortgageRelations"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="mortgageNumberHeader"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
@@ -164,12 +296,18 @@
                     <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="mortgagePaymentMonthly"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="submitButton"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
 
                 <fields-not-referenced/>
 
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6" style="text-right"><field-ref name="submitButton"/></field-col>
+                    <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="backButton"/></field-col>
+                    <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="continueButton"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
             </field-layout>

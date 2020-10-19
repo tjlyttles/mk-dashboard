@@ -15,12 +15,42 @@
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_LAST_NAME" locale="en" localized="Invalid last name."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_RESIDENCE_ADDR" locale="en" localized="Invalid residential address."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_CITY" locale="en" localized="Invalid city."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_POSTAL_CODE" locale="en" localized="Invalid postal code."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_POSTAL_CODE" locale="en" localized="Invalid ZIP code."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_SSN" locale="en" localized="Invalid social security number."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_DOB" locale="en" localized="Invalid date of birth."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PHONE_NUMBER" locale="en" localized="Invalid phone number."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMAIL" locale="en" localized="Invalid email address."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMAIL_VERIFY" locale="en" localized="Invalid email address verification."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_OCCUPATION" locale="en" localized="Invalid occupation."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYER_NAME" locale="en" localized="Invalid employer name."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_JOB_TITLE" locale="en" localized="Invalid job title."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYMENT_DURATION" locale="en" localized="Invalid employment duration."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_MONTHLY_INCOME" locale="en" localized="Invalid monthly income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYER_POSTAL_CODE" locale="en" localized="Invalid employer ZIP code."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYER_POSTAL_CODE" locale="en" localized="Invalid employer ZIP code."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYER_CITY" locale="en" localized="Invalid employer city."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYMENT" locale="en" localized="Invalid employment."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_RENT_INCOME" locale="en" localized="Invalid rent income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_RETIREMENT_INCOME" locale="en" localized="Invalid retirement income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_INVESTMENT_INCOME" locale="en" localized="Invalid investment income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_BONUS_INCOME" locale="en" localized="Invalid bonus income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_SOCIAL_SECURITY_INCOME" locale="en" localized="Invalid social security income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_DISABILITY_INCOME" locale="en" localized="Invalid disability income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_STUDENT_INCOME" locale="en" localized="Invalid student income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_UNEMPLOYMENT_INCOME" locale="en" localized="Invalid unemployment income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ALIMONY_INCOME" locale="en" localized="Invalid alimony income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_CHILD_SUPPORT_INCOME" locale="en" localized="Invalid child support income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_OTHER_INCOME" locale="en" localized="Invalid other income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ASSET_CLASS" locale="en" localized="Invalid property type."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_SALVAGE_VALUE" locale="en" localized="Invalid current property value."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ACQUIRE_COST" locale="en" localized="Invalid original purchase price."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_HOA_FEE_MONTHLY" locale="en" localized="Invalid HOA fee monthly."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PROPERTY_TAX_ANNUALLY" locale="en" localized="Invalid property tax annually."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PROPERTY_INSURANCE_COST_ANNUALLY" locale="en" localized="Invalid property insurance cost annually."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_LENDER_NAME" locale="en" localized="Invalid lender name."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_MORTGAGE_BALANCE" locale="en" localized="Invalid mortgage balance."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_MORTGAGE_PAYMENT_MONTHLY" locale="en" localized="Invalid mortgage payment monthly."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_MORTGAGE" locale="en" localized="Invalid mortgage."/>
 
     <moqui.basic.LocalizedMessage original="DASHBOARD_APPLICANT_NOT_ELIGIBLE" locale="en" localized="Applicant is not eligible to place an order."/>
 
