@@ -92,6 +92,7 @@
         <in-parameters>
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
             <parameter name="firstName">
                 <matches regexp="^[- A-Za-z']+$" message="Please enter a first name."/>
             </parameter>
@@ -116,7 +117,7 @@
             <parameter name="socialSecurityNumber">
                 <matches regexp="^\d{3}-\d{2}-\d{4}$" message="Please enter a valid social security number."/>
             </parameter>
-            <parameter name="birthDate" type="Date"/>
+            <parameter name="birthDate" type="Date" format="MM-dd-yyyy" />
             <parameter name="idTypeEnumId"/>
             <parameter name="idIssuedBy"/>
             <parameter name="idValue">
