@@ -17,6 +17,10 @@
         <service-call name="mantle.order.OrderServices.update#OrderStatus"/>
         <default-response url="."/>
     </transition>
+    <transition name="cancelOrder">
+        <service-call name="mantle.order.OrderServices.cancel#Order"/>
+        <default-response url="."/>
+    </transition>
 
     <subscreens default-item="OrderOverview"/>
     
@@ -88,7 +92,7 @@
                     </container-dialog>
                     <button-menu text="More" icon="fa fa-ellipsis-v">
                         <link url="#" text="Add Party"/>
-                        <link url="#" text="Cancel Order"/>
+                        <link url="cancelOrder" text="Cancel Order" btn-type="danger"/>
                     </button-menu>
                 </container>
             </row-col>
