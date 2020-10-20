@@ -13,57 +13,106 @@
         <service-call name="create#mantle.order.OrderNote" in-map="context"/>
         <default-response url="."/>
     </transition>
+    <transition name="addOrderDocument">
+        <service-call name="close.RequestServices.upload#OrderDocument" in-map="context" out-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateOrderStatus">
+        <service-call name="mantle.order.OrderServices.update#OrderStatus"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="cancelOrder">
+        <service-call name="mantle.order.OrderServices.cancel#Order"/>
+        <default-response url="."/>
+    </transition>
 
     <subscreens default-item="OrderOverview"/>
+    
+    <actions>
+        <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
+            <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+            <econdition field-name="partyId" from="ec.user.getUserAccount().partyId"/>
+            <econdition field-name="roleTypeId" value="FinanceManager"/>
+            <date-filter/>
+        </entity-find-count>
+        <if condition="financeManagerCount > 0">
+            <set field="statusFlowId" value="MkDashboardIndirectFinanceManager"/>
+            <else>
+                <set field="statusFlowId" value="MkDashboardIndirectSalesRepresentative"/>
+            </else>
+        </if>
+        <entity-find entity-name="moqui.basic.StatusFlowTransition" list="transitionList">
+            <econdition field-name="statusFlowId" from="statusFlowId"/>
+            <econdition field-name="statusId" from="orderHeader.statusId"/>
+            <order-by field-name="transitionSequence"/>
+        </entity-find>
+    </actions>
 
     <widgets>
-        <container>
-            <link url="dashboard" text="Back" icon="fa fa-arrow-left"/>
-            <container-dialog id="AddNoteDialog" button-text="Add Note" width="960">
-                <form-single name="AddNoteForm" transition="addNote">
-                    <field name="orderId">
-                        <default-field>
-                            <hidden default-value="${orderId}"/>
-                        </default-field>
-                    </field>
-                    <field name="internalNote">
-                        <default-field title="Make this note private?">
-                            <check>
-                                <option key="Y" text=" "/>
-                            </check>
-                        </default-field>
-                    </field>
-                    <field name="noteText">
-                        <default-field title="Note">
-                            <text-area/>
-                        </default-field>
-                    </field>
-                    <field name="submit">
-                        <default-field>
-                            <submit text="Save"/>
-                        </default-field>
-                    </field>
-                </form-single>
-            </container-dialog>
-            <container-dialog id="AttachFileDialog" button-text="Attach File" width="960">
-                <form-single name="AttachFileForm">
-                    <field name="file">
-                        <default-field>
-                            <file/>
-                        </default-field>
-                    </field>
-                    <field name="submit">
-                        <default-field>
-                            <submit text="Save"/>
-                        </default-field>
-                    </field>
-                </form-single>
-            </container-dialog>
-            <button-menu text="More" icon="fa fa-ellipsis-v">
-                <link url="#" text="Add Party"/>
-                <link url="#" text="Cancel Order"/>
-            </button-menu>
-        </container>
+        <container-row>
+            <row-col lg="6">
+                <container>
+                    <link url="dashboard" text="Back" icon="fa fa-arrow-left"/>
+                    <container-dialog id="AddNoteDialog" button-text="Add Note" width="960">
+                        <form-single name="AddNoteForm" transition="addNote">
+                            <field name="orderId">
+                                <default-field>
+                                    <hidden default-value="${orderId}"/>
+                                </default-field>
+                            </field>
+                            <field name="internalNote">
+                                <default-field title="Make this note private?">
+                                    <check>
+                                        <option key="Y" text=" "/>
+                                    </check>
+                                </default-field>
+                            </field>
+                            <field name="noteText">
+                                <default-field title="Note">
+                                    <text-area/>
+                                </default-field>
+                            </field>
+                            <field name="submit">
+                                <default-field>
+                                    <submit text="Save"/>
+                                </default-field>
+                            </field>
+                        </form-single>
+                    </container-dialog>
+                    <container-dialog id="AttachFileDialog" button-text="Attach File" width="960">
+                        <form-single name="AttachFileForm" transition="addOrderDocument">
+                            <field name="orderId">
+                                <default-field>
+                                    <hidden/>
+                                </default-field>
+                            </field>
+                            <field name="contentFile">
+                                <default-field title="File">
+                                    <file/>
+                                </default-field>
+                            </field>
+                            <field name="submit">
+                                <default-field>
+                                    <submit text="Save"/>
+                                </default-field>
+                            </field>
+                        </form-single>
+                    </container-dialog>
+                    <button-menu text="More" icon="fa fa-ellipsis-v">
+                        <link url="#" text="Add Party"/>
+                        <link url="cancelOrder" text="Cancel Order" btn-type="danger"/>
+                    </button-menu>
+                </container>
+            </row-col>
+            <row-col lg="6" style="text-right">
+                <section-iterate name="TransitionIterator" list="transitionList" entry="transition">
+                    <widgets>
+                        <link url="updateOrderStatus" text="${transition.transitionName}" parameter-map="[orderId: orderId, statusId: transition.toStatusId]" btn-type="success"/>
+                    </widgets>
+                </section-iterate>
+            </row-col>
+        </container-row>
 
         <subscreens-menu id="OrderMenu"/>
         <subscreens-active/>

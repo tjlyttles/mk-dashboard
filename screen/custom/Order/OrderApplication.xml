@@ -12,10 +12,139 @@
             <field-map field-name="orderId" from="orderId"/>
             <field-map field-name="orderPartSeqId" value="01"/>
         </entity-find-one>
-        <entity-find-related value-field="orderPart" relationship-name="parties" list="partyList"/>
+        <entity-find entity-name="mantle.order.OrderPartParty" list="partyList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
+            <econditions combine="or">
+                <econdition field-name="roleTypeId" value="PrimaryApplicant"/>
+                <econdition field-name="roleTypeId" value="CoApplicant"/>
+            </econditions>
+        </entity-find>
+        <set field="partyIdList" from="partyList?.partyId?.toSet()"/>
+        <entity-find entity-name="mantle.product.asset.Asset" list="assetList">
+            <econdition field-name="ownerPartyId" operator="in" from="partyIdList"/>
+        </entity-find>
     </actions>
 
     <widgets>
+        <container style="row">
+            <section-iterate name="AssetSection" list="assetList" entry="asset">
+                <actions>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryPostalAddress" out-map="context">
+                        <field-map field-name="partyId" from="asset.ownerPartyId"/>
+                    </service-call>
+                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="assetClass">
+                        <field-map field-name="enumId" from="asset.classEnumId"/>
+                    </entity-find-one>
+                    <entity-find entity-name="mk.close.FinancialFlow" list="hoaMonthlyFeeFinFlowList">
+                        <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                        <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowHoaMonthlyFee"/>
+                        <econdition field-name="partyId" from="asset.ownerPartyId"/>
+                        <econdition field-name="assetId" from="asset.assetId"/>
+                    </entity-find>
+                    <entity-find entity-name="mk.close.FinancialFlow" list="annualPropertyTaxFinFlowList">
+                        <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                        <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowAnnualPropertyTaxes"/>
+                        <econdition field-name="partyId" from="asset.ownerPartyId"/>
+                        <econdition field-name="assetId" from="asset.assetId"/>
+                    </entity-find>
+                    <entity-find entity-name="mk.close.FinancialFlow" list="annualInsuranceCostFinFlowList">
+                        <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                        <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowAnnualInsuranceCosts"/>
+                        <econdition field-name="partyId" from="asset.ownerPartyId"/>
+                        <econdition field-name="assetId" from="asset.assetId"/>
+                    </entity-find>
+                    <entity-find entity-name="mantle.party.PartyToAndRelationship" list="mortgageRelationList">
+                        <econdition field-name="relationshipTypeEnumId" value="PrtMortgage"/>
+                        <econdition field-name="fromPartyId" from="asset.ownerPartyId"/>
+                        <econdition field-name="fromRoleTypeId" value="Borrower"/>
+                    </entity-find>
+                </actions>
+                <widgets>
+                    <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                        <container style="h-separator v-separator">
+                            <container style="padding-all-1">
+                                <container>
+                                    <label text="Property" type="h4"/>
+                                </container>
+
+                                <container style="q-pt-md">
+                                    <label text="Property Information" type="h6"/>
+                                    <container style="q-pt-sm">
+                                        <container-row>
+                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Address" style="text-light-grey"/></row-col>
+                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${postalAddress ?: '-'}"/></row-col>
+                                        </container-row>
+                                        <container-row>
+                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Type" style="text-light-grey"/></row-col>
+                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${assetClass.description ?: '-'}"/></row-col>
+                                        </container-row>
+                                        <container-row>
+                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Current Property Value (Estimate)" style="text-light-grey"/></row-col>
+                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(asset.salvageValue ?: 0, orderHeader.currencyUomId)}"/></row-col>
+                                        </container-row>
+                                        <container-row>
+                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Original Purchase Price" style="text-light-grey"/></row-col>
+                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(asset.acquireCost ?: 0, orderHeader.currencyUomId)}"/></row-col>
+                                        </container-row>
+                                        <container-row>
+                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="HOA Fee Monthly" style="text-light-grey"/></row-col>
+                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(hoaMonthlyFeeFinFlowList?.getFirst().amount ?: 0, orderHeader.currencyUomId)}"/></row-col>
+                                        </container-row>
+                                        <container-row>
+                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Property Tax Annually" style="text-light-grey"/></row-col>
+                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(annualPropertyTaxFinFlowList?.getFirst().amount ?: 0, orderHeader.currencyUomId)}"/></row-col>
+                                        </container-row>
+                                        <container-row>
+                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Property Insurance Costs Annually" style="text-light-grey"/></row-col>
+                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(annualInsuranceCostFinFlowList?.getFirst().amount ?: 0, orderHeader.currencyUomId)}"/></row-col>
+                                        </container-row>
+                                    </container>
+                                </container>
+
+                                <section name="MortgageSection" condition="mortgageRelationList.size() > 0">
+                                    <widgets>
+                                        <container style="q-pt-md">
+                                            <label text="Mortgage" type="h6"/>
+                                            <container style="q-pt-sm">
+                                                <section-iterate name="MortgageRelationSection" list="mortgageRelationList" entry="mortgageRelation">
+                                                    <actions>
+                                                        <entity-find-one entity-name="mk.close.FinancialFlow" value-field="financialFlow">
+                                                            <field-map field-name="partyId" from="mortgageRelation.fromPartyId"/>
+                                                            <field-map field-name="financialFlowTypeEnumId" value="MkFinFlowMortgage"/>
+                                                            <field-map field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                                                            <field-map field-name="partyRelationshipId" from="mortgageRelation.partyRelationshipId"/>
+                                                        </entity-find-one>
+                                                    </actions>
+                                                    <widgets>
+                                                        <container-row>
+                                                            <row-col lg="12" md="12" sm="12" xs="12" style="padding-all-0"><label text="Mortgage ${sectionEntryIndex + 1}" style="text-light-grey"/></row-col>
+                                                        </container-row>
+                                                        <container-row>
+                                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Lender Name" style="text-light-grey"/></row-col>
+                                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${mortgageRelation.organizationName}"/></row-col>
+                                                        </container-row>
+                                                        <container-row>
+                                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Mortgage Balance" style="text-light-grey"/></row-col>
+                                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(financialFlow.balance, orderHeader.currencyUomId)}"/></row-col>
+                                                        </container-row>
+                                                        <container-row>
+                                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Mortgage Payment Monthly" style="text-light-grey"/></row-col>
+                                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(financialFlow.amount, orderHeader.currencyUomId)}"/></row-col>
+                                                        </container-row>
+                                                    </widgets>
+                                                </section-iterate>
+                                            </container>
+                                        </container>
+                                    </widgets>
+                                </section>
+                            </container>
+                        </container>
+                    </container>
+                </widgets>
+            </section-iterate>
+        </container>
+
         <container style="row">
             <section-iterate name="PartySection" list="partyList" entry="party">
                 <actions>
@@ -88,7 +217,6 @@
                 </widgets>
             </section-iterate>
         </container>
-
 
 <!--        <container-row>-->
 <!--            <row-col lg="6">-->

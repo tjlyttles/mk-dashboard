@@ -6,6 +6,27 @@
 
     <parameter name="orderId" required="true"/>
 
+    <transition name="downloadPartyContent" read-only="true">
+        <parameter name="contentId"/>
+        <actions>
+            <entity-find-one entity-name="mantle.party.PartyContent" value-field="partyContent">
+                <field-map field-name="partyContentId" from="contentId"/>
+            </entity-find-one>
+            <script>ec.web.sendResourceResponse(partyContent?.contentLocation)</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    <transition name="downloadOrderContent" read-only="true">
+        <parameter name="contentId"/>
+        <actions>
+            <entity-find-one entity-name="mantle.party.OrderContent" value-field="orderContent">
+                <field-map field-name="orderContentId" from="contentId"/>
+            </entity-find-one>
+            <script>ec.web.sendResourceResponse(orderContent?.contentLocation)</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+
     <actions>
         <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
         <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart">
@@ -14,12 +35,46 @@
         </entity-find-one>
         <entity-find-related value-field="orderPart" relationship-name="parties" list="partyList"/>
         <set field="partyIdList" from="partyList?.partyId?.toSet()"/>
-        <entity-find entity-name="mantle.party.PartyContent" list="contentList">
-            <econdition field-name="partyId" operator="in" from="partyIdList"/>
-        </entity-find>
-        <entity-find entity-name="mantle.order.OrderContent" list="fileList">
+
+        <entity-find entity-name="mantle.order.OrderAgreement" list="agreementList">
             <econdition field-name="orderId" from="orderId"/>
         </entity-find>
+        <set field="agreementIdList" from="agreementList?.agreementId?.toSet()"/>
+        <entity-find entity-name="mantle.party.agreement.AgreementContent" list="agreementContentList">
+            <econdition field-name="agreementId" operator="in" from="agreementIdList"/>
+        </entity-find>
+
+        <entity-find entity-name="mantle.party.PartyContent" list="partyContentList">
+            <econdition field-name="partyId" operator="in" from="partyIdList"/>
+        </entity-find>
+        <entity-find entity-name="mantle.order.OrderContent" list="orderContentList">
+            <econdition field-name="orderId" from="orderId"/>
+        </entity-find>
+        <set field="fileList" from="[]"/>
+        <iterate list="partyContentList" entry="partyContent">
+            <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
+                <field-map field-name="enumId" from="partyContent.partyContentTypeEnumId"/>
+            </entity-find-one>
+            <entity-find-one entity-name="moqui.security.UserAccount" value-field="userAccount">
+                <field-map field-name="userId" from="partyContent.userId"/>
+            </entity-find-one>
+            <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="party">
+                <field-map field-name="partyId" from="partyContent.partyId"/>
+            </service-call>
+            <set field="resourceRef" from="ec.resource.getLocationReference(partyContent.contentLocation)"/>
+            <script>fileList.add([contentId: partyContent.partyContentId, contentOrigin: 'Party', contentType:contentType.description, partyName: party.partyName ?: '-', source: resourceRef?.getFileName() ?: '-', performedBy: userAccount.userFullName, contentDate: partyContent.contentDate])</script>
+        </iterate>
+        <iterate list="orderContentList" entry="orderContent">
+            <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
+                <field-map field-name="enumId" from="orderContent.orderContentTypeEnumId"/>
+            </entity-find-one>
+            <entity-find-one entity-name="moqui.security.UserAccount" value-field="userAccount">
+                <field-map field-name="userId" from="orderContent.userId"/>
+            </entity-find-one>
+            <set field="resourceRef" from="ec.resource.getLocationReference(orderContent.contentLocation)"/>
+            <script>fileList.add([contentId: orderContent.orderContentId, contentOrigin: 'Order', contentType:contentType.description, partyName: '-', source: resourceRef?.getFileName() ?: '-', performedBy: userAccount.userFullName, contentDate: orderContent.contentDate])</script>
+        </iterate>
+
         <entity-find entity-name="mantle.order.OrderEmailMessageDetail" list="emailList">
             <econdition field-name="orderId" from="orderId"/>
         </entity-find>
@@ -28,13 +83,19 @@
     <widgets>
         <container>
             <label text="Agreements" type="h4" style="q-my-md"/>
-            <form-list name="ContentList" list="contentList" list-entry="content">
+            <form-list name="AgreementList" list="agreementContentList" list-entry="content">
                 <row-actions>
                     <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
-                        <field-map field-name="enumId" from="content.partyContentTypeEnumId"/>
+                        <field-map field-name="enumId" from="content.contentTypeEnumId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="moqui.security.UserAccount" value-field="userAccount">
+                        <field-map field-name="userId" from="content.userId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="mantle.party.agreement.Agreement" value-field="agreement">
+                        <field-map field-name="agreementId" from="content.agreementId"/>
                     </entity-find-one>
                     <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="party">
-                        <field-map field-name="partyId" from="content.partyId"/>
+                        <field-map field-name="partyId" from="agreement.otherPartyId"/>
                     </service-call>
                     <set field="resourceRef" from="ec.resource.getLocationReference(content.contentLocation)"/>
                 </row-actions>
@@ -55,7 +116,7 @@
                 </field>
                 <field name="performedBy">
                     <default-field>
-                        <display text="Missing Mapping" style="text-red"/>
+                        <display text="${userAccount.userFullName}"/>
                     </default-field>
                 </field>
                 <field name="contentDate">
@@ -64,7 +125,7 @@
                     </default-field>
                 </field>
             </form-list>
-            <section name="EmptyContentList" condition="contentList == null || contentList.isEmpty()">
+            <section name="EmptyContentList" condition="contentList == null || agreementContentList.isEmpty()">
                 <widgets>
                     <container style="text-center">
                         <label text="No agreements have been added yet" style="text-grey"/>
@@ -76,30 +137,27 @@
         <container>
             <label text="Files" type="h4" style="q-my-md"/>
             <form-list name="FileList" list="fileList" list-entry="content">
-                <row-actions>
-                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
-                        <field-map field-name="enumId" from="content.orderContentTypeEnumId"/>
-                    </entity-find-one>
-                    <set field="resourceRef" from="ec.resource.getLocationReference(content.contentLocation)"/>
-                </row-actions>
-                <field name="description">
-                    <default-field>
-                        <display text="${contentType?.description ?: '-'}"/>
+                <field name="contentType">
+                    <default-field title="Type">
+                        <display/>
                     </default-field>
                 </field>
-                <field name="party">
-                    <default-field>
-                        <display text="Missing Mapping" style="text-red"/>
+                <field name="partyName">
+                    <default-field title="Party">
+                        <display/>
                     </default-field>
                 </field>
                 <field name="source">
+                    <conditional-field condition="contentOrigin == 'Order'">
+                        <link url="downloadOrderContent" text="${source}" parameter-map="[contentId: contentId]"/>
+                    </conditional-field>
                     <default-field>
-                        <display text="${resourceRef?.getFileName() ?: '-'}"/>
+                        <link url="downloadPartyContent" text="${source}" parameter-map="[contentId: contentId]" link-type="anchor"/>
                     </default-field>
                 </field>
                 <field name="performedBy">
                     <default-field>
-                        <display text="Missing Mapping" style="text-red"/>
+                        <display/>
                     </default-field>
                 </field>
                 <field name="contentDate">

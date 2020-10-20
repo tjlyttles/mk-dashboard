@@ -295,12 +295,12 @@
                 </default-field>
             </field>
             <field name="totalPurchasePrice">
-                <default-field>
+                <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="totalPurchasePrice">
                     <text-line/>
                 </default-field>
             </field>
             <field name="downPayment">
-                <default-field>
+                <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="downPayment">
                     <text-line/>
                 </default-field>
             </field>

@@ -80,7 +80,6 @@ class PartyServices {
         // get the postal addresses
         EntityList postalAddresses = ef.find("mantle.party.contact.PartyContactMechPostalAddress")
                 .condition("partyId", partyId)
-                .condition("contactMechPurposeId", "PostalPrimary")
                 .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
                 .list();
 
@@ -110,7 +109,6 @@ class PartyServices {
         // get the telecom numbers
         EntityList telecomNumbers = ef.find("mantle.party.contact.PartyContactMechTelecomNumber")
                 .condition("partyId", partyId)
-                .condition("contactMechPurposeId", "PhonePrimary")
                 .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
                 .list();
 
