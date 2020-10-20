@@ -375,7 +375,7 @@
             </field>
             <field name="contactNumber">
                 <default-field title="Phone Number">
-                    <text-line/>
+                    <text-line  mask="###-###-####"/>
                 </default-field>
             </field>
             <field name="contactMechPurposeId">
@@ -651,7 +651,7 @@
             </field>
             <field name="employerContactNumber">
                 <default-field title="Employer Phone Number (Optional)">
-                    <text-line/>
+                    <text-line  mask="###-###-####"/>
                 </default-field>
             </field>
 
