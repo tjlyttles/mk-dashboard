@@ -4,6 +4,8 @@
     <!-- Order -->
     <service verb="validate" noun="OrderFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateOrderFields">
         <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
             <parameter name="salesChannelEnumId"/>
             <parameter name="productStoreId"/>
             <parameter name="salesRepresentativeId"/>
@@ -41,6 +43,9 @@
     <!-- Applicants -->
     <service verb="validate" noun="PrimaryApplicantFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validatePrimaryApplicantFields">
         <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
             <parameter name="firstName"/>
             <parameter name="middleName"/>
             <parameter name="lastName"/>
@@ -140,17 +145,15 @@
                 <matches regexp="^[- A-Za-z']+$" message="Please enter an occupation using only letters, apostrophes or hyphens."/>
             </parameter>
             <parameter name="employmentStatusEnumId"/>
-            <parameter name="employerName" required="true">
-                <matches regexp="^[- A-Za-z0-9']+$" message="Please enter a name using only letters, numbers, apostrophes or hyphens."/>
-            </parameter>
-            <parameter name="jobTitle" required="true"/>
-            <parameter name="years" type="Integer" required="true">
+            <parameter name="employerName"/>
+            <parameter name="jobTitle"/>
+            <parameter name="years" type="Integer">
                 <number-range min="0" max="100" max-include-equals="true"/>
             </parameter>
-            <parameter name="months" type="Integer" required="true">
+            <parameter name="months" type="Integer">
                 <number-range min="0" max="11" max-include-equals="true"/>
             </parameter>
-            <parameter name="monthlyIncome" type="BigDecimal" required="true"/>
+            <parameter name="monthlyIncome" type="BigDecimal"/>
             <parameter name="employerAddress1">
                 <matches regexp="^[- #a-zA-Z0-9.]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, and - or #."/>
             </parameter>
