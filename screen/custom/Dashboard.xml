@@ -12,7 +12,7 @@
 
     <actions>
         <entity-find entity-name="mkdecision.dashboard.OrderHeaderDetail" list="orderList">
-            <search-form-inputs/>
+            <search-form-inputs default-order-by="-entryDate"/>
         </entity-find>
     </actions>
     
