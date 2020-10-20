@@ -9,8 +9,8 @@
             <parameter name="salesRepresentativeId"/>
             <parameter name="productCategoryId"/>
             <parameter name="productId"/>
-            <parameter name="totalPurchasePrice" type="BigDecimal"/>
-            <parameter name="downPayment" type="BigDecimal"/>
+            <parameter name="totalPurchasePrice" type="BigDecimal" required="true"/>
+            <parameter name="downPayment" type="BigDecimal" required="true"/>
             <parameter name="loanFee" type="BigDecimal"/>
             <parameter name="amount" type="BigDecimal"/>
             <parameter name="estimatedPayment" type="BigDecimal"/>
@@ -26,8 +26,8 @@
             <parameter name="productCategoryId"/>
             <parameter name="productId"/>
             <parameter name="formResponseId"/>
-            <parameter name="totalPurchasePrice" type="BigDecimal"/>
-            <parameter name="downPayment" type="BigDecimal"/>
+            <parameter name="totalPurchasePrice" type="BigDecimal" required="true"/>
+            <parameter name="downPayment" type="BigDecimal" required="true"/>
             <parameter name="loanFee" type="BigDecimal"/>
             <parameter name="amount" type="BigDecimal"/>
             <parameter name="estimatedPayment" type="BigDecimal"/>
