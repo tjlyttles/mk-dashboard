@@ -12,7 +12,14 @@
             <field-map field-name="orderId" from="orderId"/>
             <field-map field-name="orderPartSeqId" value="01"/>
         </entity-find-one>
-        <entity-find-related value-field="orderPart" relationship-name="parties" list="partyList"/>
+        <entity-find entity-name="mantle.order.OrderPartParty" list="partyList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
+            <econditions combine="or">
+                <econdition field-name="roleTypeId" value="PrimaryApplicant"/>
+                <econdition field-name="roleTypeId" value="CoApplicant"/>
+            </econditions>
+        </entity-find>
     </actions>
 
     <widgets>
@@ -88,7 +95,6 @@
                 </widgets>
             </section-iterate>
         </container>
-
 
 <!--        <container-row>-->
 <!--            <row-col lg="6">-->
