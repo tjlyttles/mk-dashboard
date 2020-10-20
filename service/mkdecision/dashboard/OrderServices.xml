@@ -145,10 +145,10 @@
             </parameter>
             <parameter name="jobTitle" required="true"/>
             <parameter name="years" type="Integer" required="true">
-                <matches regexp="^(0[1-9]|[0-9]|([1-9][0-9])|100)$" message="Please enter a number between 0 and 100."/>
-            </parameter>
+                <number-range min="0" max="100"/>
+             </parameter>
             <parameter name="months" type="Integer" required="true">
-                <matches regexp="^(0[1-9]|[0-9]|1[0-2])$" message="Please enter a number between 0 and 12."/>
+                <number-range min="0" max="12"/>
             </parameter>
             <parameter name="monthlyIncome" type="BigDecimal" required="true"/>
             <parameter name="employerAddress1">
