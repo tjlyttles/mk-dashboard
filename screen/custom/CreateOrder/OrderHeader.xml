@@ -121,7 +121,7 @@
             <if condition="totalPurchasePrice == null || loanFee == null || downPayment == null">
                 <script>ec.web.sendTextResponse('"Enter all amounts above"')</script>
                 <else>
-                    <set field="orderAmount" from="(new BigDecimal(totalPurchasePrice)).add(new BigDecimal(loanFee)).subtract(new BigDecimal(downPayment))" type="BigDecimal"/>
+                    <set field="orderAmount" from="(ec.l10n.parseNumber(totalPurchasePrice, null)).add(ec.l10n.parseNumber(loanFee,null)).subtract(ec.l10n.parseNumber(downPayment,null))" type="BigDecimal"/>
                     <script>ec.web.sendTextResponse(String.format("%f", orderAmount))</script>
                 </else>
             </if>
@@ -133,7 +133,7 @@
             <if condition="totalPurchasePrice == null || loanFee == null || downPayment == null">
                 <script>ec.web.sendTextResponse('"Enter all amounts above"')</script>
                 <else>
-                    <set field="orderAmount" from="(new BigDecimal(totalPurchasePrice)).add(new BigDecimal(loanFee)).subtract(new BigDecimal(downPayment))" type="BigDecimal"/>
+                    <set field="orderAmount" from="(ec.l10n.parseNumber(totalPurchasePrice, null)).add(ec.l10n.parseNumber(loanFee,null)).subtract(ec.l10n.parseNumber(downPayment,null))" type="BigDecimal"/>
                     <service-call name="close.ProductServices.calculate#EstimatedPayment" out-map="estimatedPayment">
                         <field-map field-name="productId"/>
                         <field-map field-name="creditLine" from="orderAmount"/>
