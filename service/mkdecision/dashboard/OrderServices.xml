@@ -229,6 +229,13 @@
             <parameter name="partyRelationshipId" required="true"/>
         </in-parameters>
     </service>
+    <service verb="archive" noun="OrderParty" type="java" location="com.mkdecision.dashboard.OrderServices" method="archiveOrderParty">
+        <in-parameters>
+            <parameter name="orderId" required="true"/>
+            <parameter name="orderPartSeqId" required="true"/>
+            <parameter name="partyId" required="true"/>
+        </in-parameters>
+    </service>
 
     <!-- Property -->
     <service verb="validate" noun="PropertyFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validatePropertyFields">

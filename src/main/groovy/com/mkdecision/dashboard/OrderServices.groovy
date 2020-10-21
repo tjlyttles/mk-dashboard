@@ -919,6 +919,9 @@ class OrderServices {
             employmentStartDate = DateUtils.addYears(employmentStartDate, -years)
             employmentStartDate = DateUtils.addMonths(employmentStartDate, -months)
 
+            // TODO: set correct relationship dates
+            // TODO: set correct relationship type (current vs previous employment)
+
             // create employment relation
             Map<String, Object> employmentRelationshipResp = sf.sync().name("create#mantle.party.PartyRelationship")
                     .parameter("relationshipTypeEnumId", "PrtEmployee")
@@ -1089,6 +1092,46 @@ class OrderServices {
         // delete relationship
         sf.sync().name("delete#mantle.party.PartyRelationship")
                 .parameter("partyRelationshipId", partyRelationshipId)
+                .call()
+
+        // return the output parameters
+        return new HashMap<>()
+    }
+
+    static Map<String, Object> archiveOrderParty(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String partyId = (String) cs.getOrDefault("partyId", null)
+
+        // find party
+        EntityValue party = ef.find("mantle.order.OrderPartParty")
+                .condition("orderId", orderId)
+                .condition("orderPartSeqId", orderPartSeqId)
+                .condition("partyId", partyId)
+                .one()
+
+        // validate party
+        if (party == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PARTY"))
+            return new HashMap<String, Object>()
+        }
+
+        // archive party
+        sf.sync().name("update#mantle.order.OrderPartParty")
+                .parameter("orderId", orderId)
+                .parameter("orderPartSeqId", orderPartSeqId)
+                .parameter("partyId", partyId)
+                .parameter("roleTypeId", "Archived")
                 .call()
 
         // return the output parameters
@@ -1376,7 +1419,7 @@ class OrderServices {
         EntityValue orderHeader = ef.find("mantle.order.OrderHeader")
                 .condition("orderId", orderId)
                 .one()
-        if(orderHeader==null) {
+        if (orderHeader == null) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ORDER"))
             return new HashMap<String, Object>()
         }
