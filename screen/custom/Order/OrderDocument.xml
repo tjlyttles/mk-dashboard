@@ -62,7 +62,7 @@
                 <field-map field-name="partyId" from="partyContent.partyId"/>
             </service-call>
             <set field="resourceRef" from="ec.resource.getLocationReference(partyContent.contentLocation)"/>
-            <script>fileList.add([contentId: partyContent.partyContentId, contentOrigin: 'Party', contentType:contentType.description, partyName: party.partyName ?: '-', source: resourceRef?.getFileName() ?: '-', performedBy: userAccount.userFullName, contentDate: partyContent.contentDate])</script>
+            <script>fileList.add([contentId: partyContent.partyContentId, contentOrigin: 'Party', contentType:contentType.description, partyName: party.partyName ?: '-', source: resourceRef?.getFileName() ?: '-', performedBy: userAccount?.userFullName ?: '-', contentDate: partyContent.contentDate])</script>
         </iterate>
         <iterate list="orderContentList" entry="orderContent">
             <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
@@ -72,7 +72,7 @@
                 <field-map field-name="userId" from="orderContent.userId"/>
             </entity-find-one>
             <set field="resourceRef" from="ec.resource.getLocationReference(orderContent.contentLocation)"/>
-            <script>fileList.add([contentId: orderContent.orderContentId, contentOrigin: 'Order', contentType:contentType.description, partyName: '-', source: resourceRef?.getFileName() ?: '-', performedBy: userAccount.userFullName, contentDate: orderContent.contentDate])</script>
+            <script>fileList.add([contentId: orderContent.orderContentId, contentOrigin: 'Order', contentType:contentType.description, partyName: '-', source: resourceRef?.getFileName() ?: '-', performedBy: userAccount?.userFullName ?: '-', contentDate: orderContent.contentDate])</script>
         </iterate>
 
         <entity-find entity-name="mantle.order.OrderEmailMessageDetail" list="emailList">
