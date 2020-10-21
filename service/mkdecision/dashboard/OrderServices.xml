@@ -39,6 +39,36 @@
             <parameter name="orderPartSeqId"/>
         </out-parameters>
     </service>
+    <service verb="validate" noun="OrderItemFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateOrderItemFields">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="productCategoryId"/>
+            <parameter name="productId"/>
+            <parameter name="totalPurchasePrice" type="BigDecimal"/>
+            <parameter name="downPayment" type="BigDecimal"/>
+            <parameter name="loanFee" type="BigDecimal"/>
+            <parameter name="amount" type="BigDecimal"/>
+            <parameter name="estimatedPayment" type="BigDecimal"/>
+        </in-parameters>
+    </service>
+    <service verb="add" noun="OrderItem" type="java" location="com.mkdecision.dashboard.OrderServices" method="addOrderItem">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="productCategoryId" required="true"/>
+            <parameter name="productId" required="true"/>
+            <parameter name="totalPurchasePrice" type="BigDecimal" required="true"/>
+            <parameter name="downPayment" type="BigDecimal" required="true"/>
+            <parameter name="loanFee" type="BigDecimal" required="true"/>
+            <parameter name="amount" type="BigDecimal" required="true"/>
+            <parameter name="estimatedPayment" type="BigDecimal" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderItemSeqId"/>
+        </out-parameters>
+    </service>
 
     <!-- Applicants -->
     <service verb="validate" noun="PrimaryApplicantFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validatePrimaryApplicantFields">
