@@ -116,7 +116,7 @@
                 </field>
                 <field name="performedBy">
                     <default-field>
-                        <display text="${userAccount.userFullName}"/>
+                        <display text="${userAccount?.userFullName ?: '-'}"/>
                     </default-field>
                 </field>
                 <field name="contentDate">
