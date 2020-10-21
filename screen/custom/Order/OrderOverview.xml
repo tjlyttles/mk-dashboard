@@ -111,9 +111,19 @@
                 </field>
                 <field name="unitAmount">
                     <default-field title="Amount">
-                        <display/>
+                        <display text="${ec.l10n.formatCurrency(unitAmount, orderHeader.currencyUomId)}"/>
                     </default-field>
                 </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="productName"/>
+                        <field-ref name="unitAmount"/>
+                    </column>
+                    <column>
+                        <field-ref name="status"/>
+                    </column>
+                </columns>
             </form-list>
             <section name="EmptyItemList" condition="itemList == null || itemList.isEmpty()">
                 <widgets>
@@ -152,6 +162,16 @@
                         <display format="d/M/yyyy h:mm:ss a"/>
                     </default-field>
                 </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="description"/>
+                        <field-ref name="decisionDate"/>
+                    </column>
+                    <column>
+                        <field-ref name="decisionBy"/>
+                    </column>
+                </columns>
             </form-list>
             <section name="EmptyDecisionList" condition="decisionList == null || decisionList.isEmpty()">
                 <widgets>
@@ -207,15 +227,32 @@
                     </default-field>
                 </field>
                 <field name="telecomNumber">
-                    <default-field title="Phone">
+                    <conditional-field condition="telecomNumber == null" title="Phone">
                         <display text="${telecomNumber ?: '-'}"/>
+                    </conditional-field>
+                    <default-field title="Phone">
+                        <link link-type="anchor" url="tel:${telecomNumber}" text="${telecomNumber}" url-type="plain"/>
                     </default-field>
                 </field>
                 <field name="emailAddress">
-                    <default-field title="Email">
+                    <conditional-field condition="emailAddress == null" title="Email">
                         <display text="${emailAddress ?: '-'}"/>
+                    </conditional-field>
+                    <default-field title="Email">
+                        <link link-type="anchor" url="mailto:${emailAddress}" text="${emailAddress}" url-type="plain"/>
                     </default-field>
                 </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="applicants"/>
+                        <field-ref name="partyName"/>
+                    </column>
+                    <column>
+                        <field-ref name="telecomNumber"/>
+                        <field-ref name="emailAddress"/>
+                    </column>
+                </columns>
             </form-list>
             <section name="EmptyPartyList" condition="partyList == null || partyList.isEmpty()">
                 <widgets>
