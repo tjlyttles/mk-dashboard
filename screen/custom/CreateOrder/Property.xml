@@ -152,7 +152,7 @@
                                 </field>
                                 <field name="relationshipAction">
                                     <default-field>
-                                        <link text="Remove Mortgage" btn-type="danger" url="deleteMortgage" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, assetId: assetId, partyRelationshipId: mortgageRelation.partyRelationshipId]" />
+                                        <link text="Remove Mortgage" btn-type="danger" url="deleteMortgage" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, assetId: assetId, partyRelationshipId: mortgageRelation.partyRelationshipId]"/>
                                     </default-field>
                                 </field>
                                 <field name="lenderName">

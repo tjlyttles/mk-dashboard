@@ -116,7 +116,7 @@
                 </field>
                 <field name="performedBy">
                     <default-field>
-                        <display text="${userAccount.userFullName}"/>
+                        <display text="${userAccount?.userFullName ?: '-'}"/>
                     </default-field>
                 </field>
                 <field name="contentDate">
@@ -124,6 +124,18 @@
                         <display format="d/M/yyyy h:mm:ss a"/>
                     </default-field>
                 </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="description"/>
+                        <field-ref name="party"/>
+                        <field-ref name="source"/>
+                    </column>
+                    <column>
+                        <field-ref name="contentDate"/>
+                        <field-ref name="performedBy"/>
+                    </column>
+                </columns>
             </form-list>
             <section name="EmptyContentList" condition="contentList == null || agreementContentList.isEmpty()">
                 <widgets>
@@ -149,7 +161,7 @@
                 </field>
                 <field name="source">
                     <conditional-field condition="contentOrigin == 'Order'">
-                        <link url="downloadOrderContent" text="${source}" parameter-map="[contentId: contentId]"/>
+                        <link url="downloadOrderContent" text="${source}" parameter-map="[contentId: contentId]" link-type="anchor"/>
                     </conditional-field>
                     <default-field>
                         <link url="downloadPartyContent" text="${source}" parameter-map="[contentId: contentId]" link-type="anchor"/>
@@ -165,6 +177,18 @@
                         <display format="d/M/yyyy h:mm:ss a"/>
                     </default-field>
                 </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="contentType"/>
+                        <field-ref name="partyName"/>
+                        <field-ref name="source"/>
+                    </column>
+                    <column>
+                        <field-ref name="contentDate"/>
+                        <field-ref name="performedBy"/>
+                    </column>
+                </columns>
             </form-list>
             <section name="EmptyFileList" condition="fileList == null || fileList.isEmpty()">
                 <widgets>
@@ -185,10 +209,16 @@
                     <entity-find-one entity-name="moqui.basic.email.EmailMessage" value-field="emailMessage">
                         <field-map field-name="emailMessageId" from="email.emailMessageId"/>
                     </entity-find-one>
+                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="emailType">
+                        <field-map field-name="enumId" from="email.emailTypeEnumId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="moqui.security.UserAccount" value-field="userAccount">
+                        <field-map field-name="userId" from="email.fromUserId"/>
+                    </entity-find-one>
                 </row-actions>
                 <field name="type">
                     <default-field>
-                        <display text="Missing Mapping" style="text-red"/>
+                        <display text="${emailType.description ?: '-'}"/>
                     </default-field>
                 </field>
                 <field name="party">
@@ -203,7 +233,7 @@
                 </field>
                 <field name="performedBy">
                     <default-field>
-                        <display text="Missing Mapping" style="text-red"/>
+                        <display text="${userAccount?.userFullName ?: '-'}"/>
                     </default-field>
                 </field>
                 <field name="sentDate">
@@ -211,6 +241,18 @@
                         <display format="d/M/yyyy h:mm:ss a"/>
                     </default-field>
                 </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="type"/>
+                        <field-ref name="party"/>
+                        <field-ref name="source"/>
+                    </column>
+                    <column>
+                        <field-ref name="sentDate"/>
+                        <field-ref name="performedBy"/>
+                    </column>
+                </columns>
             </form-list>
             <section name="EmptyEmailList" condition="emailList == null || emailList.isEmpty()">
                 <widgets>

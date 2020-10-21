@@ -30,6 +30,8 @@ class OrderServices {
         L10nFacade lf = ec.getL10n()
 
         // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String salesChannelEnumId = (String) cs.getOrDefault("salesChannelEnumId", null)
         String productStoreId = (String) cs.getOrDefault("productStoreId", null)
         String salesRepresentativeId = (String) cs.getOrDefault("salesRepresentativeId", null)
@@ -917,6 +919,9 @@ class OrderServices {
             employmentStartDate = DateUtils.addYears(employmentStartDate, -years)
             employmentStartDate = DateUtils.addMonths(employmentStartDate, -months)
 
+            // TODO: set correct relationship dates
+            // TODO: set correct relationship type (current vs previous employment)
+
             // create employment relation
             Map<String, Object> employmentRelationshipResp = sf.sync().name("create#mantle.party.PartyRelationship")
                     .parameter("relationshipTypeEnumId", "PrtEmployee")
@@ -1087,6 +1092,46 @@ class OrderServices {
         // delete relationship
         sf.sync().name("delete#mantle.party.PartyRelationship")
                 .parameter("partyRelationshipId", partyRelationshipId)
+                .call()
+
+        // return the output parameters
+        return new HashMap<>()
+    }
+
+    static Map<String, Object> archiveOrderParty(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String partyId = (String) cs.getOrDefault("partyId", null)
+
+        // find party
+        EntityValue party = ef.find("mantle.order.OrderPartParty")
+                .condition("orderId", orderId)
+                .condition("orderPartSeqId", orderPartSeqId)
+                .condition("partyId", partyId)
+                .one()
+
+        // validate party
+        if (party == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PARTY"))
+            return new HashMap<String, Object>()
+        }
+
+        // archive party
+        sf.sync().name("update#mantle.order.OrderPartParty")
+                .parameter("orderId", orderId)
+                .parameter("orderPartSeqId", orderPartSeqId)
+                .parameter("partyId", partyId)
+                .parameter("roleTypeId", "Archived")
                 .call()
 
         // return the output parameters
@@ -1344,6 +1389,239 @@ class OrderServices {
         // delete relationship
         sf.sync().name("delete#mantle.party.PartyRelationship")
                 .parameter("partyRelationshipId", partyRelationshipId)
+                .call()
+
+        // return the output parameters
+        return new HashMap<>()
+    }
+
+    static Map<String, Object> validateOrderItemFields(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
+        String productId = (String) cs.getOrDefault("productId", null)
+        BigDecimal totalPurchasePrice = (BigDecimal) cs.getOrDefault("totalPurchasePrice", null)
+        BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
+        BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
+        String amount = (String) cs.getOrDefault("amount", null)
+        BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
+
+        // validate order header
+        EntityValue orderHeader = ef.find("mantle.order.OrderHeader")
+                .condition("orderId", orderId)
+                .one()
+        if (orderHeader == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ORDER"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate product store
+        EntityFacadeImpl efi = (EntityFacadeImpl) ef
+        EntityConditionFactory ecf = efi.getConditionFactory()
+        String productStoreId = orderHeader.getString("productStoreId")
+        long storeCount = ef.find("mantle.product.store.ProductStoreParty")
+                .condition("productStoreId", productStoreId)
+                .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
+                .condition(
+                        ecf.makeCondition(
+                                ecf.makeCondition("roleTypeId", EntityCondition.ComparisonOperator.EQUALS, "FinanceManager"),
+                                EntityCondition.JoinOperator.OR,
+                                ecf.makeCondition("roleTypeId", EntityCondition.ComparisonOperator.EQUALS, "SalesRepresentative")
+                        )
+                )
+                .count()
+        if (storeCount == 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT_STORE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate product category
+        long productCategoryCount = ef.find("mkdecision.dashboard.ProductStoreCategoryDetail")
+                .condition("productStoreId", productStoreId)
+                .condition("storeCategoryTypeEnumId", "PsctFinanceableProducts")
+                .condition("productCategoryId", productCategoryId)
+                .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
+                .count()
+        if (productCategoryCount == 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT_CATEGORY"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate product category member
+        long categoryMemberCount = ef.find("mantle.product.category.ProductCategoryMember")
+                .condition("productCategoryId", productCategoryId)
+                .condition("productId", productId)
+                .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
+                .count()
+        if (categoryMemberCount == 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate total purchase price
+        if (totalPurchasePrice == null || totalPurchasePrice <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_TOTAL_PURCHASE_PRICE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate down payment
+        if (downPayment == null || downPayment < 0 || downPayment > totalPurchasePrice) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_DOWN_PAYMENT"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate loan fee
+        if (loanFee == null || loanFee < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_LOAN_FEE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate amount
+        BigDecimal amountBigDecimal = new BigDecimal(amount)
+        if (amountBigDecimal == null || amountBigDecimal != ((totalPurchasePrice + loanFee) - downPayment)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_AMOUNT"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate estimated amount
+        if (estimatedPayment == null || estimatedPayment <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ESTIMATED_AMOUNT"))
+            return new HashMap<String, Object>()
+        }
+
+        // return the output parameters
+        return new HashMap<>()
+    }
+
+    static Map<String, Object> addOrderItem(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
+        String productId = (String) cs.getOrDefault("productId", null)
+        BigDecimal totalPurchasePrice = (BigDecimal) cs.getOrDefault("totalPurchasePrice", null)
+        BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
+        BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
+        BigDecimal amount = (BigDecimal) cs.getOrDefault("amount", null)
+        BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
+
+        // validate fields
+        sf.sync().name("mkdecision.dashboard.OrderServices.validate#OrderItemFields")
+                .parameters(cs)
+                .call()
+        if (mf.hasError()) {
+            return new HashMap<String, Object>()
+        }
+
+        // create product parameter set
+        Map<String, Object> productParameterSetResp = sf.sync().name("create#mantle.product.ProductParameterSet")
+                .parameter("productId", productId)
+                .call()
+        String productParameterSetId = (String) productParameterSetResp.get("productParameterSetId")
+
+        // create order item
+        Map<String, Object> orderItemResp = sf.sync().name("mantle.order.OrderServices.create#OrderItem")
+                .parameter("orderId", orderId)
+                .parameter("orderPartSeqId", orderPartSeqId)
+                .parameter("productId", productId)
+                .parameter("productParameterSetId", productParameterSetId)
+                .parameter("unitAmount", amount)
+                .call()
+        String orderItemSeqId = (String) orderItemResp.get("orderItemSeqId")
+
+        // create product category
+        sf.sync().name("create#mantle.product.ProductParameterValue")
+                .parameter("productParameterId", "ProductCategory")
+                .parameter("productParameterSetId", productParameterSetId)
+                .parameter("parameterValue", productCategoryId)
+                .call()
+
+        // create total purchase price
+        sf.sync().name("create#mantle.product.ProductParameterValue")
+                .parameter("productParameterId", "TotalPurchasePrice")
+                .parameter("productParameterSetId", productParameterSetId)
+                .parameter("parameterValue", totalPurchasePrice)
+                .call()
+
+        // create down payment
+        sf.sync().name("create#mantle.product.ProductParameterValue")
+                .parameter("productParameterId", "DownPayment")
+                .parameter("productParameterSetId", productParameterSetId)
+                .parameter("parameterValue", downPayment)
+                .call()
+
+        // create loan fee
+        sf.sync().name("create#mantle.product.ProductParameterValue")
+                .parameter("productParameterId", "LoanFee")
+                .parameter("productParameterSetId", productParameterSetId)
+                .parameter("parameterValue", loanFee)
+                .call()
+
+        // create estimated payment
+        sf.sync().name("create#mantle.product.ProductParameterValue")
+                .parameter("productParameterId", "EstimatedPayment")
+                .parameter("productParameterSetId", productParameterSetId)
+                .parameter("parameterValue", estimatedPayment)
+                .call()
+
+        // return the output parameters
+        Map<String, Object> outParams = new HashMap<>()
+        outParams.put("orderId", orderId)
+        outParams.put("orderItemSeqId", orderItemSeqId)
+        return outParams
+    }
+
+    static Map<String, Object> deleteOrderItem(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String orderItemSeqId = (String) cs.getOrDefault("orderItemSeqId", null)
+
+        // find order item
+        EntityValue item = ef.find("mantle.order.OrderItem")
+                .condition("orderId", orderId)
+                .condition("orderItemSeqId", orderItemSeqId)
+                .one()
+
+        // validate item
+        if (item == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ORDER_ITEM"))
+            return new HashMap<String, Object>()
+        }
+
+        // TODO: Cleanup product parameter set?
+
+        // delete order item
+        sf.sync().name("mantle.order.OrderServices.delete#OrderItem")
+                .parameter("orderId", orderId)
+                .parameter("orderItemSeqId", orderItemSeqId)
                 .call()
 
         // return the output parameters
