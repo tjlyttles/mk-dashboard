@@ -33,7 +33,7 @@
                         <text-find/>
                     </header-field>
                     <default-field>
-                        <link url="editOrder" text="${partyName}" link-type="anchor"/>
+                        <link url="editOrder" text="${partyName ?: '-'}" link-type="anchor"/>
                     </default-field>
                 </field>
 
