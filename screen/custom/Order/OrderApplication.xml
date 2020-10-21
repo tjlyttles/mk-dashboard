@@ -204,7 +204,7 @@
                                                 <container-row>
                                                     <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Primary phone number" style="text-light-grey"/></row-col>
                                                     <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0">
-                                                        <link link-type="anchor" url="mailto:${telecomNumber ?: '-'}" text="${telecomNumber ?: '-'}" url-type="plain"/>
+                                                        <link link-type="anchor" url="'tel':${telecomNumber ?: '-'}" text="${telecomNumber ?: '-'}" url-type="plain"/>
                                                     </row-col>
                                                 </container-row>
                                                 <container-row>
