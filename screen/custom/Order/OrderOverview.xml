@@ -255,7 +255,7 @@
                 </row-actions>
                 <field name="productName">
                     <default-field title="Description">
-                        <display text="${product.productName}"/>
+                        <display text="${product?.productName ?: '-'}"/>
                     </default-field>
                 </field>
                 <field name="status">
