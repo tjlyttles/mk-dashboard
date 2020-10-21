@@ -2,6 +2,7 @@
 <entity-facade-xml type="seed">
 
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ORDER" locale="en" localized="Invalid order."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ORDER_ITEM" locale="en" localized="Invalid order item."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PRODUCT_STORE" locale="en" localized="Invalid product store selection."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_SALES_REP" locale="en" localized="Invalid sales representative selection."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PRODUCT_CATEGORY" locale="en" localized="Invalid product category selection."/>

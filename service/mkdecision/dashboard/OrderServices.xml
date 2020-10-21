@@ -69,6 +69,13 @@
             <parameter name="orderItemSeqId"/>
         </out-parameters>
     </service>
+    <service verb="delete" noun="OrderItem" type="java" location="com.mkdecision.dashboard.OrderServices" method="deleteOrderItem">
+        <in-parameters>
+            <parameter name="orderId" required="true"/>
+            <parameter name="orderPartSeqId" required="true"/>
+            <parameter name="orderItemSeqId" required="true"/>
+        </in-parameters>
+    </service>
 
     <!-- Applicants -->
     <service verb="validate" noun="PrimaryApplicantFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validatePrimaryApplicantFields">

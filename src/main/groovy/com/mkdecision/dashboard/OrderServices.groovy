@@ -1545,4 +1545,43 @@ class OrderServices {
         outParams.put("orderItemSeqId", orderItemSeqId)
         return outParams
     }
+
+    static Map<String, Object> deleteOrderItem(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String orderItemSeqId = (String) cs.getOrDefault("orderItemSeqId", null)
+
+        // find order item
+        EntityValue item = ef.find("mantle.order.OrderItem")
+                .condition("orderId", orderId)
+                .condition("orderItemSeqId", orderItemSeqId)
+                .one()
+
+        // validate item
+        if (item == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ORDER_ITEM"))
+            return new HashMap<String, Object>()
+        }
+
+        // TODO: Cleanup product parameter set?
+
+        // delete order item
+        sf.sync().name("mantle.order.OrderServices.delete#OrderItem")
+                .parameter("orderId", orderId)
+                .parameter("orderItemSeqId", orderItemSeqId)
+                .call()
+
+        // return the output parameters
+        return new HashMap<>()
+    }
 }
