@@ -149,7 +149,7 @@
                 </field>
                 <field name="source">
                     <conditional-field condition="contentOrigin == 'Order'">
-                        <link url="downloadOrderContent" text="${source}" parameter-map="[contentId: contentId]"/>
+                        <link url="downloadOrderContent" text="${source}" parameter-map="[contentId: contentId]" link-type="anchor"/>
                     </conditional-field>
                     <default-field>
                         <link url="downloadPartyContent" text="${source}" parameter-map="[contentId: contentId]" link-type="anchor"/>
