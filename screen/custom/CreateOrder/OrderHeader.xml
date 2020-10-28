@@ -296,12 +296,12 @@
             </field>
             <field name="totalPurchasePrice">
                 <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="totalPurchasePrice">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="downPayment">
                 <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="downPayment">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="loanFee">
