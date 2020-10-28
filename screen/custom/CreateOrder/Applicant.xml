@@ -507,17 +507,17 @@
                                     </default-field>
                                 </field>
                                 <field name="employerPostalCode">
-                                    <default-field title="ZIP Code">
+                                    <default-field title="ZIP Code (Optional)">
                                         <display style="bg-grey-1 margin-l-05"/>
                                     </default-field>
                                 </field>
                                 <field name="employerCity">
-                                    <default-field>
+                                    <default-field title="Employer City (Optional)">
                                         <display style="bg-grey-1 margin-r-05"/>
                                     </default-field>
                                 </field>
                                 <field name="employerStateGeoName">
-                                    <default-field title="State">
+                                    <default-field title="State (Optional)">
                                         <display style="bg-grey-1 margin-l-05"/>
                                     </default-field>
                                 </field>
@@ -627,17 +627,17 @@
                 </default-field>
             </field>
             <field name="employerPostalCode">
-                <default-field title="ZIP Code">
+                <default-field title="ZIP Code (Optional)">
                     <text-line/>
                 </default-field>
             </field>
             <field name="employerCity">
-                <default-field>
+                <default-field title="Employer City (Optional)">
                     <text-line/>
                 </default-field>
             </field>
             <field name="employerStateProvinceGeoId">
-                <default-field title="State">
+                <default-field title="State (Optional)">
                     <drop-down allow-empty="true">
                         <entity-options text="${geoName}" key="${toGeoId}">
                             <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
