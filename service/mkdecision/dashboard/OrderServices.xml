@@ -189,12 +189,14 @@
             <parameter name="employerName"/>
             <parameter name="jobTitle"/>
             <parameter name="years" type="Integer">
-                <number-range min="0" max="100" max-include-equals="true"/>
+                <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
             </parameter>
             <parameter name="months" type="Integer">
-                <number-range min="0" max="11" max-include-equals="true"/>
+                <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
             </parameter>
-            <parameter name="monthlyIncome" type="BigDecimal"/>
+            <parameter name="monthlyIncome" type="BigDecimal">
+                <number-range min="0" min-include-equals="false" message="Please enter a valid income."/>
+            </parameter>
             <parameter name="employerAddress1">
                 <matches regexp="^[- #a-zA-Z0-9.]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, and - or #."/>
             </parameter>
@@ -266,14 +268,29 @@
             <parameter name="partyId" required="true"/>
             <parameter name="assetId"/>
             <parameter name="classEnumId" required="true"/>
-            <parameter name="salvageValue" type="BigDecimal" required="true"/>
-            <parameter name="acquireCost" type="BigDecimal" required="true"/>
-            <parameter name="hoaFeeMonthly" type="BigDecimal" required="true"/>
-            <parameter name="propertyTaxesAnnually" type="BigDecimal" required="true"/>
-            <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal" required="true"/>
+            <parameter name="salvageValue" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter the Current Property Value"/>
+            </parameter>
+            <parameter name="acquireCost" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter the Original Purchase Price"/>
+            </parameter>
+            <parameter name="hoaFeeMonthly" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter the HOA Fee Monthly"/>
+            </parameter>
+            <parameter name="propertyTaxesAnnually" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter the Property Taxes Annually"/>
+            </parameter>
+            <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter the Insurance Costs Annually"/>
+            </parameter>
             <parameter name="lenderName"/>
-            <parameter name="mortgageBalance" type="BigDecimal"/>
-            <parameter name="mortgagePaymentMonthly" type="BigDecimal"/>
+            <parameter name="mortgageBalance" type="BigDecimal">
+                <number-range min="0" min-include-equals="false" message="Please enter the current Mortgage Balance"/>
+            </parameter>
+
+            <parameter name="mortgagePaymentMonthly" type="BigDecimal">
+                <number-range min="0" min-include-equals="false" message="Please enter the Mortgage Payment Monthly"/>
+            </parameter>
         </in-parameters>
         <out-parameters>
             <parameter name="assetId"/>
