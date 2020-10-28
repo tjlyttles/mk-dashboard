@@ -28,8 +28,12 @@
             <parameter name="productCategoryId" required="true"/>
             <parameter name="productId" required="true"/>
             <parameter name="formResponseId" required="true"/>
-            <parameter name="totalPurchasePrice" type="BigDecimal" required="true"/>
-            <parameter name="downPayment" type="BigDecimal" required="true"/>
+            <parameter name="totalPurchasePrice" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter total purchase price"/>
+            </parameter>
+            <parameter name="downPayment" type="BigDecimal" required="true">
+                <number-range min="0" message="Please enter a down payment."/>
+            </parameter>
             <parameter name="loanFee" type="BigDecimal" required="true"/>
             <parameter name="amount" type="BigDecimal" required="true"/>
             <parameter name="estimatedPayment" type="BigDecimal" required="true"/>
