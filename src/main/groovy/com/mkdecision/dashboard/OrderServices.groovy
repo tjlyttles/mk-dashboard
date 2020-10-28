@@ -1279,11 +1279,34 @@ class OrderServices {
             }
         } else {
 
+            // create facility
+            Map<String, Object> facilityResp = sf.sync().name("create#mantle.facility.Facility")
+                    .parameter("facilityTypeEnumId", "FcTpHeadquarters")
+                    .call()
+            String facilityId = (String) facilityResp.get("facilityId")
+
+            // create facility contact mech
+            EntityValue postalAddress = ef.find("mantle.party.contact.PartyContactMechPostalAddress")
+                    .condition("partyId", partyId)
+                    .condition("contactMechTypeEnumId", "CmtPostalAddress")
+                    .condition("contactMechPurposeId", "PostalHome")
+                    .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
+                    .list()
+                    .getFirst()
+            String contactMechId = postalAddress.getString("contactMechId")
+            sf.sync().name("create#mantle.facility.FacilityContactMech")
+                    .parameter("facilityId", facilityId)
+                    .parameter("contactMechId", contactMechId)
+                    .parameter("contactMechPurposeId", "PostalProperty")
+                    .parameter("fromDate", uf.getNowTimestamp())
+                    .call()
+
             // create asset
             Map<String, Object> assetResp = sf.sync().name("create#mantle.product.asset.Asset")
                     .parameter("assetId", assetId)
                     .parameter("assetTypeEnumId", "AstTpRealEstate")
                     .parameter("classEnumId", classEnumId)
+                    .parameter("facilityId", facilityId)
                     .parameter("salvageValue", salvageValue)
                     .parameter("acquireCost", acquireCost)
                     .parameter("ownerPartyId", partyId)
