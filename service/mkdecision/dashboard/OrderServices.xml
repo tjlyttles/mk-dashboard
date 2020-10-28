@@ -263,7 +263,7 @@
             <parameter name="assetId"/>
             <parameter name="classEnumId" required="true"/>
             <parameter name="salvageValue" type="BigDecimal" required="true"/>
-            <parameter name="acquireCost" type="BigDecimal"  required="true"/>
+            <parameter name="acquireCost" type="BigDecimal" required="true"/>
             <parameter name="hoaFeeMonthly" type="BigDecimal" required="true"/>
             <parameter name="propertyTaxesAnnually" type="BigDecimal" required="true"/>
             <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal" required="true"/>
