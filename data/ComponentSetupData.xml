@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed-initial">
+
+    <!-- Default dashboard saved finds -->
+    <moqui.screen.form.FormListFind description="Pipeline" formLocation="component://mk-dashboard/screen/custom/Dashboard.xml.form_list$OrderList" orderByField="-entryDate">
+        <fields fieldName="statusId" fieldOperator="in" fieldValue="OrderOpen,OrderRequested,OrderProposed,OrderCustomerProcessing,OrderPlaced,OrderFundingRequested,OrderConditionalApproved"/>
+        <userGroups userGroupId="ALL_USERS"/>
+    </moqui.screen.form.FormListFind>
+    <moqui.screen.form.FormListFind description="All Orders" formLocation="component://mk-dashboard/screen/custom/Dashboard.xml.form_list$OrderList" orderByField="-entryDate">
+        <fields fieldName="statusId" fieldOperator="in" fieldValue="OrderApproved,OrderCancelled,OrderCustomerProcessing,OrderFundingRequested,OrderConditionalApproved,OrderOpen,OrderPendingRejected,OrderPlaced,OrderProcessing,OrderProposed,OrderRejected,OrderRequested,OrderSent"/>
+        <userGroups userGroupId="ALL_USERS"/>
+    </moqui.screen.form.FormListFind>
+
+</entity-facade-xml>
