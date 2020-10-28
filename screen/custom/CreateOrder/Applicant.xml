@@ -276,7 +276,7 @@
             </field>
             <field name="postalCode">
                 <default-field title="ZIP Code">
-                    <text-line input-type="tel"/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="city">
@@ -306,7 +306,7 @@
             </field>
             <field name="socialSecurityNumber">
                 <default-field>
-                    <text-line mask="###-##-####" input-type="tel"/>
+                    <text-line mask="###-##-####"/>
                 </default-field>
             </field>
             <field name="birthDate">
@@ -392,12 +392,12 @@
             </field>
             <field name="email">
                 <default-field title="Email Address">
-                    <text-line/>
+                    <text-line input-type="email"/>
                 </default-field>
             </field>
             <field name="emailVerify">
                 <default-field title="Verify Email Address">
-                    <text-line/>
+                    <text-line input-type="email"/>
                 </default-field>
             </field>
 
@@ -603,12 +603,12 @@
             </field>
             <field name="years">
                 <default-field>
-                    <text-line input-type="tel"/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="months">
                 <default-field>
-                    <text-line input-type="tel"/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="monthlyIncome">
@@ -628,7 +628,7 @@
             </field>
             <field name="employerPostalCode">
                 <default-field title="ZIP Code">
-                    <text-line input-type="tel"/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="employerCity">
@@ -687,7 +687,7 @@
             </field>
             <field name="socialSecurityIncome">
                 <default-field title="Social Security (Optional)">
-                    <text-line input-type="tel"/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="disabilityIncome">
