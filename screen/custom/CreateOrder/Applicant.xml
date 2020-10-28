@@ -276,7 +276,7 @@
             </field>
             <field name="postalCode">
                 <default-field title="ZIP Code">
-                    <text-line/>
+                    <text-line input-type="tel"/>
                 </default-field>
             </field>
             <field name="city">
@@ -306,7 +306,7 @@
             </field>
             <field name="socialSecurityNumber">
                 <default-field>
-                    <text-line mask="###-##-####"/>
+                    <text-line mask="###-##-####" input-type="tel"/>
                 </default-field>
             </field>
             <field name="birthDate">
@@ -375,7 +375,7 @@
             </field>
             <field name="contactNumber">
                 <default-field title="Phone Number">
-                    <text-line mask="###-###-####"/>
+                    <text-line mask="###-###-####" input-type="tel"/>
                 </default-field>
             </field>
             <field name="contactMechPurposeId">
@@ -603,17 +603,17 @@
             </field>
             <field name="years">
                 <default-field>
-                    <text-line/>
+                    <text-line input-type="tel"/>
                 </default-field>
             </field>
             <field name="months">
                 <default-field>
-                    <text-line/>
+                    <text-line input-type="tel"/>
                 </default-field>
             </field>
             <field name="monthlyIncome">
                 <default-field title="Pre-Tax Income Monthly">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="employerAddress1">
@@ -628,7 +628,7 @@
             </field>
             <field name="employerPostalCode">
                 <default-field title="ZIP Code">
-                    <text-line/>
+                    <text-line input-type="tel"/>
                 </default-field>
             </field>
             <field name="employerCity">
@@ -651,7 +651,7 @@
             </field>
             <field name="employerContactNumber">
                 <default-field title="Employer Phone Number (Optional)">
-                    <text-line  mask="###-###-####"/>
+                    <text-line  mask="###-###-####" input-type="tel"/>
                 </default-field>
             </field>
 
@@ -667,12 +667,12 @@
             </field>
             <field name="rentIncome">
                 <default-field title="Rent (Optional)">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="retirementIncome">
                 <default-field title="Retirement (Optional)">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="investmentIncome">
@@ -682,42 +682,42 @@
             </field>
             <field name="bonusIncome">
                 <default-field title="Bonus (Optional)">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="socialSecurityIncome">
                 <default-field title="Social Security (Optional)">
-                    <text-line/>
+                    <text-line input-type="tel"/>
                 </default-field>
             </field>
             <field name="disabilityIncome">
                 <default-field title="Disability (Optional)">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="studentIncome">
                 <default-field title="Student Financial Assistance (Optional)">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="unemploymentIncome">
                 <default-field title="Unemployment Compensation (Optional)">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="alimonyIncome">
                 <default-field title="Alimony (Optional)">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="childSupportIncome">
                 <default-field title="Child Support (Optional)">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="otherIncome">
                 <default-field title="Other (Optional)">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="totalNonEmploymentIncome">
