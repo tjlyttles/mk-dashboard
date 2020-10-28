@@ -127,7 +127,22 @@
         <entity-find-related-one value-field="orderHeader" relationship-name="salesChannel" to-value-field="salesChannel"/>
         <entity-find-related-one value-field="orderItem" relationship-name="product" to-value-field="product"/>
         <entity-find-related value-field="orderPart" relationship-name="items" list="itemList"/>
-        <entity-find-related value-field="orderPart" relationship-name="parties" list="partyList"/>
+        <entity-find entity-name="mantle.order.OrderPartParty" list="partyList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
+            <econditions combine="or">
+                <econdition field-name="roleTypeId" value="PrimaryApplicant"/>
+                <econdition field-name="roleTypeId" value="CoApplicant"/>
+            </econditions>
+        </entity-find>
+        <entity-find entity-name="mantle.order.OrderPartParty" list="internalList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
+            <econditions combine="and">
+                <econdition field-name="roleTypeId" operator="not-equals" value="PrimaryApplicant"/>
+                <econdition field-name="roleTypeId" operator="not-equals" value="CoApplicant"/>
+            </econditions>
+        </entity-find>
         <entity-find-related value-field="orderHeader" relationship-name="notes" list="noteList"/>
     </actions>
 
@@ -336,6 +351,74 @@
                 <widgets>
                     <container style="text-center">
                         <label text="No decisions have been added yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
+
+        <container style="h-separator margin-tb-1"/>
+
+        <container>
+            <container-row>
+                <row-col sm="12" xs="12">
+                    <label text="Internal" type="h4"/>
+                </row-col>
+            </container-row>
+            <form-list name="InternalList" list="internalList">
+                <row-actions>
+                    <entity-find-one entity-name="mantle.party.RoleType" value-field="roleType"/>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
+                        <field-map field-name="partyId" from="partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryTelecomNumber" out-map="context">
+                        <field-map field-name="partyId" from="partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryEmailAddress" out-map="context">
+                        <field-map field-name="partyId" from="partyId"/>
+                    </service-call>
+                </row-actions>
+                <field name="roleType">
+                    <default-field title="Role">
+                        <display text="${roleType.description}"/>
+                    </default-field>
+                </field>
+                <field name="partyName">
+                    <default-field title="Name">
+                        <display text="${partyName ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="telecomNumber">
+                    <conditional-field condition="telecomNumber == null" title="Phone">
+                        <display text="${telecomNumber ?: '-'}"/>
+                    </conditional-field>
+                    <default-field title="Phone">
+                        <link link-type="anchor" url="tel:${telecomNumber}" text="${telecomNumber}" url-type="plain"/>
+                    </default-field>
+                </field>
+                <field name="emailAddress">
+                    <conditional-field condition="emailAddress == null" title="Email">
+                        <display text="${emailAddress ?: '-'}"/>
+                    </conditional-field>
+                    <default-field title="Email">
+                        <link link-type="anchor" url="mailto:${emailAddress}" text="${emailAddress}" url-type="plain"/>
+                    </default-field>
+                </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="roleType"/>
+                        <field-ref name="partyName"/>
+                    </column>
+                    <column>
+                        <field-ref name="telecomNumber"/>
+                        <field-ref name="emailAddress"/>
+                    </column>
+                </columns>
+            </form-list>
+            <section name="EmptyInternalList" condition="internalList == null || internalList.isEmpty()">
+                <widgets>
+                    <container style="text-center">
+                        <label text="No parties have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
