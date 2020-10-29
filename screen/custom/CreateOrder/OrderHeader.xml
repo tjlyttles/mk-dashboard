@@ -7,16 +7,12 @@
 
     <parameter name="orderId"/>
     <parameter name="orderPartSeqId"/>
-    <parameter name="partyId"/>
-    <parameter name="assetId"/>
 
     <transition name="checkEligibility">
         <service-call name="mkdecision.dashboard.OrderServices.validate#OrderFields" in-map="context"/>
         <default-response url="../Eligibility">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
-            <parameter name="partyId"/>
-            <parameter name="assetId"/>
             <parameter name="salesChannelEnumId"/>
             <parameter name="productStoreId"/>
             <parameter name="salesRepresentativeId"/>
@@ -222,8 +218,6 @@
         <form-single name="OrderForm" transition="checkEligibility">
             <field name="orderId"><default-field><hidden/></default-field></field>
             <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
-            <field name="partyId"><default-field><hidden/></default-field></field>
-            <field name="assetId"><default-field><hidden/></default-field></field>
 
             <field name="applicationHeader">
                 <default-field>
@@ -296,12 +290,12 @@
             </field>
             <field name="totalPurchasePrice">
                 <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="totalPurchasePrice">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="downPayment">
                 <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="downPayment">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="loanFee">

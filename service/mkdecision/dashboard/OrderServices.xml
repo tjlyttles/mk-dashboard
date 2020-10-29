@@ -28,8 +28,12 @@
             <parameter name="productCategoryId" required="true"/>
             <parameter name="productId" required="true"/>
             <parameter name="formResponseId" required="true"/>
-            <parameter name="totalPurchasePrice" type="BigDecimal" required="true"/>
-            <parameter name="downPayment" type="BigDecimal" required="true"/>
+            <parameter name="totalPurchasePrice" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter total purchase price"/>
+            </parameter>
+            <parameter name="downPayment" type="BigDecimal" required="true">
+                <number-range min="0" message="Please enter a down payment."/>
+            </parameter>
             <parameter name="loanFee" type="BigDecimal" required="true"/>
             <parameter name="amount" type="BigDecimal" required="true"/>
             <parameter name="estimatedPayment" type="BigDecimal" required="true"/>
@@ -78,11 +82,12 @@
     </service>
 
     <!-- Applicants -->
-    <service verb="validate" noun="PrimaryApplicantFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validatePrimaryApplicantFields">
+    <service verb="validate" noun="ApplicantFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateApplicantFields">
         <in-parameters>
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
             <parameter name="partyId"/>
+            <parameter name="roleTypeId"/>
             <parameter name="firstName"/>
             <parameter name="middleName"/>
             <parameter name="lastName"/>
@@ -104,37 +109,14 @@
             <parameter name="contactMechPurposeId"/>
             <parameter name="email"/>
             <parameter name="emailVerify"/>
-            <parameter name="occupation"/>
-            <parameter name="employmentStatusEnumId"/>
-            <parameter name="employerName"/>
-            <parameter name="jobTitle"/>
-            <parameter name="years" type="Integer"/>
-            <parameter name="months" type="Integer"/>
-            <parameter name="monthlyIncome" type="BigDecimal"/>
-            <parameter name="employerAddress1"/>
-            <parameter name="employerUnitNumber"/>
-            <parameter name="employerPostalCode"/>
-            <parameter name="employerCity"/>
-            <parameter name="employerStateProvinceGeoId"/>
-            <parameter name="employerContactNumber"/>
-            <parameter name="rentIncome" type="BigDecimal"/>
-            <parameter name="retirementIncome" type="BigDecimal"/>
-            <parameter name="investmentIncome" type="BigDecimal"/>
-            <parameter name="bonusIncome" type="BigDecimal"/>
-            <parameter name="socialSecurityIncome" type="BigDecimal"/>
-            <parameter name="disabilityIncome" type="BigDecimal"/>
-            <parameter name="studentIncome" type="BigDecimal"/>
-            <parameter name="unemploymentIncome" type="BigDecimal"/>
-            <parameter name="alimonyIncome" type="BigDecimal"/>
-            <parameter name="childSupportIncome" type="BigDecimal"/>
-            <parameter name="otherIncome" type="BigDecimal"/>
         </in-parameters>
     </service>
-    <service verb="store" noun="PrimaryApplicant" type="java" location="com.mkdecision.dashboard.OrderServices" method="storePrimaryApplicant">
+    <service verb="store" noun="Applicant" type="java" location="com.mkdecision.dashboard.OrderServices" method="storeApplicant">
         <in-parameters>
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
             <parameter name="partyId"/>
+            <parameter name="roleTypeId"/>
             <parameter name="firstName" required="true">
                 <matches regexp="^[- A-Za-z']+$" message="Please enter a first name."/>
             </parameter>
@@ -178,6 +160,47 @@
             <parameter name="emailVerify" required="true">
                 <text-email/>
             </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+        </out-parameters>
+    </service>
+    <service verb="validate" noun="EmploymentFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateEmploymentFields">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="occupation"/>
+            <parameter name="employmentStatusEnumId"/>
+            <parameter name="employerName"/>
+            <parameter name="jobTitle"/>
+            <parameter name="years" type="Integer"/>
+            <parameter name="months" type="Integer"/>
+            <parameter name="monthlyIncome" type="BigDecimal"/>
+            <parameter name="employerAddress1"/>
+            <parameter name="employerUnitNumber"/>
+            <parameter name="employerPostalCode"/>
+            <parameter name="employerCity"/>
+            <parameter name="employerStateProvinceGeoId"/>
+            <parameter name="employerContactNumber"/>
+            <parameter name="rentIncome" type="BigDecimal"/>
+            <parameter name="retirementIncome" type="BigDecimal"/>
+            <parameter name="investmentIncome" type="BigDecimal"/>
+            <parameter name="bonusIncome" type="BigDecimal"/>
+            <parameter name="socialSecurityIncome" type="BigDecimal"/>
+            <parameter name="disabilityIncome" type="BigDecimal"/>
+            <parameter name="studentIncome" type="BigDecimal"/>
+            <parameter name="unemploymentIncome" type="BigDecimal"/>
+            <parameter name="alimonyIncome" type="BigDecimal"/>
+            <parameter name="childSupportIncome" type="BigDecimal"/>
+            <parameter name="otherIncome" type="BigDecimal"/>
+        </in-parameters>
+    </service>
+    <service verb="add" noun="Employment" type="java" location="com.mkdecision.dashboard.OrderServices" method="addEmployment">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
             <parameter name="occupation" required="true">
                 <matches regexp="^[- A-Za-z']+$" message="Please enter an occupation using only letters, apostrophes or hyphens."/>
             </parameter>

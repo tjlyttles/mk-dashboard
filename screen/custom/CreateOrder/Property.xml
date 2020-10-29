@@ -3,12 +3,10 @@
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
         default-menu-title="Property"
         default-menu-include="false"
-        default-menu-index="4">
+        default-menu-index="7">
 
     <parameter name="orderId" required="true"/>
     <parameter name="orderPartSeqId" required="true"/>
-    <parameter name="partyId" required="true"/>
-    <parameter name="assetId"/>
 
     <transition name="storeProperty">
         <service-call name="mkdecision.dashboard.OrderServices.store#Property" in-map="context" out-map="context"/>
@@ -18,8 +16,6 @@
             </condition>
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
-            <parameter name="partyId"/>
-            <parameter name="assetId"/>
         </conditional-response>
         <default-response url="."/>
     </transition>
@@ -27,16 +23,28 @@
         <service-call name="mkdecision.dashboard.OrderServices.delete#Mortgage" in-map="context"/>
         <default-response url="."/>
     </transition>
-    <transition name="viewApplicant">
-        <default-response url="../Applicant">
+    <transition name="viewCoApplicantEmployment">
+        <default-response url="../CoApplicantEmployment">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
-            <parameter name="partyId"/>
-            <parameter name="assetId"/>
         </default-response>
     </transition>
 
     <actions>
+        <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+        <entity-find entity-name="mantle.order.OrderPartParty" list="partyList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
+            <econdition field-name="roleTypeId" value="PrimaryApplicant"/>
+        </entity-find>
+        <set field="partyId" from="partyList?.getFirst()?.partyId ?: null"/>
+
+        <entity-find entity-name="mantle.product.asset.Asset" list="assetList">
+            <econdition field-name="ownerPartyId" from="partyId"/>
+        </entity-find>
+        <set field="assetId" from="assetList?.getFirst()?.assetId ?: null"/>
+
         <if condition="assetId != null">
             <entity-find-one entity-name="mantle.product.asset.Asset" value-field="asset"/>
             <entity-find entity-name="mk.close.FinancialFlow" list="hoaMonthlyFeeFinFlowList">
@@ -225,7 +233,7 @@
             </field>
             <field name="backButton">
                 <default-field container-style="dark-link">
-                    <link url="viewApplicant" text="Back" btn-type="default"/>
+                    <link url="viewCoApplicantEmployment" text="Back" btn-type="default"/>
                 </default-field>
             </field>
 
