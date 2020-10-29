@@ -584,32 +584,56 @@ class OrderServices {
                     .parameter("maritalStatusEnumId", maritalStatusEnumId)
                     .call()
 
-            // delete contact mechanisms
-            EntityList partyContactMechList = ef.find("mantle.party.contact.PartyContactMech")
+            // update postal address
+            EntityValue postalAddress = ef.find("mantle.party.contact.PartyContactMechPostalAddress")
                     .condition("partyId", partyId)
+                    .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
                     .list()
-            for (EntityValue partyContactMech : partyContactMechList) {
-                sf.sync().name("delete#mantle.party.contact.PartyContactMech")
-                        .parameter("partyId", partyId)
-                        .parameter("contactMechId", partyContactMech.get("contactMechId"))
-                        .parameter("contactMechPurposeId", partyContactMech.get("contactMechPurposeId"))
-                        .parameter("fromDate", partyContactMech.get("fromDate"))
-                        .call()
-                sf.sync().name("delete#mantle.party.contact.TelecomNumber")
-                        .parameter("contactMechId", partyContactMech.getString("contactMechId"))
-                        .call()
-                sf.sync().name("delete#mantle.party.contact.PostalAddress")
-                        .parameter("contactMechId", partyContactMech.getString("contactMechId"))
-                        .call()
-                sf.sync().name("delete#mantle.party.contact.ContactMech")
-                        .parameter("contactMechId", partyContactMech.getString("contactMechId"))
-                        .call()
-            }
+                    .getFirst()
+            sf.sync().name("update#mantle.party.contact.PostalAddress")
+                    .parameter("contactMechId", postalAddress.getString("contactMechId"))
+                    .parameter("address1", address1)
+                    .parameter("unitNumber", unitNumber)
+                    .parameter("city", city)
+                    .parameter("postalCode", postalCode)
+                    .parameter("stateProvinceGeoId", stateProvinceGeoId)
+                    .parameter("contactMechPurposeId", "PostalHome")
+                    .call()
 
-            // delete identifications
-            sf.sync().name("delete#mantle.party.PartyIdentification")
+            // update telecom number
+            EntityValue telecomNumber = ef.find("mantle.party.contact.PartyContactMechTelecomNumber")
+                    .condition("partyId", partyId)
+                    .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
+                    .list()
+                    .getFirst()
+            sf.sync().name("update#mantle.party.contact.TelecomNumber")
+                    .parameter("contactMechId", telecomNumber.getString("contactMechId"))
+                    .parameter("contactNumber", contactNumber)
+                    .parameter("contactMechPurposeId", contactMechPurposeId)
+                    .call()
+            sf.sync().name("delete#mantle.party.contact.PartyContactMech")
                     .parameter("partyId", partyId)
-                    .parameter("partyIdTypeEnumId", "*")
+                    .parameter("contactMechId", telecomNumber.getString("contactMechId"))
+                    .parameter("contactMechPurposeId", telecomNumber.getString("contactMechPurposeId"))
+                    .parameter("fromDate", telecomNumber.getString("fromDate"))
+                    .call()
+            sf.sync().name("create#mantle.party.contact.PartyContactMech")
+                    .parameter("partyId", partyId)
+                    .parameter("contactMechId", telecomNumber.getString("contactMechId"))
+                    .parameter("contactMechPurposeId", contactMechPurposeId)
+                    .parameter("fromDate", uf.getNowTimestamp())
+                    .call()
+
+            // update email address
+            EntityValue info = ef.find("mantle.party.contact.PartyContactMechInfo")
+                    .condition("partyId", partyId)
+                    .condition("contactMechPurposeId", "EmailPrimary")
+                    .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
+                    .list()
+                    .getFirst()
+            sf.sync().name("update#mantle.party.contact.ContactMech")
+                    .parameter("contactMechId", info.getString("contactMechId"))
+                    .parameter("infoString", email)
                     .call()
         } else {
 
@@ -641,35 +665,41 @@ class OrderServices {
                         .parameter("customerPartyId", partyId)
                         .call()
             }
+
+            // create postal address
+            sf.sync().name("mantle.party.ContactServices.create#PostalAddress")
+                    .parameter("partyId", partyId)
+                    .parameter("address1", address1)
+                    .parameter("unitNumber", unitNumber)
+                    .parameter("city", city)
+                    .parameter("postalCode", postalCode)
+                    .parameter("stateProvinceGeoId", stateProvinceGeoId)
+                    .parameter("contactMechPurposeId", "PostalHome")
+                    .call()
+
+            // create telecom number
+            sf.sync().name("mantle.party.ContactServices.create#TelecomNumber")
+                    .parameter("partyId", partyId)
+                    .parameter("contactNumber", contactNumber)
+                    .parameter("contactMechPurposeId", contactMechPurposeId)
+                    .call()
+
+            // create email address
+            sf.sync().name("mantle.party.ContactServices.create#EmailAddress")
+                    .parameter("partyId", partyId)
+                    .parameter("emailAddress", email)
+                    .parameter("contactMechPurposeId", "EmailPrimary")
+                    .call()
         }
 
-        // create postal address
-        sf.sync().name("mantle.party.ContactServices.create#PostalAddress")
+        // delete identifications
+        sf.sync().name("delete#mantle.party.PartyIdentification")
                 .parameter("partyId", partyId)
-                .parameter("address1", address1)
-                .parameter("unitNumber", unitNumber)
-                .parameter("city", city)
-                .parameter("postalCode", postalCode)
-                .parameter("stateProvinceGeoId", stateProvinceGeoId)
-                .parameter("contactMechPurposeId", "PostalHome")
-                .call()
-
-        // create telecom number
-        sf.sync().name("mantle.party.ContactServices.create#TelecomNumber")
-                .parameter("partyId", partyId)
-                .parameter("contactNumber", contactNumber)
-                .parameter("contactMechPurposeId", contactMechPurposeId)
-                .call()
-
-        // create email address
-        sf.sync().name("mantle.party.ContactServices.create#EmailAddress")
-                .parameter("partyId", partyId)
-                .parameter("emailAddress", email)
-                .parameter("contactMechPurposeId", "EmailPrimary")
+                .parameter("partyIdTypeEnumId", "*")
                 .call()
 
         // create social security number
-        sf.sync().name("create#mantle.party.PartyIdentification")
+        sf.sync().name("update#mantle.party.PartyIdentification")
                 .parameter("partyId", partyId)
                 .parameter("partyIdTypeEnumId", "PtidSsn")
                 .parameter("idValue", socialSecurityNumber)
