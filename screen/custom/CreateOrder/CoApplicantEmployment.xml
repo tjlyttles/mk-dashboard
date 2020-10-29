@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
-        default-menu-title="Applicant"
+        default-menu-title="Co-Applicant Employment"
         default-menu-include="false"
-        default-menu-index="3">
+        default-menu-index="6">
 
     <parameter name="orderId" required="true"/>
     <parameter name="orderPartSeqId" required="true"/>
-    <parameter name="partyId"/>
-    <parameter name="assetId"/>
 
-    <transition name="storePrimaryApplicant">
-        <service-call name="mkdecision.dashboard.OrderServices.store#PrimaryApplicant" in-map="context" out-map="context"/>
+    <transition name="addEmployment">
+        <service-call name="mkdecision.dashboard.OrderServices.add#Employment" in-map="context"/>
         <conditional-response url="../Property">
             <condition>
                 <expression>continueButton != null</expression>
             </condition>
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
-            <parameter name="partyId"/>
-            <parameter name="assetId"/>
         </conditional-response>
         <default-response url="."/>
     </transition>
@@ -27,12 +23,10 @@
         <service-call name="mkdecision.dashboard.OrderServices.delete#Employment" in-map="context"/>
         <default-response url="."/>
     </transition>
-    <transition name="viewOrderHeader">
-        <default-response url="../OrderHeader">
+    <transition name="viewCoApplicant">
+        <default-response url="../CoApplicant">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
-            <parameter name="partyId"/>
-            <parameter name="assetId"/>
         </default-response>
     </transition>
     <transition name="calculateTotalNonEmploymentIncome">
@@ -57,64 +51,19 @@
     </transition>
 
     <actions>
+        <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+        <entity-find entity-name="mantle.order.OrderPartParty" list="partyList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
+            <econdition field-name="roleTypeId" value="CoApplicant"/>
+        </entity-find>
+        <set field="partyId" from="partyList?.getFirst()?.partyId ?: null"/>
+
         <if condition="partyId != null">
             <entity-find-one entity-name="mantle.party.Person" value-field="party"/>
-            <set field="firstName" from="party?.firstName ?: ''"/>
-            <set field="middleName" from="party?.middleName ?: ''"/>
-            <set field="lastName" from="party?.lastName ?: ''"/>
-            <set field="suffix" from="party?.suffix ?: ''"/>
-            <set field="birthDate" from="ec.l10n.format(party?.birthDate, 'MM-dd-yyyy') ?: ''"/>
-            <set field="maritalStatusEnumId" from="party?.maritalStatusEnumId ?: ''"/>
             <set field="employmentStatusEnumId" from="party?.employmentStatusEnumId ?: ''"/>
             <set field="occupation" from="party?.occupation ?: ''"/>
-
-            <entity-find entity-name="mantle.party.contact.PartyContactMechPostalAddress" list="postalAddressList">
-                <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="contactMechPurposeId" value="PostalHome"/>
-                <date-filter/>
-            </entity-find>
-            <set field="address1" from="postalAddressList?.getFirst()?.address1 ?: ''"/>
-            <set field="unitNumber" from="postalAddressList?.getFirst()?.unitNumber ?: ''"/>
-            <set field="postalCode" from="postalAddressList?.getFirst()?.postalCode ?: ''"/>
-            <set field="city" from="postalAddressList?.getFirst()?.city ?: ''"/>
-            <set field="stateProvinceGeoId" from="postalAddressList?.getFirst()?.stateProvinceGeoId ?: ''"/>
-
-            <entity-find entity-name="mantle.party.contact.PartyContactMechTelecomNumber" list="telecomNumberList">
-                <econdition field-name="partyId" from="partyId"/>
-                <date-filter/>
-            </entity-find>
-            <set field="contactNumber" from="telecomNumberList?.getFirst()?.contactNumber ?: ''"/>
-            <set field="contactMechPurposeId" from="telecomNumberList?.getFirst()?.contactMechPurposeId ?: ''"/>
-
-            <entity-find entity-name="mantle.party.contact.PartyContactMechInfo" list="emailList">
-                <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="contactMechPurposeId" value="EmailPrimary"/>
-                <date-filter/>
-            </entity-find>
-            <set field="email" from="emailList?.getFirst()?.infoString ?: ''"/>
-            <set field="emailVerify" from="emailList?.getFirst()?.infoString ?: ''"/>
-
-            <entity-find entity-name="mantle.party.contact.PartyContactMechPostalAddress" list="postalAddressList">
-                <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="contactMechPurposeId" value="PostalHome"/>
-                <date-filter/>
-            </entity-find>
-
-            <entity-find entity-name="mantle.party.PartyIdentification" list="socialSecurityNumberList">
-                <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="partyIdTypeEnumId" value="PtidSsn"/>
-            </entity-find>
-            <set field="socialSecurityNumber" from="socialSecurityNumberList?.getFirst()?.idValue ?: ''"/>
-
-            <entity-find entity-name="mantle.party.PartyIdentification" list="idList">
-                <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="partyIdTypeEnumId" operator="not-equals" value="PtidSsn"/>
-            </entity-find>
-            <set field="idTypeEnumId" from="idList?.getFirst()?.partyIdTypeEnumId ?: ''"/>
-            <set field="idIssuedBy" from="idList?.getFirst()?.issuedBy ?: ''"/>
-            <set field="idValue" from="idList?.getFirst()?.idValue ?: ''"/>
-            <set field="idIssueDate" from="ec.l10n.format(idList?.getFirst()?.issueDate, 'MM-dd-yyyy') ?: ''"/>
-            <set field="idExpiryDate" from="ec.l10n.format(idList?.getFirst()?.expireDate, 'MM-dd-yyyy') ?: ''"/>
 
             <entity-find entity-name="mantle.party.PartyToAndRelationship" list="employmentRelationList">
                 <econdition field-name="relationshipTypeEnumId" value="PrtEmployee"/>
@@ -217,189 +166,10 @@
     </actions>
 
     <widgets>
-        <form-single name="ApplicantForm" transition="storePrimaryApplicant">
+        <form-single name="EmploymentForm" transition="addEmployment">
             <field name="orderId"><default-field><hidden/></default-field></field>
             <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
             <field name="partyId"><default-field><hidden/></default-field></field>
-            <field name="assetId"><default-field><hidden/></default-field></field>
-
-            <field name="applicantHeader">
-                <default-field>
-                    <label text="New Application" type="h4" style="margin-b-1"/>
-                    <label text="Primary Applicant" type="h5" style="margin-b-1"/>
-                    <label text="Please add all parties associated with the new application." style="margin-b-1"/>
-                    <container style="h-separator margin-tb-2"/>
-                </default-field>
-            </field>
-            <field name="personaInfoHeader">
-                <default-field>
-                    <label text="Personal Information" type="h5" style="margin-tb-1"/>
-                    <container style="h-separator margin-tb-1"/>
-                </default-field>
-            </field>
-            <field name="firstName">
-                <default-field>
-                    <text-line/>
-                </default-field>
-            </field>
-            <field name="middleName">
-                <default-field title="M.I (Optional)">
-                    <text-line/>
-                </default-field>
-            </field>
-            <field name="lastName">
-                <default-field>
-                    <text-line/>
-                </default-field>
-            </field>
-            <field name="suffix">
-                <default-field title="Suffix (Optional)">
-                    <text-line/>
-                </default-field>
-            </field>
-
-            <field name="addressHeader">
-                <default-field>
-                    <label text="Residential Address" type="h5" style="margin-tb-1"/>
-                    <container style="h-separator margin-tb-1"/>
-                </default-field>
-            </field>
-            <field name="address1">
-                <default-field title="Residential Address">
-                    <text-line/>
-                </default-field>
-            </field>
-            <field name="unitNumber">
-                <default-field title="Apt / Unit # (Optional)">
-                    <text-line/>
-                </default-field>
-            </field>
-            <field name="postalCode">
-                <default-field title="ZIP Code">
-                    <text-line input-type="number"/>
-                </default-field>
-            </field>
-            <field name="city">
-                <default-field>
-                    <text-line/>
-                </default-field>
-            </field>
-            <field name="stateProvinceGeoId">
-                <default-field title="State">
-                    <drop-down allow-empty="true">
-                        <entity-options text="${geoName}" key="${toGeoId}">
-                            <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
-                                <econdition field-name="geoId" value="USA"/>
-                                <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
-                                <order-by field-name="geoName"/>
-                            </entity-find>
-                        </entity-options>
-                    </drop-down>
-                </default-field>
-            </field>
-
-            <field name="identityHeader">
-                <default-field>
-                    <label text="Identity Information" type="h5" style="margin-tb-1"/>
-                    <container style="h-separator margin-tb-1"/>
-                </default-field>
-            </field>
-            <field name="socialSecurityNumber">
-                <default-field>
-                    <text-line mask="###-##-####"/>
-                </default-field>
-            </field>
-            <field name="birthDate">
-                <default-field title="Date of Birth">
-                    <date-time type="date" size="200" format="MM-dd-yyyy"/>
-                </default-field>
-            </field>
-            <field name="idTypeEnumId">
-                <default-field title="ID Type (Optional)">
-                    <drop-down allow-empty="true">
-                        <entity-options text="${description}" key="${enumId}">
-                            <entity-find entity-name="moqui.basic.EnumAndGroup">
-                                <econdition field-name="enumGroupEnumId" value="DefaultDashboardIdGroup"/>
-                                <order-by field-name="sequenceNum,description"/>
-                            </entity-find>
-                        </entity-options>
-                    </drop-down>
-                </default-field>
-            </field>
-            <field name="idIssuedBy">
-                <default-field title="ID State Issued (Optional)">
-                    <drop-down allow-empty="true">
-                        <entity-options text="${geoName}" key="${geoName}">
-                            <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
-                                <econdition field-name="geoId" value="USA"/>
-                                <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
-                                <order-by field-name="geoName"/>
-                            </entity-find>
-                        </entity-options>
-                    </drop-down>
-                </default-field>
-            </field>
-            <field name="idValue">
-                <default-field title="ID Number (Optional)">
-                    <text-line/>
-                </default-field>
-            </field>
-            <field name="idIssueDate">
-                <default-field title="Issue Date (Optional)">
-                    <date-time type="date" size="200" format="MM-dd-yyyy"/>
-                </default-field>
-            </field>
-            <field name="idExpiryDate">
-                <default-field title="Expiration Date (Optional)">
-                    <date-time type="date" size="200" format="MM-dd-yyyy"/>
-                </default-field>
-            </field>
-            <field name="maritalStatusEnumId">
-                <default-field title="Marital Status">
-                    <drop-down allow-empty="true">
-                        <entity-options text="${description}" key="${enumId}">
-                            <entity-find entity-name="moqui.basic.Enumeration">
-                                <econdition field-name="enumTypeId" value="MaritalStatus"/>
-                                <order-by field-name="sequenceNum,description"/>
-                            </entity-find>
-                        </entity-options>
-                    </drop-down>
-                </default-field>
-            </field>
-
-            <field name="contactHeader">
-                <default-field>
-                    <label text="Contact Information" type="h5" style="margin-tb-1"/>
-                    <container style="h-separator margin-tb-1"/>
-                </default-field>
-            </field>
-            <field name="contactNumber">
-                <default-field title="Phone Number">
-                    <text-line mask="###-###-####" input-type="tel"/>
-                </default-field>
-            </field>
-            <field name="contactMechPurposeId">
-                <default-field title="Type">
-                    <drop-down allow-empty="true">
-                        <entity-options text="${description}" key="${contactMechPurposeId}">
-                            <entity-find entity-name="mantle.party.contact.ContactMechPurpose">
-                                <econdition field-name="contactMechTypeEnumId" value="CmtTelecomNumber"/>
-                                <econdition field-name="contactMechPurposeId" operator="in" from="['PhoneHome', 'PhoneMobile', 'PhoneWork']"/>
-                            </entity-find>
-                        </entity-options>
-                    </drop-down>
-                </default-field>
-            </field>
-            <field name="email">
-                <default-field title="Email Address">
-                    <text-line input-type="email"/>
-                </default-field>
-            </field>
-            <field name="emailVerify">
-                <default-field title="Verify Email Address">
-                    <text-line input-type="email"/>
-                </default-field>
-            </field>
 
             <field name="financialHeader">
                 <default-field>
@@ -462,7 +232,7 @@
                                 </field>
                                 <field name="relationshipAction">
                                     <default-field>
-                                        <link text="Remove Employment" btn-type="danger" url="deleteEmployment" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, assetId: assetId, partyRelationshipId: employmentRelation.partyRelationshipId]" />
+                                        <link text="Remove Employment" btn-type="danger" url="deleteEmployment" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, partyRelationshipId: employmentRelation.partyRelationshipId]" />
                                     </default-field>
                                 </field>
 
@@ -677,7 +447,7 @@
             </field>
             <field name="investmentIncome">
                 <default-field title="Investment (Optional)">
-                    <text-line/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="bonusIncome">
@@ -687,7 +457,7 @@
             </field>
             <field name="socialSecurityIncome">
                 <default-field title="Social Security (Optional)">
-                    <text-line input-type="tel"/>
+                    <text-line input-type="number"/>
                 </default-field>
             </field>
             <field name="disabilityIncome">
@@ -750,111 +520,11 @@
             </field>
             <field name="backButton">
                 <default-field container-style="dark-link">
-                    <link url="viewOrderHeader" text="Back" btn-type="default"/>
+                    <link url="viewCoApplicant" text="Back" btn-type="default"/>
                 </default-field>
             </field>
 
             <field-layout>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6">
-                        <field-ref name="applicantHeader"/>
-                        <field-ref name="personaInfoHeader"/>
-                    </field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="firstName"/></field-col>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="middleName"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="lastName"/></field-col>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="suffix"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6">
-                        <field-ref name="addressHeader"/>
-                        <field-ref name="address1"/>
-                    </field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="unitNumber"/></field-col>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="postalCode"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="city"/></field-col>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="stateProvinceGeoId"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6">
-                        <field-ref name="identityHeader"/>
-                    </field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="socialSecurityNumber"/></field-col>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="birthDate"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idTypeEnumId"/></field-col>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idIssuedBy"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="idValue"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idIssueDate"/></field-col>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idExpiryDate"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="maritalStatusEnumId"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="contactHeader"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="contactNumber"/></field-col>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="contactMechPurposeId"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="email"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="emailVerify"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                     <field-col xs="12" sm="10" md="6" lg="6">

@@ -1,0 +1,697 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Primary Applicant Employment"
+        default-menu-include="false"
+        default-menu-index="4">
+
+    <parameter name="orderId" required="true"/>
+    <parameter name="orderPartSeqId" required="true"/>
+
+    <transition name="addEmployment">
+        <service-call name="mkdecision.dashboard.OrderServices.add#Employment" in-map="context"/>
+        <conditional-response url="../CoApplicant">
+            <condition>
+                <expression>continueButton != null</expression>
+            </condition>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+        </conditional-response>
+        <default-response url="."/>
+    </transition>
+    <transition name="deleteEmployment">
+        <service-call name="mkdecision.dashboard.OrderServices.delete#Employment" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="viewPrimaryApplicant">
+        <default-response url="../PrimaryApplicant">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+        </default-response>
+    </transition>
+    <transition name="calculateTotalNonEmploymentIncome">
+        <actions>
+            <set field="totalNonEmploymentIncome" from="0" type="BigDecimal"/>
+            <script><![CDATA[
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(rentIncome == null ? BigDecimal.ZERO : new BigDecimal(rentIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(retirementIncome == null ? BigDecimal.ZERO : new BigDecimal(retirementIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(investmentIncome == null ? BigDecimal.ZERO : new BigDecimal(investmentIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(bonusIncome == null ? BigDecimal.ZERO : new BigDecimal(bonusIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(socialSecurityIncome == null ? BigDecimal.ZERO : new BigDecimal(socialSecurityIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(disabilityIncome == null ? BigDecimal.ZERO : new BigDecimal(disabilityIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(studentIncome == null ? BigDecimal.ZERO : new BigDecimal(studentIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(unemploymentIncome == null ? BigDecimal.ZERO : new BigDecimal(unemploymentIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(alimonyIncome == null ? BigDecimal.ZERO : new BigDecimal(alimonyIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(childSupportIncome == null ? BigDecimal.ZERO : new BigDecimal(childSupportIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(otherIncome == null ? BigDecimal.ZERO : new BigDecimal(otherIncome))
+            ]]></script>
+            <script>ec.web.sendTextResponse(String.format("%f", totalNonEmploymentIncome))</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+
+    <actions>
+        <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+        <entity-find entity-name="mantle.order.OrderPartParty" list="partyList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
+            <econdition field-name="roleTypeId" value="PrimaryApplicant"/>
+        </entity-find>
+        <set field="partyId" from="partyList?.getFirst()?.partyId ?: null"/>
+
+        <if condition="partyId != null">
+            <entity-find-one entity-name="mantle.party.Person" value-field="party"/>
+            <set field="employmentStatusEnumId" from="party?.employmentStatusEnumId ?: ''"/>
+            <set field="occupation" from="party?.occupation ?: ''"/>
+
+            <entity-find entity-name="mantle.party.PartyToAndRelationship" list="employmentRelationList">
+                <econdition field-name="relationshipTypeEnumId" value="PrtEmployee"/>
+                <econdition field-name="fromPartyId" from="partyId"/>
+                <econdition field-name="fromRoleTypeId" value="Employee"/>
+            </entity-find>
+
+            <entity-find entity-name="mk.close.FinancialFlow" list="rentIncomeFinFlowList">
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowRent"/>
+            </entity-find>
+            <set field="rentIncome" from="rentIncomeFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <entity-find entity-name="mk.close.FinancialFlow" list="retirementIncomeFinFlowList">
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowRetirement"/>
+            </entity-find>
+            <set field="retirementIncome" from="retirementIncomeFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <entity-find entity-name="mk.close.FinancialFlow" list="investmentIncomeFinFlowList">
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowInvestment"/>
+            </entity-find>
+            <set field="investmentIncome" from="investmentIncomeFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <entity-find entity-name="mk.close.FinancialFlow" list="bonusIncomeFinFlowList">
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowBonus"/>
+            </entity-find>
+            <set field="bonusIncome" from="bonusIncomeFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <entity-find entity-name="mk.close.FinancialFlow" list="socialSecurityIncomeFinFlowList">
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowSocialSecurity"/>
+            </entity-find>
+            <set field="socialSecurityIncome" from="socialSecurityIncomeFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <entity-find entity-name="mk.close.FinancialFlow" list="disabilityIncomeFinFlowList">
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowDisability"/>
+            </entity-find>
+            <set field="disabilityIncome" from="disabilityIncomeFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <entity-find entity-name="mk.close.FinancialFlow" list="studentIncomeFinFlowList">
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowStudent"/>
+            </entity-find>
+            <set field="studentIncome" from="studentIncomeFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <entity-find entity-name="mk.close.FinancialFlow" list="unemploymentIncomeFinFlowList">
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowUnemployment"/>
+            </entity-find>
+            <set field="unemploymentIncome" from="unemploymentIncomeFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <entity-find entity-name="mk.close.FinancialFlow" list="alimonyIncomeFinFlowList">
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowAlimony"/>
+            </entity-find>
+            <set field="alimonyIncome" from="alimonyIncomeFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <entity-find entity-name="mk.close.FinancialFlow" list="childSupportIncomeFinFlowList">
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowChildSupport"/>
+            </entity-find>
+            <set field="childSupportIncome" from="childSupportIncomeFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <entity-find entity-name="mk.close.FinancialFlow" list="otherIncomeFinFlowList">
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowOther"/>
+            </entity-find>
+            <set field="otherIncome" from="otherIncomeFinFlowList?.getFirst()?.amount ?: ''"/>
+
+            <set field="totalNonEmploymentIncome" from="0" type="BigDecimal"/>
+            <script><![CDATA[
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(rentIncome == null || rentIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(rentIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(retirementIncome == null || retirementIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(retirementIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(investmentIncome == null || investmentIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(investmentIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(bonusIncome == null || bonusIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(bonusIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(socialSecurityIncome == null || socialSecurityIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(socialSecurityIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(disabilityIncome == null || disabilityIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(disabilityIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(studentIncome == null || studentIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(studentIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(unemploymentIncome == null || unemploymentIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(unemploymentIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(alimonyIncome == null || alimonyIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(alimonyIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(childSupportIncome == null || childSupportIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(childSupportIncome))
+                totalNonEmploymentIncome = totalNonEmploymentIncome.add(otherIncome == null || otherIncome.trim().equals("") ? BigDecimal.ZERO : new BigDecimal(otherIncome))
+            ]]></script>
+        </if>
+    </actions>
+
+    <widgets>
+        <form-single name="EmploymentForm" transition="addEmployment">
+            <field name="orderId"><default-field><hidden/></default-field></field>
+            <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
+            <field name="partyId"><default-field><hidden/></default-field></field>
+
+            <field name="financialHeader">
+                <default-field>
+                    <label text="Financial Information" type="h5" style="margin-tb-1"/>
+                    <container style="h-separator margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="employmentHeader">
+                <default-field>
+                    <label text="Employment" type="strong" style="margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="occupation">
+                <default-field title="Occupation">
+                    <text-line/>
+                </default-field>
+            </field>
+
+            <field name="employmentTipHeader">
+                <default-field>
+                    <label text="Please enter all employments for the past 2 years." style="margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="employmentRelations">
+                <default-field>
+                    <section-iterate name="EmploymentRelationIterator" list="employmentRelationList" entry="employmentRelation">
+                        <actions>
+                            <set field="years" from="1"/>
+                            <set field="months" from="1"/>
+                            <entity-find-one entity-name="mk.close.FinancialFlow" value-field="financialFlow">
+                                <field-map field-name="partyId" from="employmentRelation.fromPartyId"/>
+                                <field-map field-name="financialFlowTypeEnumId" value="MkFinFlowTotalMonthlyIncome"/>
+                                <field-map field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                                <field-map field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
+                            </entity-find-one>
+
+                            <entity-find entity-name="mantle.party.contact.PartyContactMechPostalAddress" list="employerPostalAddressList">
+                                <econdition field-name="partyId" from="employmentRelation.toPartyId"/>
+                                <econdition field-name="contactMechPurposeId" value="PostalPrimary"/>
+                                <date-filter/>
+                            </entity-find>
+                            <set field="employerAddress1" from="employerPostalAddressList?.getFirst()?.address1 ?: ''"/>
+                            <set field="employerUnitNumber" from="employerPostalAddressList?.getFirst()?.unitNumber ?: ''"/>
+                            <set field="employerPostalCode" from="employerPostalAddressList?.getFirst()?.postalCode ?: ''"/>
+                            <set field="employerCity" from="employerPostalAddressList?.getFirst()?.city ?: ''"/>
+                            <set field="employerStateGeoName" from="employerPostalAddressList?.getFirst()?.stateGeoName ?: ''"/>
+
+                            <entity-find entity-name="mantle.party.contact.PartyContactMechTelecomNumber" list="employerTelecomNumberList">
+                                <econdition field-name="partyId" from="employmentRelation.toPartyId"/>
+                                <date-filter/>
+                            </entity-find>
+                            <set field="employerContactNumber" from="employerTelecomNumberList?.getFirst()?.contactNumber ?: ''"/>
+                        </actions>
+                        <widgets>
+                            <form-single name="EmploymentRelation">
+                                <field name="relationshipHeader">
+                                    <default-field>
+                                        <label text="Employment ${sectionEntryIndex + 1}" style="margin-tb-1"/>
+                                    </default-field>
+                                </field>
+                                <field name="relationshipAction">
+                                    <default-field>
+                                        <link text="Remove Employment" btn-type="danger" url="deleteEmployment" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, partyRelationshipId: employmentRelation.partyRelationshipId]" />
+                                    </default-field>
+                                </field>
+
+                                <field name="employerName">
+                                    <default-field>
+                                        <display text="${employmentRelation.organizationName}" style="bg-grey-1"/>
+                                    </default-field>
+                                </field>
+                                <field name="jobTitle">
+                                    <default-field title="Title">
+                                        <display text="${employmentRelation.relationshipName}" style="bg-grey-1"/>
+                                    </default-field>
+                                </field>
+                                <field name="durationHeader">
+                                    <default-field>
+                                        <label text="Duration" style="margin-tb-1"/>
+                                    </default-field>
+                                </field>
+                                <field name="years">
+                                    <default-field>
+                                        <display style="bg-grey-1 margin-r-05"/>
+                                    </default-field>
+                                </field>
+                                <field name="months">
+                                    <default-field>
+                                        <display style="bg-grey-1 margin-l-05"/>
+                                    </default-field>
+                                </field>
+                                <field name="monthlyIncome">
+                                    <default-field title="Pre-Tax Income Monthly">
+                                        <display text="${financialFlow.amount}" style="bg-grey-1"/>
+                                    </default-field>
+                                </field>
+                                <field name="employerAddress1">
+                                    <default-field title="Employer Address (Optional)">
+                                        <display style="bg-grey-1"/>
+                                    </default-field>
+                                </field>
+                                <field name="employerUnitNumber">
+                                    <default-field title="Apt / Unit # (Optional)">
+                                        <display style="bg-grey-1 margin-r-05"/>
+                                    </default-field>
+                                </field>
+                                <field name="employerPostalCode">
+                                    <default-field title="ZIP Code (Optional)">
+                                        <display style="bg-grey-1 margin-l-05"/>
+                                    </default-field>
+                                </field>
+                                <field name="employerCity">
+                                    <default-field title="Employer City (Optional)">
+                                        <display style="bg-grey-1 margin-r-05"/>
+                                    </default-field>
+                                </field>
+                                <field name="employerStateGeoName">
+                                    <default-field title="State (Optional)">
+                                        <display style="bg-grey-1 margin-l-05"/>
+                                    </default-field>
+                                </field>
+                                <field name="employerContactNumber">
+                                    <default-field title="Employer Phone Number (Optional)">
+                                        <display style="bg-grey-1"/>
+                                    </default-field>
+                                </field>
+
+                                <field-layout>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="6" sm="6" md="6" lg="6" style="margin-all-0"><field-ref name="relationshipHeader"/></field-col>
+                                        <field-col xs="6" sm="6" md="6" lg="6" style="margin-all-0 text-right"><field-ref name="relationshipAction"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerName"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="jobTitle"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
+                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="monthlyIncome"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
+                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
+                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateGeoName"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row style="nested-form-field">
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                                    </field-col-row>
+                                </field-layout>
+                            </form-single>
+                        </widgets>
+                    </section-iterate>
+                </default-field>
+            </field>
+            <field name="employmentNumberHeader">
+                <default-field>
+                    <label text="Employment ${(employmentRelationList?.size() ?: 0) + 1}" style="margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="employmentStatusEnumId">
+                <default-field title="Employment Status">
+                    <drop-down allow-empty="true">
+                        <entity-options text="${description}" key="${enumId}">
+                            <entity-find entity-name="moqui.basic.Enumeration">
+                                <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                <order-by field-name="sequenceNum,description"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="employerName">
+                <default-field>
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="jobTitle">
+                <default-field title="Title">
+                    <text-line/>
+                </default-field>
+            </field>
+
+            <field name="durationHeader">
+                <default-field>
+                    <label text="Duration" style="margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="years">
+                <default-field>
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="months">
+                <default-field>
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="monthlyIncome">
+                <default-field title="Pre-Tax Income Monthly">
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="employerAddress1">
+                <default-field title="Employer Address (Optional)">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="employerUnitNumber">
+                <default-field title="Apt / Unit # (Optional)">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="employerPostalCode">
+                <default-field title="ZIP Code (Optional)">
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="employerCity">
+                <default-field title="Employer City (Optional)">
+                    <text-line/>
+                </default-field>
+            </field>
+            <field name="employerStateProvinceGeoId">
+                <default-field title="State (Optional)">
+                    <drop-down allow-empty="true">
+                        <entity-options text="${geoName}" key="${toGeoId}">
+                            <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                <econdition field-name="geoId" value="USA"/>
+                                <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                <order-by field-name="geoName"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="employerContactNumber">
+                <default-field title="Employer Phone Number (Optional)">
+                    <text-line  mask="###-###-####" input-type="tel"/>
+                </default-field>
+            </field>
+
+            <field name="nonEmploymentHeader">
+                <default-field>
+                    <label text="Non-Employment Income" type="strong" style="margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="nonEmploymentTipHeader">
+                <default-field>
+                    <label text="Alimony, child support, or separate maintenance income need not be provided if you do not wish it to be considered as a basis for repaying this obligation" style="margin-tb-1"/>
+                </default-field>
+            </field>
+            <field name="rentIncome">
+                <default-field title="Rent (Optional)">
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="retirementIncome">
+                <default-field title="Retirement (Optional)">
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="investmentIncome">
+                <default-field title="Investment (Optional)">
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="bonusIncome">
+                <default-field title="Bonus (Optional)">
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="socialSecurityIncome">
+                <default-field title="Social Security (Optional)">
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="disabilityIncome">
+                <default-field title="Disability (Optional)">
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="studentIncome">
+                <default-field title="Student Financial Assistance (Optional)">
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="unemploymentIncome">
+                <default-field title="Unemployment Compensation (Optional)">
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="alimonyIncome">
+                <default-field title="Alimony (Optional)">
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="childSupportIncome">
+                <default-field title="Child Support (Optional)">
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="otherIncome">
+                <default-field title="Other (Optional)">
+                    <text-line input-type="number"/>
+                </default-field>
+            </field>
+            <field name="totalNonEmploymentIncome">
+                <default-field title="Total Other Income Monthly">
+                    <display dynamic-transition="calculateTotalNonEmploymentIncome" depends-optional="true" style="bg-grey-1">
+                        <depends-on field="rentIncome"/>
+                        <depends-on field="retirementIncome"/>
+                        <depends-on field="investmentIncome"/>
+                        <depends-on field="bonusIncome"/>
+                        <depends-on field="socialSecurityIncome"/>
+                        <depends-on field="disabilityIncome"/>
+                        <depends-on field="studentIncome"/>
+                        <depends-on field="unemploymentIncome"/>
+                        <depends-on field="alimonyIncome"/>
+                        <depends-on field="childSupportIncome"/>
+                        <depends-on field="otherIncome"/>
+                    </display>
+                </default-field>
+            </field>
+
+            <field name="submitButton">
+                <default-field container-style="text-primary">
+                    <submit text="Add Employment"/>
+                </default-field>
+            </field>
+            <field name="continueButton">
+                <default-field container-style="text-primary">
+                    <submit text="Continue"/>
+                </default-field>
+            </field>
+            <field name="backButton">
+                <default-field container-style="dark-link">
+                    <link url="viewPrimaryApplicant" text="Back" btn-type="default"/>
+                </default-field>
+            </field>
+
+            <field-layout>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="financialHeader"/>
+                        <field-ref name="employmentHeader"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="occupation"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentTipHeader"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentRelations"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentNumberHeader"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employerName"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="jobTitle"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="durationHeader"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="years"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="months"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employerAddress1"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="employerUnitNumber"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="employerPostalCode"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="employerCity"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employerContactNumber"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="submitButton"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="nonEmploymentHeader"/>
+                        <field-ref name="nonEmploymentTipHeader"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="rentIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="retirementIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="investmentIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="bonusIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="socialSecurityIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="disabilityIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="studentIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="unemploymentIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="alimonyIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="childSupportIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="otherIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="totalNonEmploymentIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <fields-not-referenced/>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="backButton"/></field-col>
+                    <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="continueButton"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+            </field-layout>
+        </form-single>
+    </widgets>
+
+</screen>

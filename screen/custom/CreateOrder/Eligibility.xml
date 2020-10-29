@@ -7,8 +7,6 @@
 
     <parameter name="orderId"/>
     <parameter name="orderPartSeqId"/>
-    <parameter name="partyId"/>
-    <parameter name="assetId"/>
     <parameter name="salesChannelEnumId"/>
     <parameter name="productStoreId"/>
     <parameter name="salesRepresentativeId"/>
@@ -28,19 +26,15 @@
             </service-call>
             <service-call name="mkdecision.dashboard.OrderServices.store#Order" in-map="context" out-map="context"/>
         </actions>
-        <default-response url="../Applicant">
+        <default-response url="../PrimaryApplicant">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
-            <parameter name="partyId"/>
-            <parameter name="assetId"/>
         </default-response>
     </transition>
     <transition name="viewOrderHeader">
         <default-response url="../OrderHeader">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
-            <parameter name="partyId"/>
-            <parameter name="assetId"/>
             <parameter name="salesChannelEnumId"/>
             <parameter name="productStoreId"/>
             <parameter name="salesRepresentativeId"/>
@@ -79,8 +73,6 @@
 
                     <field name="orderId"><default-field><hidden/></default-field></field>
                     <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
-                    <field name="partyId"><default-field><hidden/></default-field></field>
-                    <field name="assetId"><default-field><hidden/></default-field></field>
                     <field name="formLocation"><default-field><hidden default-value="DbForm#${formId}"/></default-field></field>
                     <field name="formId" from="formId"><default-field><hidden/></default-field></field>
                     <field name="salesChannelEnumId"><default-field><hidden/></default-field></field>

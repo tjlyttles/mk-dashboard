@@ -3,12 +3,10 @@
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
         default-menu-title="Agreement"
         default-menu-include="false"
-        default-menu-index="5">
+        default-menu-index="8">
 
     <parameter name="orderId" required="true"/>
     <parameter name="orderPartSeqId" required="true"/>
-    <parameter name="partyId" required="true"/>
-    <parameter name="assetId" required="true"/>
 
     <transition name="openOrder">
         <default-response url="../../Dashboard"/>
@@ -20,8 +18,6 @@
         <default-response url="../Property">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
-            <parameter name="partyId"/>
-            <parameter name="assetId"/>
         </default-response>
     </transition>
 
@@ -29,8 +25,6 @@
         <form-single name="AgreementForm" transition="requestAgreement">
             <field name="orderId"><default-field><hidden/></default-field></field>
             <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
-            <field name="partyId"><default-field><hidden/></default-field></field>
-            <field name="assetId"><default-field><hidden/></default-field></field>
 
             <field name="agreementHeader">
                 <default-field>
