@@ -23,8 +23,8 @@
         <service-call name="mkdecision.dashboard.OrderServices.delete#Mortgage" in-map="context"/>
         <default-response url="."/>
     </transition>
-    <transition name="viewCoApplicantEmployment">
-        <default-response url="../CoApplicantEmployment">
+    <transition name="viewCoApplicant">
+        <default-response url="../CoApplicant">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
         </default-response>
@@ -233,7 +233,7 @@
             </field>
             <field name="backButton">
                 <default-field container-style="dark-link">
-                    <link url="viewCoApplicantEmployment" text="Back" btn-type="default"/>
+                    <link url="viewCoApplicant" text="Back" btn-type="default"/>
                 </default-field>
             </field>
 

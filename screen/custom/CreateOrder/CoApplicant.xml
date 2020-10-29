@@ -9,17 +9,15 @@
     <parameter name="orderPartSeqId" required="true"/>
 
     <transition name="storeApplicant">
-        <service-call name="mkdecision.dashboard.OrderServices.store#Applicant" in-map="context">
-            <field-map field-name="roleTypeId" value="CoApplicant"/>
-        </service-call>
+        <service-call name="mkdecision.dashboard.OrderServices.store#CoApplicant" in-map="context" out-map="context"/>
         <conditional-response url="../CoApplicantEmployment">
             <condition>
-                <expression>continueButton != null</expression>
+                <expression>partyId != null</expression>
             </condition>
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
         </conditional-response>
-        <default-response url="."/>
+        <default-response url="../Property"/>
     </transition>
     <transition name="viewPrimaryApplicantEmployment">
         <default-response url="../PrimaryApplicantEmployment">
