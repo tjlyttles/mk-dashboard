@@ -591,24 +591,6 @@ class OrderServices {
                 mf.addError(lf.localize("DASHBOARD_INVALID_MONTHLY_INCOME"))
                 return new HashMap<String, Object>()
             }
-
-            // validate employer postal code
-            if (StringUtils.isBlank(employerPostalCode)) {
-                mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYER_POSTAL_CODE"))
-                return new HashMap<String, Object>()
-            }
-
-            // validate employer city
-            if (StringUtils.isBlank(employerCity)) {
-                mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYER_CITY"))
-                return new HashMap<String, Object>()
-            }
-
-            // validate employer state
-            if (StringUtils.isBlank(employerStateProvinceGeoId)) {
-                mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYER_STATE"))
-                return new HashMap<String, Object>()
-            }
         }
 
         // validate rent income
