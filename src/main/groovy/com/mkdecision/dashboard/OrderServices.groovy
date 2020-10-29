@@ -699,7 +699,7 @@ class OrderServices {
                 .call()
 
         // create social security number
-        sf.sync().name("update#mantle.party.PartyIdentification")
+        sf.sync().name("create#mantle.party.PartyIdentification")
                 .parameter("partyId", partyId)
                 .parameter("partyIdTypeEnumId", "PtidSsn")
                 .parameter("idValue", socialSecurityNumber)

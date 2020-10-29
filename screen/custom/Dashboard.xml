@@ -39,7 +39,7 @@
 
                 <field name="statusId">
                     <header-field title="Status" show-order-by="true">
-                        <drop-down allow-empty="true">
+                        <drop-down allow-empty="true" allow-multiple="true">
                             <entity-options text="${description}" key="${statusId}">
                                 <entity-find entity-name="moqui.basic.StatusItem">
                                     <econdition field-name="statusTypeId" value="OrderHeader"/>
