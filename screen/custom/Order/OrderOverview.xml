@@ -548,7 +548,7 @@
                     </container>
                 </row-col>
             </container-row>
-            <section-iterate name="NodeForm" list="noteList" entry="note">
+            <section-iterate name="NoteForm" list="noteList" entry="note">
                 <actions>
                     <entity-find-related-one value-field="note" relationship-name="moqui.security.UserAccount" to-value-field="userAccount"/>
                 </actions>
