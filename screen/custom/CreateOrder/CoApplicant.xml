@@ -9,7 +9,9 @@
     <parameter name="orderPartSeqId" required="true"/>
 
     <transition name="storeApplicant">
-        <service-call name="mkdecision.dashboard.OrderServices.store#CoApplicant" in-map="context" out-map="context"/>
+        <service-call name="mkdecision.dashboard.OrderServices.store#Applicant" in-map="context" out-map="context">
+            <field-map field-name="roleTypeId" value="CoApplicant"/>
+        </service-call>
         <conditional-response url="../CoApplicantEmployment">
             <condition>
                 <expression>partyId != null</expression>
@@ -19,7 +21,22 @@
         </conditional-response>
         <default-response url="../Property"/>
     </transition>
-    <transition name="viewPrimaryApplicantEmployment">
+    <transition name="viewCoApplicantOption">
+        <actions>
+            <entity-find-count entity-name="mantle.order.OrderPartParty" count-field="coApplicantCount">
+                <econdition field-name="orderId" from="orderId"/>
+                <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
+                <econdition field-name="roleTypeId" value="CoApplicant"/>
+            </entity-find-count>
+            <log level="warn" message="${coApplicantCount}"/>
+        </actions>
+        <conditional-response url="../CoApplicantOption">
+            <condition>
+                <expression>coApplicantCount == 0</expression>
+            </condition>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+        </conditional-response>
         <default-response url="../PrimaryApplicantEmployment">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
@@ -286,7 +303,7 @@
             </field>
             <field name="backButton">
                 <default-field container-style="dark-link">
-                    <link url="viewPrimaryApplicantEmployment" text="Back" btn-type="default"/>
+                    <link url="viewCoApplicantOption" text="Back" btn-type="default"/>
                 </default-field>
             </field>
 

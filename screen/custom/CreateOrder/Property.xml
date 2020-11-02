@@ -24,7 +24,22 @@
         <default-response url="."/>
     </transition>
     <transition name="viewCoApplicant">
-        <default-response url="../CoApplicant">
+        <actions>
+            <entity-find-count entity-name="mantle.order.OrderPartParty" count-field="coApplicantCount">
+                <econdition field-name="orderId" from="orderId"/>
+                <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
+                <econdition field-name="roleTypeId" value="CoApplicant"/>
+            </entity-find-count>
+            <log level="warn" message="${coApplicantCount}"/>
+        </actions>
+        <conditional-response url="../CoApplicantOption">
+            <condition>
+                <expression>coApplicantCount == 0</expression>
+            </condition>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+        </conditional-response>
+        <default-response url="../CoApplicantEmployment">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
         </default-response>
@@ -53,7 +68,7 @@
                 <econdition field-name="partyId" from="partyId"/>
                 <econdition field-name="assetId" from="assetId"/>
             </entity-find>
-            <set field="hoaFeeMonthly" from="hoaMonthlyFeeFinFlowList?.getFirst()?.amount ?: ''"/>
+            <set field="hoaFeeMonthly" from="hoaMonthlyFeeFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
 
             <entity-find entity-name="mk.close.FinancialFlow" list="annualPropertyTaxFinFlowList">
                 <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
@@ -61,7 +76,7 @@
                 <econdition field-name="partyId" from="partyId"/>
                 <econdition field-name="assetId" from="assetId"/>
             </entity-find>
-            <set field="propertyTaxesAnnually" from="annualPropertyTaxFinFlowList?.getFirst()?.amount ?: ''"/>
+            <set field="propertyTaxesAnnually" from="annualPropertyTaxFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
 
             <entity-find entity-name="mk.close.FinancialFlow" list="annualInsuranceCostFinFlowList">
                 <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
@@ -69,7 +84,8 @@
                 <econdition field-name="partyId" from="partyId"/>
                 <econdition field-name="assetId" from="assetId"/>
             </entity-find>
-            <set field="propertyInsuranceCostsAnnually" from="annualInsuranceCostFinFlowList?.getFirst()?.amount ?: ''"/>
+            <set field="propertyInsuranceCostsAnnually" from="annualInsuranceCostFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
+            <log level="warn" message="${propertyInsuranceCostsAnnually}"/>
 
             <entity-find entity-name="mantle.party.PartyToAndRelationship" list="mortgageRelationList">
                 <econdition field-name="relationshipTypeEnumId" value="PrtMortgage"/>
@@ -109,27 +125,27 @@
             </field>
             <field name="salvageValue">
                 <default-field title="Current Property Value (Estimate)">
-                    <text-line input-type="number" prefix="$"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="acquireCost">
                 <default-field title="Original Purchase Price">
-                    <text-line input-type="number" prefix="$"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="hoaFeeMonthly">
                 <default-field title="HOA Fee Monthly">
-                    <text-line input-type="number" prefix="$"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="propertyTaxesAnnually">
                 <default-field title="Property Taxes Annually">
-                    <text-line input-type="number" prefix="$"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="propertyInsuranceCostsAnnually">
                 <default-field title="Property Insurance Costs Annually">
-                    <text-line input-type="number" prefix="$"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
 
@@ -211,12 +227,12 @@
             </field>
             <field name="mortgageBalance">
                 <default-field>
-                    <text-line input-type="number" prefix="$"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="mortgagePaymentMonthly">
                 <default-field>
-                    <text-line input-type="number" prefix="$"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                     <label text="Exclude property taxes, insurance, or HOA fees" style="text-caption"/>
                 </default-field>
             </field>
