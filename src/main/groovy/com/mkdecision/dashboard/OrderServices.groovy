@@ -1193,8 +1193,16 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
-        // archive party
-        sf.sync().name("update#mantle.order.OrderPartParty")
+        // delete party
+        sf.sync().name("delete#mantle.order.OrderPartParty")
+                .parameter("orderId", orderId)
+                .parameter("orderPartSeqId", orderPartSeqId)
+                .parameter("partyId", partyId)
+                .parameter("roleTypeId", party.getString("roleTypeId"))
+                .call()
+
+        // create party with archived status
+        sf.sync().name("create#mantle.order.OrderPartParty")
                 .parameter("orderId", orderId)
                 .parameter("orderPartSeqId", orderPartSeqId)
                 .parameter("partyId", partyId)
