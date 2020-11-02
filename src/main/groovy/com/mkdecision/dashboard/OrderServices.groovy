@@ -1251,25 +1251,25 @@ class OrderServices {
         }
 
         // validate acquire cost
-        if (acquireCost == null || acquireCost <= 0) {
+        if (acquireCost == null || acquireCost < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ACQUIRE_COST"))
             return new HashMap<String, Object>()
         }
 
         // validate HOA monthly fee
-        if (hoaFeeMonthly == null || hoaFeeMonthly <= 0) {
+        if (hoaFeeMonthly == null || hoaFeeMonthly < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_HOA_FEE_MONTHLY"))
             return new HashMap<String, Object>()
         }
 
         // validate property tax annually
-        if (propertyTaxesAnnually == null || propertyTaxesAnnually <= 0) {
+        if (propertyTaxesAnnually == null || propertyTaxesAnnually < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_TAX_ANNUALLY"))
             return new HashMap<String, Object>()
         }
 
         // validate property insurance cost annually
-        if (propertyInsuranceCostsAnnually == null || propertyInsuranceCostsAnnually <= 0) {
+        if (propertyInsuranceCostsAnnually == null || propertyInsuranceCostsAnnually < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_INSURANCE_COST_ANNUALLY"))
             return new HashMap<String, Object>()
         }
