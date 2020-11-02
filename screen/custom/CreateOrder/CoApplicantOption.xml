@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Co-Applicant"
+        default-menu-include="false"
+        default-menu-index="5">
+
+    <parameter name="orderId" required="true"/>
+    <parameter name="orderPartSeqId" required="true"/>
+
+    <transition name="viewCoApplicant">
+        <default-response url="../CoApplicant">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+        </default-response>
+    </transition>
+    <transition name="viewProperty">
+        <default-response url="../Property">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+        </default-response>
+    </transition>
+    <transition name="viewPrimaryApplicantEmployment">
+        <default-response url="../PrimaryApplicantEmployment">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+        </default-response>
+    </transition>
+
+    <widgets>
+        <form-single name="ApplicantForm">
+            <field name="orderId"><default-field><hidden/></default-field></field>
+            <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
+            <field name="partyId"><default-field><hidden/></default-field></field>
+
+            <field name="applicantHeader">
+                <default-field>
+                    <label text="New Application" type="h4" style="margin-b-1"/>
+                    <label text="Add Co-Applicant (Optional)" type="h5" style="margin-b-1"/>
+                    <label text="Co-applicant must be reside and be a spouse or co-owner of the property." style="margin-b-1"/>
+                    <container style="h-separator margin-tb-2"/>
+                </default-field>
+            </field>
+
+            <field name="addButton">
+                <default-field container-style="text-primary">
+                    <link url="viewCoApplicant" text="Add Co-Applicant" btn-type="default" icon="fa fa-plus"/>
+                </default-field>
+            </field>
+            <field name="continueButton">
+                <default-field container-style="text-primary">
+                    <link url="viewProperty" text="Continue" btn-type="default"/>
+                </default-field>
+            </field>
+            <field name="backButton">
+                <default-field container-style="dark-link">
+                    <link url="viewPrimaryApplicantEmployment" text="Back" btn-type="default"/>
+                </default-field>
+            </field>
+
+            <field-layout>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="applicantHeader"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row style="margin-b-1">
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6">
+                        <field-ref name="addButton"/>
+                    </field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+
+                <fields-not-referenced/>
+
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="backButton"/></field-col>
+                    <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="continueButton"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+            </field-layout>
+        </form-single>
+    </widgets>
+
+</screen>

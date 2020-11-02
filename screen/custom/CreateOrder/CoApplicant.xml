@@ -9,7 +9,9 @@
     <parameter name="orderPartSeqId" required="true"/>
 
     <transition name="storeApplicant">
-        <service-call name="mkdecision.dashboard.OrderServices.store#CoApplicant" in-map="context" out-map="context"/>
+        <service-call name="mkdecision.dashboard.OrderServices.store#Applicant" in-map="context" out-map="context">
+            <field-map field-name="roleTypeId" value="CoApplicant"/>
+        </service-call>
         <conditional-response url="../CoApplicantEmployment">
             <condition>
                 <expression>partyId != null</expression>
@@ -19,7 +21,21 @@
         </conditional-response>
         <default-response url="../Property"/>
     </transition>
-    <transition name="viewPrimaryApplicantEmployment">
+    <transition name="viewCoApplicantOption">
+        <actions>
+            <entity-find-count entity-name="mantle.order.OrderPartParty" count-field="coApplicantCount">
+                <econdition field-name="orderId" from="orderId"/>
+                <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
+                <econdition field-name="roleTypeId" value="CoApplicant"/>
+            </entity-find-count>
+        </actions>
+        <conditional-response url="../CoApplicantOption">
+            <condition>
+                <expression>coApplicantCount == 0</expression>
+            </condition>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+        </conditional-response>
         <default-response url="../PrimaryApplicantEmployment">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
@@ -47,7 +63,7 @@
 
             <entity-find entity-name="mantle.party.contact.PartyContactMechPostalAddress" list="postalAddressList">
                 <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="contactMechPurposeId" value="PostalHome"/>
+                <econdition field-name="contactMechPurposeId" value="PostalPrimary"/>
                 <date-filter/>
             </entity-find>
             <set field="address1" from="postalAddressList?.getFirst()?.address1 ?: ''"/>
@@ -73,7 +89,7 @@
 
             <entity-find entity-name="mantle.party.contact.PartyContactMechPostalAddress" list="postalAddressList">
                 <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="contactMechPurposeId" value="PostalHome"/>
+                <econdition field-name="contactMechPurposeId" value="PostalPrimary"/>
                 <date-filter/>
             </entity-find>
 
@@ -104,12 +120,12 @@
             <field name="applicantHeader">
                 <default-field>
                     <label text="New Application" type="h4" style="margin-b-1"/>
-                    <label text="Co-Applicant" type="h5" style="margin-b-1"/>
-                    <label text="Please add all parties associated with the new application." style="margin-b-1"/>
+                    <label text="Add Co-Applicant (Optional)" type="h5" style="margin-b-1"/>
+                    <label text="Co-applicant must be reside and be a spouse or co-owner of the property." style="margin-b-1"/>
                     <container style="h-separator margin-tb-2"/>
                 </default-field>
             </field>
-            <field name="personaInfoHeader">
+            <field name="personalInfoHeader">
                 <default-field>
                     <label text="Personal Information" type="h5" style="margin-tb-1"/>
                     <container style="h-separator margin-tb-1"/>
@@ -286,7 +302,7 @@
             </field>
             <field name="backButton">
                 <default-field container-style="dark-link">
-                    <link url="viewPrimaryApplicantEmployment" text="Back" btn-type="default"/>
+                    <link url="viewCoApplicantOption" text="Back" btn-type="default"/>
                 </default-field>
             </field>
 
@@ -295,7 +311,7 @@
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                     <field-col xs="12" sm="10" md="6" lg="6">
                         <field-ref name="applicantHeader"/>
-                        <field-ref name="personaInfoHeader"/>
+                        <field-ref name="personalInfoHeader"/>
                     </field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>

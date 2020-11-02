@@ -9,10 +9,26 @@
     <parameter name="orderPartSeqId" required="true"/>
 
     <transition name="addEmployment">
-        <service-call name="mkdecision.dashboard.OrderServices.add#Employment" in-map="context"/>
+        <actions>
+            <service-call name="mkdecision.dashboard.OrderServices.add#Employment" in-map="context"/>
+            <actions>
+                <entity-find-count entity-name="mantle.order.OrderPartParty" count-field="coApplicantCount">
+                    <econdition field-name="orderId" from="orderId"/>
+                    <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
+                    <econdition field-name="roleTypeId" value="CoApplicant"/>
+                </entity-find-count>
+            </actions>
+        </actions>
+        <conditional-response url="../CoApplicantOption">
+            <condition>
+                <expression>continueButton != null &amp;&amp; coApplicantCount == 0</expression>
+            </condition>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+        </conditional-response>
         <conditional-response url="../CoApplicant">
             <condition>
-                <expression>continueButton != null</expression>
+                <expression>continueButton != null &amp;&amp; coApplicantCount > 0</expression>
             </condition>
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
@@ -383,7 +399,7 @@
             </field>
             <field name="monthlyIncome">
                 <default-field title="Pre-Tax Income Monthly">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="employerAddress1">
@@ -437,57 +453,57 @@
             </field>
             <field name="rentIncome">
                 <default-field title="Rent (Optional)">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="retirementIncome">
                 <default-field title="Retirement (Optional)">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="investmentIncome">
                 <default-field title="Investment (Optional)">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="bonusIncome">
                 <default-field title="Bonus (Optional)">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="socialSecurityIncome">
                 <default-field title="Social Security (Optional)">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="disabilityIncome">
                 <default-field title="Disability (Optional)">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="studentIncome">
                 <default-field title="Student Financial Assistance (Optional)">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="unemploymentIncome">
                 <default-field title="Unemployment Compensation (Optional)">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="alimonyIncome">
                 <default-field title="Alimony (Optional)">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="childSupportIncome">
                 <default-field title="Child Support (Optional)">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="otherIncome">
                 <default-field title="Other (Optional)">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="totalNonEmploymentIncome">

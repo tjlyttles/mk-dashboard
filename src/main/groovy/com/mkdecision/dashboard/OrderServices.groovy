@@ -259,7 +259,7 @@ class OrderServices {
                     .call()
 
             // create order item form response
-            sf.sync().name("update#mantle.order.OrderItemFormResponse")
+            sf.sync().name("create#mantle.order.OrderItemFormResponse")
                     .parameter("orderId", orderId)
                     .parameter("orderItemSeqId", orderItemSeqId)
                     .parameter("formResponseId", formResponseId)
@@ -597,7 +597,7 @@ class OrderServices {
                     .parameter("city", city)
                     .parameter("postalCode", postalCode)
                     .parameter("stateProvinceGeoId", stateProvinceGeoId)
-                    .parameter("contactMechPurposeId", "PostalHome")
+                    .parameter("contactMechPurposeId", "PostalPrimary")
                     .call()
 
             // update telecom number
@@ -674,7 +674,7 @@ class OrderServices {
                     .parameter("city", city)
                     .parameter("postalCode", postalCode)
                     .parameter("stateProvinceGeoId", stateProvinceGeoId)
-                    .parameter("contactMechPurposeId", "PostalHome")
+                    .parameter("contactMechPurposeId", "PostalPrimary")
                     .call()
 
             // create telecom number
@@ -1193,8 +1193,16 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
-        // archive party
-        sf.sync().name("update#mantle.order.OrderPartParty")
+        // delete party
+        sf.sync().name("delete#mantle.order.OrderPartParty")
+                .parameter("orderId", orderId)
+                .parameter("orderPartSeqId", orderPartSeqId)
+                .parameter("partyId", partyId)
+                .parameter("roleTypeId", party.getString("roleTypeId"))
+                .call()
+
+        // create party with archived status
+        sf.sync().name("create#mantle.order.OrderPartParty")
                 .parameter("orderId", orderId)
                 .parameter("orderPartSeqId", orderPartSeqId)
                 .parameter("partyId", partyId)
@@ -1356,7 +1364,7 @@ class OrderServices {
             EntityValue postalAddress = ef.find("mantle.party.contact.PartyContactMechPostalAddress")
                     .condition("partyId", partyId)
                     .condition("contactMechTypeEnumId", "CmtPostalAddress")
-                    .condition("contactMechPurposeId", "PostalHome")
+                    .condition("contactMechPurposeId", "PostalPrimary")
                     .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
                     .list()
                     .getFirst()

@@ -53,6 +53,29 @@
             <econdition field-name="productId"/>
         </entity-find>
         <set field="formId" from="formList.isEmpty() ? null : formList.getFirst().get('formId')"/>
+
+        <if condition="orderId != null &amp;&amp; orderPartSeqId != null">
+            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+            <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+            <entity-find entity-name="mantle.order.OrderItem" list="orderItemList">
+                <econdition field-name="orderId" from="orderId"/>
+                <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
+                <order-by field-name="-lastUpdatedStamp"/>
+            </entity-find>
+            <set field="orderItemSeqId" from="orderItemList?.getFirst()?.orderItemSeqId ?: ''"/>
+            <entity-find entity-name="mantle.order.OrderItemFormResponse" list="responseList">
+                <econdition field-name="orderId" from="orderId"/>
+                <econdition field-name="orderItemSeqId" from="orderItemSeqId"/>
+            </entity-find>
+            <set field="formResponseId" from="responseList?.getFirst()?.formResponseId ?: null"/>
+
+            <if condition="formResponseId != null">
+                <service-call name="org.moqui.impl.ScreenServices.get#FormResponse" out-map="formResponse">
+                    <field-map field-name="formResponseId" from="formResponseId"/>
+                </service-call>
+                <set field="responseMap" from="formResponse?.responseMap"/>
+            </if>
+        </if>
     </actions>
 
     <widgets>
@@ -61,7 +84,7 @@
                 <expression>formId != null</expression>
             </condition>
             <widgets>
-                <form-single name="EligibilityForm" extends="DbForm#${formId}" dynamic="true" transition="storeOrder">
+                <form-single name="EligibilityForm" extends="DbForm#${formId}" dynamic="true" transition="storeOrder" map="responseMap">
                     <field name="eligibilityHeader">
                         <default-field>
                             <label text="New Application" type="h4" style="margin-b-1"/>

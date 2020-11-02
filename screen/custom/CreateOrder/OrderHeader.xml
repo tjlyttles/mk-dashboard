@@ -290,12 +290,12 @@
             </field>
             <field name="totalPurchasePrice">
                 <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="totalPurchasePrice">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="downPayment">
                 <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="downPayment">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
             <field name="loanFee">
