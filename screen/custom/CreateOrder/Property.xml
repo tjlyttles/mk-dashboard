@@ -109,27 +109,27 @@
             </field>
             <field name="salvageValue">
                 <default-field title="Current Property Value (Estimate)">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" prefix="$"/>
                 </default-field>
             </field>
             <field name="acquireCost">
                 <default-field title="Original Purchase Price">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" prefix="$"/>
                 </default-field>
             </field>
             <field name="hoaFeeMonthly">
                 <default-field title="HOA Fee Monthly">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" prefix="$"/>
                 </default-field>
             </field>
             <field name="propertyTaxesAnnually">
                 <default-field title="Property Taxes Annually">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" prefix="$"/>
                 </default-field>
             </field>
             <field name="propertyInsuranceCostsAnnually">
                 <default-field title="Property Insurance Costs Annually">
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" prefix="$"/>
                 </default-field>
             </field>
 
@@ -211,12 +211,12 @@
             </field>
             <field name="mortgageBalance">
                 <default-field>
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" prefix="$"/>
                 </default-field>
             </field>
             <field name="mortgagePaymentMonthly">
                 <default-field>
-                    <text-line input-type="number"/>
+                    <text-line input-type="number" prefix="$"/>
                     <label text="Exclude property taxes, insurance, or HOA fees" style="text-caption"/>
                 </default-field>
             </field>
