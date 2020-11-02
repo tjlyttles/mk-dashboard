@@ -259,7 +259,7 @@ class OrderServices {
                     .call()
 
             // create order item form response
-            sf.sync().name("update#mantle.order.OrderItemFormResponse")
+            sf.sync().name("create#mantle.order.OrderItemFormResponse")
                     .parameter("orderId", orderId)
                     .parameter("orderItemSeqId", orderItemSeqId)
                     .parameter("formResponseId", formResponseId)
