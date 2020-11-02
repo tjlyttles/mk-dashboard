@@ -17,7 +17,6 @@
                     <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
                     <econdition field-name="roleTypeId" value="CoApplicant"/>
                 </entity-find-count>
-                <log level="warn" message="${coApplicantCount}"/>
             </actions>
         </actions>
         <conditional-response url="../CoApplicantOption">

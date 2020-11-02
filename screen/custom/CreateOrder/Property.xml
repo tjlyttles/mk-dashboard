@@ -30,7 +30,6 @@
                 <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
                 <econdition field-name="roleTypeId" value="CoApplicant"/>
             </entity-find-count>
-            <log level="warn" message="${coApplicantCount}"/>
         </actions>
         <conditional-response url="../CoApplicantOption">
             <condition>
@@ -85,7 +84,6 @@
                 <econdition field-name="assetId" from="assetId"/>
             </entity-find>
             <set field="propertyInsuranceCostsAnnually" from="annualInsuranceCostFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
-            <log level="warn" message="${propertyInsuranceCostsAnnually}"/>
 
             <entity-find entity-name="mantle.party.PartyToAndRelationship" list="mortgageRelationList">
                 <econdition field-name="relationshipTypeEnumId" value="PrtMortgage"/>
