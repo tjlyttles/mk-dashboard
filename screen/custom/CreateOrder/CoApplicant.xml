@@ -47,7 +47,7 @@
 
             <entity-find entity-name="mantle.party.contact.PartyContactMechPostalAddress" list="postalAddressList">
                 <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="contactMechPurposeId" value="PostalHome"/>
+                <econdition field-name="contactMechPurposeId" value="PostalPrimary"/>
                 <date-filter/>
             </entity-find>
             <set field="address1" from="postalAddressList?.getFirst()?.address1 ?: ''"/>
@@ -73,7 +73,7 @@
 
             <entity-find entity-name="mantle.party.contact.PartyContactMechPostalAddress" list="postalAddressList">
                 <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="contactMechPurposeId" value="PostalHome"/>
+                <econdition field-name="contactMechPurposeId" value="PostalPrimary"/>
                 <date-filter/>
             </entity-find>
 
@@ -104,8 +104,8 @@
             <field name="applicantHeader">
                 <default-field>
                     <label text="New Application" type="h4" style="margin-b-1"/>
-                    <label text="Co-Applicant" type="h5" style="margin-b-1"/>
-                    <label text="Please add all parties associated with the new application." style="margin-b-1"/>
+                    <label text="Add Co-Applicant (Optional)" type="h5" style="margin-b-1"/>
+                    <label text="Co-applicant must be reside and be a spouse or co-owner of the property." style="margin-b-1"/>
                     <container style="h-separator margin-tb-2"/>
                 </default-field>
             </field>

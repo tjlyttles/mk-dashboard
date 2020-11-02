@@ -597,7 +597,7 @@ class OrderServices {
                     .parameter("city", city)
                     .parameter("postalCode", postalCode)
                     .parameter("stateProvinceGeoId", stateProvinceGeoId)
-                    .parameter("contactMechPurposeId", "PostalHome")
+                    .parameter("contactMechPurposeId", "PostalPrimary")
                     .call()
 
             // update telecom number
@@ -674,7 +674,7 @@ class OrderServices {
                     .parameter("city", city)
                     .parameter("postalCode", postalCode)
                     .parameter("stateProvinceGeoId", stateProvinceGeoId)
-                    .parameter("contactMechPurposeId", "PostalHome")
+                    .parameter("contactMechPurposeId", "PostalPrimary")
                     .call()
 
             // create telecom number
@@ -1364,7 +1364,7 @@ class OrderServices {
             EntityValue postalAddress = ef.find("mantle.party.contact.PartyContactMechPostalAddress")
                     .condition("partyId", partyId)
                     .condition("contactMechTypeEnumId", "CmtPostalAddress")
-                    .condition("contactMechPurposeId", "PostalHome")
+                    .condition("contactMechPurposeId", "PostalPrimary")
                     .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
                     .list()
                     .getFirst()

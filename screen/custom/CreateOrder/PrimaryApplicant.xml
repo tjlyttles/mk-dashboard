@@ -43,7 +43,7 @@
 
             <entity-find entity-name="mantle.party.contact.PartyContactMechPostalAddress" list="postalAddressList">
                 <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="contactMechPurposeId" value="PostalHome"/>
+                <econdition field-name="contactMechPurposeId" value="PostalPrimary"/>
                 <date-filter/>
             </entity-find>
             <set field="address1" from="postalAddressList?.getFirst()?.address1 ?: ''"/>
@@ -69,7 +69,7 @@
 
             <entity-find entity-name="mantle.party.contact.PartyContactMechPostalAddress" list="postalAddressList">
                 <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="contactMechPurposeId" value="PostalHome"/>
+                <econdition field-name="contactMechPurposeId" value="PostalPrimary"/>
                 <date-filter/>
             </entity-find>
 
