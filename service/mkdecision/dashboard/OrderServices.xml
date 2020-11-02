@@ -292,16 +292,16 @@
                 <number-range min="0" min-include-equals="false" message="Please enter the Current Property Value"/>
             </parameter>
             <parameter name="acquireCost" type="BigDecimal" required="true">
-                <number-range min="0" min-include-equals="false" message="Please enter the Original Purchase Price"/>
+                <number-range min="0" min-include-equals="true" message="Please enter the Original Purchase Price"/>
             </parameter>
             <parameter name="hoaFeeMonthly" type="BigDecimal" required="true">
-                <number-range min="0" min-include-equals="false" message="Please enter the HOA Fee Monthly"/>
+                <number-range min="0" min-include-equals="true" message="Please enter the HOA Fee Monthly"/>
             </parameter>
             <parameter name="propertyTaxesAnnually" type="BigDecimal" required="true">
-                <number-range min="0" min-include-equals="false" message="Please enter the Property Taxes Annually"/>
+                <number-range min="0" min-include-equals="true" message="Please enter the Property Taxes Annually"/>
             </parameter>
             <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal" required="true">
-                <number-range min="0" min-include-equals="false" message="Please enter the Insurance Costs Annually"/>
+                <number-range min="0" min-include-equals="true" message="Please enter the Insurance Costs Annually"/>
             </parameter>
             <parameter name="lenderName"/>
             <parameter name="mortgageBalance" type="BigDecimal">
