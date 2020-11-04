@@ -77,6 +77,12 @@
                     </default-field>
                 </field>
 
+                <field name="compositeOrderId">
+                    <default-field title="Order ID">
+                        <link url="editOrder" text="${orderId} - ${statusDescription}" link-type="anchor"/>
+                    </default-field>
+                </field>
+
                 <field name="entryDate">
                     <header-field show-order-by="true" title="Date">
                         <date-period/>
@@ -95,9 +101,27 @@
                     </header-field>
                 </field>
 
+                <columns>
+                    <column>
+                        <field-ref name="customerFirstName"/>
+                    </column>
+                    <column>
+                        <field-ref name="statusId"/>
+                    </column>
+                    <column>
+                        <field-ref name="productId"/>
+                    </column>
+                    <column>
+                        <field-ref name="orderId"/>
+                    </column>
+                    <column>
+                        <field-ref name="entryDate"/>
+                    </column>
+                </columns>
                 <columns type="mobile">
                     <column>
                         <field-ref name="customerFirstName"/>
+                        <field-ref name="compositeOrderId"/>
                         <field-ref name="productId"/>
                     </column>
                     <column>
