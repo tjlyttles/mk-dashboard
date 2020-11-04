@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
-        default-menu-title="Order"
+        default-menu-title="Order Profile"
         default-menu-include="false">
 
     <parameter name="orderId" required="true"/>
 
     <transition name="dashboard">
         <default-response url="../Dashboard"/>
+    </transition>
+    <transition name="addParty">
+        <default-response url="../OrderParty">
+            <parameter name="orderId" from="orderId"/>
+            <parameter name="orderPartSeqId" value="01"/>
+        </default-response>
     </transition>
     <transition name="addNote">
         <service-call name="create#mantle.order.OrderNote" in-map="context"/>
@@ -100,7 +106,7 @@
                         </form-single>
                     </container-dialog>
                     <button-menu text="More" icon="fa fa-ellipsis-v">
-                        <link url="#" text="Add Party"/>
+                        <link url="addParty" text="Add Party"/>
                         <link url="cancelOrder" text="Cancel Order" btn-type="danger"/>
                     </button-menu>
                 </container>
