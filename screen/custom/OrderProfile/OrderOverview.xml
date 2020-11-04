@@ -88,7 +88,7 @@
         <default-response type="none"/>
     </transition>
     <transition name="addParty">
-        <default-response url="../../AddParty/Party">
+        <default-response url="../../OrderParty/Party">
             <parameter name="orderId" from="orderId"/>
             <parameter name="orderPartSeqId" value="01"/>
         </default-response>

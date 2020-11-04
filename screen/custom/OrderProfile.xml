@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
-        default-menu-title="Order"
+        default-menu-title="Order Profile"
         default-menu-include="false">
 
     <parameter name="orderId" required="true"/>
@@ -10,7 +10,7 @@
         <default-response url="../Dashboard"/>
     </transition>
     <transition name="addParty">
-        <default-response url="../AddParty">
+        <default-response url="../OrderParty">
             <parameter name="orderId" from="orderId"/>
             <parameter name="orderPartSeqId" value="01"/>
         </default-response>

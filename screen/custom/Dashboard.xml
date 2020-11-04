@@ -4,10 +4,10 @@
         default-menu-title="Dashboard">
 
     <transition name="newOrder">
-        <default-response url="../NewOrder"/>
+        <default-response url="../OrderWizard"/>
     </transition>
     <transition name="editOrder">
-        <default-response url="../Order"/>
+        <default-response url="../OrderProfile"/>
     </transition>
 
     <actions>
