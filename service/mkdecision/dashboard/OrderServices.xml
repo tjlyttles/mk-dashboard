@@ -73,6 +73,23 @@
             <parameter name="orderItemSeqId"/>
         </out-parameters>
     </service>
+    <service verb="update" noun="OrderItem" type="java" location="com.mkdecision.dashboard.OrderServices" method="updateOrderItem">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="productCategoryId" required="true"/>
+            <parameter name="productId" required="true"/>
+            <parameter name="totalPurchasePrice" type="BigDecimal" required="true"/>
+            <parameter name="downPayment" type="BigDecimal" required="true"/>
+            <parameter name="loanFee" type="BigDecimal" required="true"/>
+            <parameter name="amount" type="BigDecimal" required="true"/>
+            <parameter name="estimatedPayment" type="BigDecimal" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderItemSeqId"/>
+        </out-parameters>
+    </service>
     <service verb="delete" noun="OrderItem" type="java" location="com.mkdecision.dashboard.OrderServices" method="deleteOrderItem">
         <in-parameters>
             <parameter name="orderId" required="true"/>

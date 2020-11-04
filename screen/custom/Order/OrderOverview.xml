@@ -101,6 +101,10 @@
         <service-call name="mkdecision.dashboard.OrderServices.add#OrderItem" in-map="context"/>
         <default-response url="."/>
     </transition>
+    <transition name="updateOrderItem">
+        <service-call name="mkdecision.dashboard.OrderServices.update#OrderItem" in-map="context"/>
+        <default-response url="."/>
+    </transition>
     <transition name="deleteOrderItem">
         <service-call name="mkdecision.dashboard.OrderServices.delete#OrderItem" in-map="context"/>
         <default-response url="."/>
@@ -190,10 +194,71 @@
                 <row-col sm="6" xs="6">
                     <label text="Order Items" type="h4"/>
                 </row-col>
-                <row-col sm="6" xs="6">
-                    <container style="text-right">
-                        <container-dialog id="AddItemDialog" button-text="Add Item" width="960">
-                            <form-single name="AddItemForm" transition="addOrderItem">
+            </container-row>
+            <form-list name="ItemList" list="itemList">
+                <row-actions>
+                    <entity-find-one entity-name="mantle.product.Product" value-field="product"/>
+                    <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+                    <entity-find-one entity-name="moqui.basic.StatusItem" value-field="orderPartStatus">
+                        <field-map field-name="statusId" from="orderPart.statusId"/>
+                    </entity-find-one>
+                    <set field="amount" from="unitAmount"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="productCategoryParamList">
+                        <econdition field-name="productParameterId" value="ProductCategory"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="productCategoryId" from="productCategoryParamList?.getFirst()?.parameterValue ?: ''"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="productCategoryParamList">
+                        <econdition field-name="productParameterId" value="ProductCategory"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="productCategoryId" from="productCategoryParamList?.getFirst()?.parameterValue ?: ''"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="totalPurchasePriceParamList">
+                        <econdition field-name="productParameterId" value="TotalPurchasePrice"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="totalPurchasePrice" from="totalPurchasePriceParamList?.getFirst()?.parameterValue ?: ''"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="downPaymentParamList">
+                        <econdition field-name="productParameterId" value="DownPayment"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="downPayment" from="downPaymentParamList?.getFirst()?.parameterValue ?: ''"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="loanFeeParamList">
+                        <econdition field-name="productParameterId" value="LoanFee"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="loanFee" from="loanFeeParamList?.getFirst()?.parameterValue ?: ''"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="estimatedPaymentParamList">
+                        <econdition field-name="productParameterId" value="EstimatedPayment"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="estimatedPayment" from="estimatedPaymentParamList?.getFirst()?.parameterValue ?: ''"/>
+                </row-actions>
+                <field name="productName">
+                    <default-field title="Description">
+                        <display text="${product?.productName ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="status">
+                    <default-field>
+                        <display text="${orderPartStatus.description}"/>
+                    </default-field>
+                </field>
+                <field name="unitAmount">
+                    <default-field title="Amount">
+                        <display text="${ec.l10n.formatCurrency(unitAmount, orderHeader.currencyUomId)}"/>
+                    </default-field>
+                </field>
+                <field name="options">
+                    <default-field title="" container-style="text-right">
+                        <container-dialog id="EditItemDialog" button-text="Edit Item" width="960">
+                            <form-single name="EditItemForm" transition="updateOrderItem">
                                 <field name="orderId">
                                     <default-field>
                                         <hidden default-value="${orderId}"/>
@@ -263,34 +328,6 @@
                                 </field>
                             </form-single>
                         </container-dialog>
-                    </container>
-                </row-col>
-            </container-row>
-            <form-list name="ItemList" list="itemList">
-                <row-actions>
-                    <entity-find-one entity-name="mantle.product.Product" value-field="product"/>
-                    <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
-                    <entity-find-one entity-name="moqui.basic.StatusItem" value-field="orderPartStatus">
-                        <field-map field-name="statusId" from="orderPart.statusId"/>
-                    </entity-find-one>
-                </row-actions>
-                <field name="productName">
-                    <default-field title="Description">
-                        <display text="${product?.productName ?: '-'}"/>
-                    </default-field>
-                </field>
-                <field name="status">
-                    <default-field>
-                        <display text="${orderPartStatus.description}"/>
-                    </default-field>
-                </field>
-                <field name="unitAmount">
-                    <default-field title="Amount">
-                        <display text="${ec.l10n.formatCurrency(unitAmount, orderHeader.currencyUomId)}"/>
-                    </default-field>
-                </field>
-                <field name="options">
-                    <default-field title="" container-style="text-right">
                         <link icon="fa fa-trash" link-type="hidden-form-link" btn-type="danger" url="deleteOrderItem" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, orderItemSeqId: orderItemSeqId]"/>
                     </default-field>
                 </field>
