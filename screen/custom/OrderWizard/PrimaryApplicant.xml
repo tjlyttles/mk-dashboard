@@ -162,7 +162,7 @@
             </field>
             <field name="stateProvinceGeoId">
                 <default-field title="State">
-                    <drop-down allow-empty="true">
+                    <drop-down>
                         <entity-options text="${geoName}" key="${toGeoId}">
                             <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
                                 <econdition field-name="geoId" value="USA"/>
