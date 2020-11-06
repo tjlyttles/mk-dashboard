@@ -3,11 +3,11 @@
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
         default-menu-title="Dashboard">
 
-    <transition name="createOrder">
-        <default-response url="../CreateOrder"/>
+    <transition name="newOrder">
+        <default-response url="../OrderWizard"/>
     </transition>
     <transition name="editOrder">
-        <default-response url="../Order"/>
+        <default-response url="../OrderProfile"/>
     </transition>
 
     <actions>
@@ -18,7 +18,7 @@
     
     <widgets>
         <container>
-            <link url="createOrder" text="New Order" icon="fa fa-plus" style="q-btn--rectangle q-btn--rounded margin-all-05"/>
+            <link url="newOrder" text="New Order" icon="fa fa-plus" style="q-btn--rectangle q-btn--rounded margin-all-05"/>
 
             <form-list name="OrderList" list="orderList" list-entry="order" header-dialog="true" select-columns="true" saved-finds="true">
                 <row-actions>
@@ -77,6 +77,12 @@
                     </default-field>
                 </field>
 
+                <field name="compositeOrderId">
+                    <default-field title="Order ID">
+                        <link url="editOrder" text="${orderId} - ${statusDescription}" link-type="anchor"/>
+                    </default-field>
+                </field>
+
                 <field name="entryDate">
                     <header-field show-order-by="true" title="Date">
                         <date-period/>
@@ -95,9 +101,27 @@
                     </header-field>
                 </field>
 
+                <columns>
+                    <column>
+                        <field-ref name="customerFirstName"/>
+                    </column>
+                    <column>
+                        <field-ref name="statusId"/>
+                    </column>
+                    <column>
+                        <field-ref name="productId"/>
+                    </column>
+                    <column>
+                        <field-ref name="orderId"/>
+                    </column>
+                    <column>
+                        <field-ref name="entryDate"/>
+                    </column>
+                </columns>
                 <columns type="mobile">
                     <column>
                         <field-ref name="customerFirstName"/>
+                        <field-ref name="compositeOrderId"/>
                         <field-ref name="productId"/>
                     </column>
                     <column>

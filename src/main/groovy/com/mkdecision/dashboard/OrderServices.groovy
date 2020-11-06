@@ -1687,6 +1687,116 @@ class OrderServices {
         return outParams
     }
 
+    static Map<String, Object> updateOrderItem(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
+        String productId = (String) cs.getOrDefault("productId", null)
+        BigDecimal totalPurchasePrice = (BigDecimal) cs.getOrDefault("totalPurchasePrice", null)
+        BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
+        BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
+        BigDecimal amount = (BigDecimal) cs.getOrDefault("amount", null)
+        BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
+
+        // validate fields
+        sf.sync().name("mkdecision.dashboard.OrderServices.validate#OrderItemFields")
+                .parameters(cs)
+                .call()
+        if (mf.hasError()) {
+            return new HashMap<String, Object>()
+        }
+
+        // find order item
+        EntityValue orderItem = ef.find("mantle.order.OrderItem")
+                .condition("orderId", orderId)
+                .condition("orderPartSeqId", orderPartSeqId)
+                .orderBy("-lastUpdatedStamp")
+                .list()
+                .getFirst()
+        String orderItemSeqId = orderItem.getString("orderItemSeqId")
+        String productParameterSetId = orderItem.getString("productParameterSetId")
+
+        // update order item
+        sf.sync().name("mantle.order.OrderServices.update#OrderItem")
+                .parameter("orderId", orderId)
+                .parameter("orderPartSeqId", orderPartSeqId)
+                .parameter("orderItemSeqId", orderItemSeqId)
+                .parameter("productId", productId)
+                .parameter("unitAmount", amount)
+                .call()
+
+        // update product category
+        EntityValue productCategoryParam = ef.find("mantle.product.ProductParameterValue")
+                .condition("productParameterId", "ProductCategory")
+                .condition("productParameterSetId", productParameterSetId)
+                .list()
+                .getFirst()
+        sf.sync().name("update#mantle.product.ProductParameterValue")
+                .parameter("productParameterValueId", productCategoryParam.getString("productParameterValueId"))
+                .parameter("parameterValue", productCategoryId)
+                .call()
+
+        // update total purchase price
+        EntityValue totalPurchasePriceParam = ef.find("mantle.product.ProductParameterValue")
+                .condition("productParameterId", "TotalPurchasePrice")
+                .condition("productParameterSetId", productParameterSetId)
+                .list()
+                .getFirst()
+        sf.sync().name("update#mantle.product.ProductParameterValue")
+                .parameter("productParameterValueId", totalPurchasePriceParam.getString("productParameterValueId"))
+                .parameter("parameterValue", totalPurchasePrice)
+                .call()
+
+        // update down payment
+        EntityValue downPaymentParam = ef.find("mantle.product.ProductParameterValue")
+                .condition("productParameterId", "DownPayment")
+                .condition("productParameterSetId", productParameterSetId)
+                .list()
+                .getFirst()
+        sf.sync().name("update#mantle.product.ProductParameterValue")
+                .parameter("productParameterValueId", downPaymentParam.getString("productParameterValueId"))
+                .parameter("parameterValue", downPayment)
+                .call()
+
+        // update loan fee
+        EntityValue loanFeeParam = ef.find("mantle.product.ProductParameterValue")
+                .condition("productParameterId", "LoanFee")
+                .condition("productParameterSetId", productParameterSetId)
+                .list()
+                .getFirst()
+        sf.sync().name("update#mantle.product.ProductParameterValue")
+                .parameter("productParameterValueId", loanFeeParam.getString("productParameterValueId"))
+                .parameter("parameterValue", loanFee)
+                .call()
+
+        // update estimated amount
+        EntityValue estimatedPaymentParam = ef.find("mantle.product.ProductParameterValue")
+                .condition("productParameterId", "EstimatedPayment")
+                .condition("productParameterSetId", productParameterSetId)
+                .list()
+                .getFirst()
+        sf.sync().name("update#mantle.product.ProductParameterValue")
+                .parameter("productParameterValueId", estimatedPaymentParam.getString("productParameterValueId"))
+                .parameter("parameterValue", estimatedPayment)
+                .call()
+
+        // return the output parameters
+        Map<String, Object> outParams = new HashMap<>()
+        outParams.put("orderId", orderId)
+        outParams.put("orderItemSeqId", orderItemSeqId)
+        return outParams
+    }
+
     static Map<String, Object> deleteOrderItem(ExecutionContext ec) {
 
         // shortcuts for convenience
