@@ -223,15 +223,15 @@
                 <matches regexp="^[- A-Za-z']+$" message="Please enter an occupation using only letters, apostrophes or hyphens."/>
             </parameter>
             <parameter name="employmentStatusEnumId"/>
-            <parameter name="employerName"/>
-            <parameter name="jobTitle"/>
-            <parameter name="years" type="Integer">
+            <parameter name="employerName" required="true"/>
+            <parameter name="jobTitle" required="true"/>
+            <parameter name="years" type="Integer" required="true">
                 <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
             </parameter>
-            <parameter name="months" type="Integer">
+            <parameter name="months" type="Integer" required="true">
                 <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
             </parameter>
-            <parameter name="monthlyIncome" type="BigDecimal">
+            <parameter name="monthlyIncome" type="BigDecimal" required="true">
                 <number-range min="0" min-include-equals="false" message="Please enter a valid income."/>
             </parameter>
             <parameter name="employerAddress1">
