@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
-        default-menu-title="Co-Applicant"
+        default-menu-title="Co-Applicant Option"
         default-menu-include="false"
-        default-menu-index="5">
+        default-menu-index="6">
 
     <parameter name="orderId" required="true"/>
     <parameter name="orderPartSeqId" required="true"/>

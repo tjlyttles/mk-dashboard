@@ -23,12 +23,15 @@
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_SSN" locale="en" localized="Invalid social security number."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_DOB" locale="en" localized="Invalid date of birth."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_MARITAL_STATUS" locale="en" localized="Invalid marital status."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYMENT_STATUS" locale="en" localized="Invalid employment status."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PHONE_NUMBER" locale="en" localized="Invalid phone number."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PHONE_NUMBER_TYPE" locale="en" localized="Invalid phone number type."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMAIL" locale="en" localized="Invalid email address."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMAIL_VERIFY" locale="en" localized="Invalid email address verification."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ID_TYPE" locale="en" localized="Invalid ID type."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ID_VALUE" locale="en" localized="Invalid ID value."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_IDENTITY" locale="en" localized="Invalid identity."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_OCCUPATION" locale="en" localized="Invalid occupation."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYMENT_STATUS" locale="en" localized="Invalid employment status."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYER_NAME" locale="en" localized="Invalid employer name."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_JOB_TITLE" locale="en" localized="Invalid job title."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYMENT_DURATION" locale="en" localized="Invalid employment duration."/>
