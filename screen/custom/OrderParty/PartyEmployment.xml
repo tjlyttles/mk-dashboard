@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
         default-menu-title="Party Employment"
         default-menu-include="false"
-        default-menu-index="2">
+        default-menu-index="3">
 
     <parameter name="orderId" required="true"/>
     <parameter name="orderPartSeqId" required="true"/>
@@ -32,8 +32,8 @@
         <service-call name="mkdecision.dashboard.OrderServices.delete#Employment" in-map="context"/>
         <default-response url="."/>
     </transition>
-    <transition name="viewParty">
-        <default-response url="../Party">
+    <transition name="viewPartyIdentity">
+        <default-response url="../PartyIdentity">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
             <parameter name="partyId"/>
@@ -64,7 +64,6 @@
         <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
         <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
         <entity-find-one entity-name="mantle.party.Person" value-field="party"/>
-        <set field="employmentStatusEnumId" from="party?.employmentStatusEnumId ?: ''"/>
         <set field="occupation" from="party?.occupation ?: ''"/>
 
         <entity-find entity-name="mantle.party.PartyToAndRelationship" list="employmentRelationList">
@@ -344,18 +343,6 @@
                     <label text="Employment ${(employmentRelationList?.size() ?: 0) + 1}" style="margin-tb-1"/>
                 </default-field>
             </field>
-            <field name="employmentStatusEnumId">
-                <default-field title="Employment Status">
-                    <drop-down allow-empty="true">
-                        <entity-options text="${description}" key="${enumId}">
-                            <entity-find entity-name="moqui.basic.Enumeration">
-                                <econdition field-name="enumTypeId" value="EmploymentStatus"/>
-                                <order-by field-name="sequenceNum,description"/>
-                            </entity-find>
-                        </entity-options>
-                    </drop-down>
-                </default-field>
-            </field>
             <field name="employerName">
                 <default-field>
                     <text-line/>
@@ -521,7 +508,7 @@
             </field>
             <field name="backButton">
                 <default-field container-style="dark-link">
-                    <link url="viewParty" text="Back" btn-type="default"/>
+                    <link url="viewPartyIdentity" text="Back" btn-type="default"/>
                 </default-field>
             </field>
 
@@ -552,11 +539,6 @@
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                     <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentNumberHeader"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
