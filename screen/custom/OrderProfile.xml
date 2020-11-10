@@ -15,6 +15,11 @@
             <parameter name="orderPartSeqId" value="01"/>
         </default-response>
     </transition>
+    <transition name="secureSign">
+        <default-response url="https://mkdecision.customer.alpha.mkdecision.com">
+            <parameter name="orderId" from="orderId"/>
+        </default-response>
+    </transition>
     <transition name="addNote">
         <service-call name="create#mantle.order.OrderNote" in-map="context"/>
         <default-response url="."/>
@@ -33,7 +38,7 @@
     </transition>
 
     <subscreens default-item="OrderOverview"/>
-    
+        
     <actions>
         <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
         <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
@@ -107,6 +112,7 @@
                     </container-dialog>
                     <button-menu text="More" icon="fa fa-ellipsis-v">
                         <link url="addParty" text="Add Party"/>
+                        <link url="secureSign" text="Secure Sign" target-window="_blank" />
                         <link url="cancelOrder" text="Cancel Order" btn-type="danger"/>
                     </button-menu>
                 </container>
