@@ -177,11 +177,11 @@
                 <row-col lg="6" md="6" sm="6" xs="12">
                     <container-row>
                         <row-col lg="3" md="3" sm="4" xs="12"><label text="Entered on" style="text-light-grey"/></row-col>
-                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${ec.l10n.format(orderHeader.entryDate, 'd/M/yyyy h:mm:ss a')}"/></row-col>
+                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${ec.l10n.format(orderHeader.entryDate, 'MM/dd/yyyy h:mm:ss a')}"/></row-col>
                     </container-row>
                     <container-row>
                         <row-col lg="3" md="3" sm="4" xs="12"><label text="Last updated" style="text-light-grey"/></row-col>
-                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${ec.l10n.format(orderHeader.lastUpdatedStamp, 'd/M/yyyy h:mm:ss a')}"/></row-col>
+                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${ec.l10n.format(orderHeader.lastUpdatedStamp, 'MM/dd/yyyy h:mm:ss a')}"/></row-col>
                     </container-row>
                 </row-col>
             </container-row>
@@ -376,7 +376,7 @@
                 </field>
                 <field name="decisionDate">
                     <default-field title="Date">
-                        <display format="d/M/yyyy h:mm:ss a"/>
+                        <display format="MM/dd/yyyy h:mm:ss a"/>
                     </default-field>
                 </field>
 
@@ -602,7 +602,7 @@
                                     <label text="&amp;nbsp;" style="fa fa-unlock" encode="false"/>
                                 </fail-widgets>
                             </section>
-                            <label text="${ec.l10n.format(note.noteDate, 'd/M/yyyy h:mm:ss a')} - ${userAccount.userFullName}" style="text-bold"/>
+                            <label text="${ec.l10n.format(note.noteDate, 'MM/dd/yyyy h:mm:ss a')} - ${userAccount.userFullName}" style="text-bold"/>
                         </box-header>
                         <box-body><label text="${note.noteText}"/></box-body>
                     </container-box>
