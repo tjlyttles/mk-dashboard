@@ -121,7 +121,7 @@
                 </field>
                 <field name="contentDate">
                     <default-field title="Date">
-                        <display format="d/M/yyyy h:mm:ss a"/>
+                        <display format="MM/dd/yyyy h:mm:ss a"/>
                     </default-field>
                 </field>
 
@@ -174,7 +174,7 @@
                 </field>
                 <field name="contentDate">
                     <default-field title="Date">
-                        <display format="d/M/yyyy h:mm:ss a"/>
+                        <display format="MM/dd/yyyy h:mm:ss a"/>
                     </default-field>
                 </field>
 
@@ -238,7 +238,7 @@
                 </field>
                 <field name="sentDate">
                     <default-field title="Date">
-                        <display format="d/M/yyyy h:mm:ss a"/>
+                        <display format="MM/dd/yyyy h:mm:ss a"/>
                     </default-field>
                 </field>
 
