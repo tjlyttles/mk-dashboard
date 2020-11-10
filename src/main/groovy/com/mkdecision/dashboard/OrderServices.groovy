@@ -1001,6 +1001,13 @@ class OrderServices {
                     .call()
             String employmentRelationshipId = employmentRelationshipResp.get("partyRelationshipId")
 
+            // add employment status as party relationship setting
+            sf.sync().name("create#mantle.party.PartyRelationshipSetting")
+                    .parameter("partyRelationshipId", employmentRelationshipId)
+                    .parameter("partySettingTypeId", "EmploymentStatus")
+                    .parameter("settingValue", employmentStatusEnumId)
+                    .call()
+
             // create monthly income
             sf.sync().name("create#mk.close.FinancialFlow")
                     .parameter("partyId", partyId)
