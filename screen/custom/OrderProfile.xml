@@ -38,7 +38,6 @@
     </transition>
 
     <subscreens default-item="OrderOverview"/>
-
     <actions>
         <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
         <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
