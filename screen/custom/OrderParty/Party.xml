@@ -18,7 +18,7 @@
         </default-response>
     </transition>
     <transition name="viewOrderOverview">
-        <default-response url="../../Order/OrderOverview">
+        <default-response url="../../OrderProfile/OrderOverview">
             <parameter name="orderId"/>
         </default-response>
     </transition>

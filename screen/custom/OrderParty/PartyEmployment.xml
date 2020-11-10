@@ -20,7 +20,7 @@
                 </entity-find-count>
             </actions>
         </actions>
-        <conditional-response url="../../Order/OrderOverview">
+        <conditional-response url="../../OrderProfile/OrderOverview">
             <condition>
                 <expression>finishButton != null</expression>
             </condition>
