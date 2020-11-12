@@ -113,7 +113,7 @@
                     <button-menu text="More" icon="fa fa-ellipsis-v">
                         <link url="addParty" text="Add Party"/>
                         <link url="secureSign" text="Secure Sign" target-window="_blank" />
-                        <link url="cancelOrder" text="Cancel Order" btn-type="danger"/>
+                        <link url="cancelOrder" text="Cancel" btn-type="danger"/>
                     </button-menu>
                 </container>
             </row-col>
