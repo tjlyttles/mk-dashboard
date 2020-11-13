@@ -286,14 +286,14 @@
                                 </field>
                                 <field name="productCategoryId">
                                     <default-field title="Merchandise">
-                                        <drop-down allow-empty="true">
+                                        <drop-down>
                                             <dynamic-options transition="getStoreProductCategories" parameter-map="[orderId: orderId]"/>
                                         </drop-down>
                                     </default-field>
                                 </field>
                                 <field name="productId">
                                     <default-field title="Product">
-                                        <drop-down allow-empty="true">
+                                        <drop-down>
                                             <dynamic-options transition="getStoreProducts">
                                                 <depends-on field="productCategoryId"/>
                                             </dynamic-options>

@@ -110,7 +110,7 @@
             </field>
             <field name="classEnumId">
                 <default-field title="Property Type">
-                    <drop-down allow-empty="true">
+                    <drop-down>
                         <entity-options text="${description}" key="${enumId}">
                             <entity-find entity-name="moqui.basic.Enumeration">
                                 <econdition field-name="enumTypeId" value="AssetClass"/>

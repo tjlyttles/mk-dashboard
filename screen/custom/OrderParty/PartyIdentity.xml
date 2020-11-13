@@ -79,7 +79,7 @@
                                 <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidDriverLicense"/></default-field></field>
 
                                 <field name="idIssuedBy">
-                                    <default-field title="ID State Issued">
+                                    <default-field title="ID State Issued (Optional)">
                                         <drop-down allow-empty="true">
                                             <entity-options text="${geoName}" key="${geoName}">
                                                 <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
@@ -97,12 +97,12 @@
                                     </default-field>
                                 </field>
                                 <field name="idIssueDate">
-                                    <default-field title="Issue Date">
+                                    <default-field title="Issue Date (Optional)">
                                         <date-time type="date" size="200" format="MM-dd-yyyy"/>
                                     </default-field>
                                 </field>
                                 <field name="idExpiryDate">
-                                    <default-field title="Expiration Date">
+                                    <default-field title="Expiration Date (Optional)">
                                         <date-time type="date" size="200" format="MM-dd-yyyy"/>
                                     </default-field>
                                 </field>
@@ -123,7 +123,7 @@
                                 <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidPassport"/></default-field></field>
 
                                 <field name="idIssuedBy">
-                                    <default-field title="ID State Issued">
+                                    <default-field title="ID State Issued (Optional)">
                                         <drop-down allow-empty="true">
                                             <entity-options text="${geoName}" key="${geoName}">
                                                 <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
@@ -167,7 +167,7 @@
                                 <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidMilitaryId"/></default-field></field>
 
                                 <field name="idIssuedBy">
-                                    <default-field title="ID State Issued">
+                                    <default-field title="ID State Issued (Optional)">
                                         <drop-down allow-empty="true">
                                             <entity-options text="${geoName}" key="${geoName}">
                                                 <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">

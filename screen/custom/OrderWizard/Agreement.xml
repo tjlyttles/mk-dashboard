@@ -12,7 +12,11 @@
         <default-response url="../../Dashboard"/>
     </transition>
     <transition name="requestAgreement">
-        <default-response url="."/>
+        <service-call name="mantle.order.OrderServices.update#OrderStatus">
+            <field-map field-name="orderId" from="orderId"/>
+            <field-map field-name="statusId" value="OrderRequested"/>
+        </service-call>
+        <default-response url="../../OrderProfile"/>
     </transition>
     <transition name="viewProperty">
         <default-response url="../Property">
