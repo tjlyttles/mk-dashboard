@@ -228,7 +228,7 @@
                 </default-field>
             </field>
             <field name="salesChannelEnumId">
-                <default-field title="Method">
+                <default-field title="Method" validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="salesChannelEnumId">
                     <drop-down>
                         <entity-options key="${enumId}" text="${description}">
                             <entity-find entity-name="moqui.basic.EnumAndGroup">
@@ -241,8 +241,8 @@
                 </default-field>
             </field>
             <field name="productStoreId">
-                <default-field title="Referrer">
-                    <drop-down allow-empty="true">
+                <default-field title="Referrer" validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="productStoreId">
+                    <drop-down>
                         <entity-options key="${productStoreId}" text="${productStoreId}: ${storeName}">
                             <entity-find entity-name="mantle.product.store.ProductStore">
                                 <econdition field-name="productStoreId" operator="in" from="productStoreIdSet"/>
@@ -253,8 +253,8 @@
                 </default-field>
             </field>
             <field name="salesRepresentativeId">
-                <default-field title="Sales Representative">
-                    <drop-down allow-empty="true">
+                <default-field title="Sales Representative" validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="salesRepresentativeId">
+                    <drop-down>
                         <dynamic-options transition="getStoreSalesReps">
                             <depends-on field="productStoreId"/>
                         </dynamic-options>
@@ -270,8 +270,8 @@
                 </default-field>
             </field>
             <field name="productCategoryId">
-                <default-field title="Merchandise">
-                    <drop-down allow-empty="true">
+                <default-field title="Merchandise" validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="productCategoryId">
+                    <drop-down>
                         <dynamic-options transition="getStoreProductCategories">
                             <depends-on field="productStoreId"/>
                         </dynamic-options>
@@ -279,8 +279,8 @@
                 </default-field>
             </field>
             <field name="productId">
-                <default-field title="Product">
-                    <drop-down allow-empty="true">
+                <default-field title="Product" validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="productId">
+                    <drop-down>
                         <dynamic-options transition="getStoreProducts">
                             <depends-on field="productStoreId"/>
                             <depends-on field="productCategoryId"/>

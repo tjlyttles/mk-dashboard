@@ -82,7 +82,7 @@
                                 <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidDriverLicense"/></default-field></field>
 
                                 <field name="idIssuedBy">
-                                    <default-field title="ID State Issued">
+                                    <default-field title="ID State Issued (Optional)">
                                         <drop-down allow-empty="true">
                                             <entity-options text="${geoName}" key="${geoName}">
                                                 <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
@@ -126,7 +126,7 @@
                                 <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidPassport"/></default-field></field>
 
                                 <field name="idIssuedBy">
-                                    <default-field title="ID State Issued">
+                                    <default-field title="ID State Issued (Optional)">
                                         <drop-down allow-empty="true">
                                             <entity-options text="${geoName}" key="${geoName}">
                                                 <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
@@ -170,7 +170,7 @@
                                 <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidMilitaryId"/></default-field></field>
 
                                 <field name="idIssuedBy">
-                                    <default-field title="ID State Issued">
+                                    <default-field title="ID State Issued (Optional)">
                                         <drop-down allow-empty="true">
                                             <entity-options text="${geoName}" key="${geoName}">
                                                 <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
