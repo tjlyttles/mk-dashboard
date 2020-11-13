@@ -72,7 +72,7 @@
                                     <hidden default-value="${orderId}"/>
                                 </default-field>
                             </field>
-                            <field name="internalNote">
+                            <field name="internalNote" hide="!ec.user.hasPermission('MK_DASHBOARD_ORDER_NOTES_ADD_INTERNAL')">
                                 <default-field title="Make this note private?">
                                     <check>
                                         <option key="Y" text=" "/>

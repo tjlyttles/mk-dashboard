@@ -153,7 +153,20 @@
                 <econdition field-name="roleTypeId" operator="not-equals" value="CoApplicant"/>
             </econditions>
         </entity-find>
-        <entity-find-related value-field="orderHeader" relationship-name="notes" list="noteList"/>
+
+        <if condition="ec.user.hasPermission('MK_DASHBOARD_ORDER_NOTES_VIEW_INTERNAL')">
+            <entity-find-related value-field="orderHeader" relationship-name="notes" list="noteList"/>
+            <else>
+                <entity-find entity-name="mantle.order.OrderNote" list="noteList">
+                    <econdition field-name="orderId" from="orderId"/>
+                    <econditions combine="or">
+                        <econdition field-name="internalNote" operator="is-null" value=""/>
+                        <econdition field-name="internalNote" value="N"/>
+                        <econdition field-name="internalNote" value=""/>
+                    </econditions>
+                </entity-find>
+            </else>
+        </if>
     </actions>
 
     <widgets>
@@ -561,7 +574,7 @@
                                         <hidden default-value="${orderId}"/>
                                     </default-field>
                                 </field>
-                                <field name="internalNote">
+                                <field name="internalNote" hide="!ec.user.hasPermission('MK_DASHBOARD_ORDER_NOTES_ADD_INTERNAL')">
                                     <default-field title="Make this note private?">
                                         <check>
                                             <option key="Y" text=" "/>
@@ -590,7 +603,6 @@
                 <widgets>
                     <container-box>
                         <box-header>
-                            <!-- TODO: Make icon dynamic -->
                             <section name="NoteIcon">
                                 <condition>
                                     <expression>note.internalNote == 'Y'</expression>
