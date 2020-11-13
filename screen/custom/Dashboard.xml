@@ -10,27 +10,51 @@
         <default-response url="../OrderProfile"/>
     </transition>
 
-    <actions>
-        <entity-find entity-name="mkdecision.dashboard.OrderHeaderDetail" list="orderList">
-            <search-form-inputs default-order-by="-entryDate"/>
-        </entity-find>
-    </actions>
+    <transition-include name="searchPartyList" location="component://SimpleScreens/template/party/PartyForms.xml"/>
     
     <widgets>
         <container>
             <link url="newOrder" text="New Order" icon="fa fa-plus" style="q-btn--rectangle q-btn--rounded margin-all-05"/>
 
             <form-list name="OrderList" list="orderList" list-entry="order" header-dialog="true" select-columns="true" saved-finds="true">
+                <entity-find entity-name="mkdecision.dashboard.OrderHeaderDetail" list="orderList" distinct="true">
+                    <search-form-inputs default-order-by="-entryDate"/>
+                    <econditions combine="or">
+                        <econditions>
+                            <econdition field-name="orderPartPartyId" from="ec.user.userAccount.partyId"/>
+                            <econdition field-name="orderPartRoleTypeId" value="SalesRepresentative"/>
+                        </econditions>
+                        <econditions>
+                            <econdition field-name="storePartyId" from="ec.user.userAccount.partyId"/>
+                            <econdition field-name="storeRoleTypeId" value="SalesRepresentative"/>
+                            <econdition field-name="storeAllowSalesRepViewAll" value="Y"/>
+                        </econditions>
+                        <econditions>
+                            <econdition field-name="storePartyId" from="ec.user.userAccount.partyId"/>
+                            <econdition field-name="storeRoleTypeId" value="FinanceManager"/>
+                        </econditions>
+                        <econditions>
+                            <econdition field-name="vendorRelationshipTypeId" value="PrtEmployee"/>
+                            <econdition field-name="vendorRelationshipFromPartyId" from="ec.user.userAccount.partyId"/>
+                            <econdition field-name="vendorRelationshipFromRoleTypeId" value="Underwriter"/>
+                        </econditions>
+                    </econditions>
+                    <select-field field-name="unitAmount"/>
+                    <select-field field-name="currencyUomId"/>
+                    <select-field field-name="statusDescription"/>
+                </entity-find>
+
                 <row-actions>
                     <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
                         <field-map field-name="partyId" from="order.customerPartyId"/>
                     </service-call>
-                    <set field="productDescription" from="((ec.l10n.formatCurrency(unitAmount, currencyUomId, 2) ?: '') + ' - ' + (productName ?: '')).trim()"/>
                 </row-actions>
 
-                <field name="customerFirstName">
+                <field name="customerPartyId">
                     <header-field title="Parties" show-order-by="true">
-                        <text-find/>
+                        <drop-down allow-empty="true">
+                            <dynamic-options transition="searchPartyList" server-search="true" min-length="2" parameter-map="[roleTypeId:'PrimaryApplicant']"/>
+                        </drop-down>
                     </header-field>
                     <default-field>
                         <link url="editOrder" text="${partyName ?: '-'}" link-type="anchor"/>
@@ -64,7 +88,7 @@
                         </drop-down>
                     </header-field>
                     <default-field>
-                        <display text="${productDescription}"/>
+                        <display-entity entity-name="mantle.product.Product" text="${((ec.l10n.formatCurrency(unitAmount, currencyUomId, 2) ?: '') + ' - ' + (productName ?: '')).trim()}"/>
                     </default-field>
                 </field>
 
@@ -103,7 +127,7 @@
 
                 <columns>
                     <column>
-                        <field-ref name="customerFirstName"/>
+                        <field-ref name="customerPartyId"/>
                     </column>
                     <column>
                         <field-ref name="statusId"/>
@@ -120,7 +144,7 @@
                 </columns>
                 <columns type="mobile">
                     <column>
-                        <field-ref name="customerFirstName"/>
+                        <field-ref name="customerPartyId"/>
                         <field-ref name="compositeOrderId"/>
                         <field-ref name="productId"/>
                     </column>
