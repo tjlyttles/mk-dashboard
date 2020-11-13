@@ -35,12 +35,9 @@
             <script><![CDATA[
                 totalNonEmploymentIncome = totalNonEmploymentIncome.add(rentIncome == null ? BigDecimal.ZERO : new BigDecimal(rentIncome))
                 totalNonEmploymentIncome = totalNonEmploymentIncome.add(retirementIncome == null ? BigDecimal.ZERO : new BigDecimal(retirementIncome))
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(investmentIncome == null ? BigDecimal.ZERO : new BigDecimal(investmentIncome))
                 totalNonEmploymentIncome = totalNonEmploymentIncome.add(bonusIncome == null ? BigDecimal.ZERO : new BigDecimal(bonusIncome))
                 totalNonEmploymentIncome = totalNonEmploymentIncome.add(socialSecurityIncome == null ? BigDecimal.ZERO : new BigDecimal(socialSecurityIncome))
                 totalNonEmploymentIncome = totalNonEmploymentIncome.add(disabilityIncome == null ? BigDecimal.ZERO : new BigDecimal(disabilityIncome))
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(studentIncome == null ? BigDecimal.ZERO : new BigDecimal(studentIncome))
-                totalNonEmploymentIncome = totalNonEmploymentIncome.add(unemploymentIncome == null ? BigDecimal.ZERO : new BigDecimal(unemploymentIncome))
                 totalNonEmploymentIncome = totalNonEmploymentIncome.add(alimonyIncome == null ? BigDecimal.ZERO : new BigDecimal(alimonyIncome))
                 totalNonEmploymentIncome = totalNonEmploymentIncome.add(childSupportIncome == null ? BigDecimal.ZERO : new BigDecimal(childSupportIncome))
                 totalNonEmploymentIncome = totalNonEmploymentIncome.add(otherIncome == null ? BigDecimal.ZERO : new BigDecimal(otherIncome))
@@ -83,13 +80,6 @@
         </entity-find>
         <set field="retirementIncome" from="retirementIncomeFinFlowList?.getFirst()?.amount ?: null"/>
 
-        <entity-find entity-name="mk.close.FinancialFlow" list="investmentIncomeFinFlowList">
-            <econdition field-name="partyId" from="partyId"/>
-            <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
-            <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowInvestment"/>
-        </entity-find>
-        <set field="investmentIncome" from="investmentIncomeFinFlowList?.getFirst()?.amount ?: null"/>
-
         <entity-find entity-name="mk.close.FinancialFlow" list="bonusIncomeFinFlowList">
             <econdition field-name="partyId" from="partyId"/>
             <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
@@ -110,20 +100,6 @@
             <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowDisability"/>
         </entity-find>
         <set field="disabilityIncome" from="disabilityIncomeFinFlowList?.getFirst()?.amount ?: null"/>
-
-        <entity-find entity-name="mk.close.FinancialFlow" list="studentIncomeFinFlowList">
-            <econdition field-name="partyId" from="partyId"/>
-            <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
-            <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowStudent"/>
-        </entity-find>
-        <set field="studentIncome" from="studentIncomeFinFlowList?.getFirst()?.amount ?: null"/>
-
-        <entity-find entity-name="mk.close.FinancialFlow" list="unemploymentIncomeFinFlowList">
-            <econdition field-name="partyId" from="partyId"/>
-            <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
-            <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowUnemployment"/>
-        </entity-find>
-        <set field="unemploymentIncome" from="unemploymentIncomeFinFlowList?.getFirst()?.amount ?: null"/>
 
         <entity-find entity-name="mk.close.FinancialFlow" list="alimonyIncomeFinFlowList">
             <econdition field-name="partyId" from="partyId"/>
@@ -150,12 +126,9 @@
         <script><![CDATA[
             totalNonEmploymentIncome = totalNonEmploymentIncome.add(rentIncome == null ? BigDecimal.ZERO : new BigDecimal(rentIncome))
             totalNonEmploymentIncome = totalNonEmploymentIncome.add(retirementIncome == null ? BigDecimal.ZERO : new BigDecimal(retirementIncome))
-            totalNonEmploymentIncome = totalNonEmploymentIncome.add(investmentIncome == null ? BigDecimal.ZERO : new BigDecimal(investmentIncome))
             totalNonEmploymentIncome = totalNonEmploymentIncome.add(bonusIncome == null ? BigDecimal.ZERO : new BigDecimal(bonusIncome))
             totalNonEmploymentIncome = totalNonEmploymentIncome.add(socialSecurityIncome == null ? BigDecimal.ZERO : new BigDecimal(socialSecurityIncome))
             totalNonEmploymentIncome = totalNonEmploymentIncome.add(disabilityIncome == null ? BigDecimal.ZERO : new BigDecimal(disabilityIncome))
-            totalNonEmploymentIncome = totalNonEmploymentIncome.add(studentIncome == null ? BigDecimal.ZERO : new BigDecimal(studentIncome))
-            totalNonEmploymentIncome = totalNonEmploymentIncome.add(unemploymentIncome == null ? BigDecimal.ZERO : new BigDecimal(unemploymentIncome))
             totalNonEmploymentIncome = totalNonEmploymentIncome.add(alimonyIncome == null ? BigDecimal.ZERO : new BigDecimal(alimonyIncome))
             totalNonEmploymentIncome = totalNonEmploymentIncome.add(childSupportIncome == null ? BigDecimal.ZERO : new BigDecimal(childSupportIncome))
             totalNonEmploymentIncome = totalNonEmploymentIncome.add(otherIncome == null ? BigDecimal.ZERO : new BigDecimal(otherIncome))
@@ -229,7 +202,7 @@
                                 </field>
                                 <field name="relationshipAction">
                                     <default-field>
-                                        <link text="Remove Employment" btn-type="danger" url="deleteEmployment" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, partyRelationshipId: employmentRelation.partyRelationshipId]" />
+                                        <link text="Remove Employment" btn-type="danger" url="deleteEmployment" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, partyRelationshipId: employmentRelation.partyRelationshipId]"/>
                                     </default-field>
                                 </field>
 
@@ -259,7 +232,7 @@
                                     </default-field>
                                 </field>
                                 <field name="monthlyIncome">
-                                    <default-field title="Pre-Tax Income Monthly">
+                                    <default-field title="Gross Income Monthly">
                                         <display text="${financialFlow.amount}" style="bg-grey-1"/>
                                     </default-field>
                                 </field>
@@ -367,7 +340,7 @@
                 </default-field>
             </field>
             <field name="monthlyIncome">
-                <default-field title="Pre-Tax Income Monthly">
+                <default-field title="Gross Income Monthly">
                     <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
@@ -430,11 +403,6 @@
                     <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
-            <field name="investmentIncome">
-                <default-field title="Investment (Optional)">
-                    <text-line input-type="number" format="#.##" prefix="$"/>
-                </default-field>
-            </field>
             <field name="bonusIncome">
                 <default-field title="Bonus (Optional)">
                     <text-line input-type="number" format="#.##" prefix="$"/>
@@ -447,16 +415,6 @@
             </field>
             <field name="disabilityIncome">
                 <default-field title="Disability (Optional)">
-                    <text-line input-type="number" format="#.##" prefix="$"/>
-                </default-field>
-            </field>
-            <field name="studentIncome">
-                <default-field title="Student Financial Assistance (Optional)">
-                    <text-line input-type="number" format="#.##" prefix="$"/>
-                </default-field>
-            </field>
-            <field name="unemploymentIncome">
-                <default-field title="Unemployment Compensation (Optional)">
                     <text-line input-type="number" format="#.##" prefix="$"/>
                 </default-field>
             </field>
@@ -480,12 +438,9 @@
                     <display dynamic-transition="calculateTotalNonEmploymentIncome" depends-optional="true" style="bg-grey-1">
                         <depends-on field="rentIncome"/>
                         <depends-on field="retirementIncome"/>
-                        <depends-on field="investmentIncome"/>
                         <depends-on field="bonusIncome"/>
                         <depends-on field="socialSecurityIncome"/>
                         <depends-on field="disabilityIncome"/>
-                        <depends-on field="studentIncome"/>
-                        <depends-on field="unemploymentIncome"/>
                         <depends-on field="alimonyIncome"/>
                         <depends-on field="childSupportIncome"/>
                         <depends-on field="otherIncome"/>
@@ -525,6 +480,11 @@
                 </field-col-row>
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
                     <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentTipHeader"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
@@ -558,11 +518,6 @@
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                     <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="years"/></field-col>
                     <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="months"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
@@ -613,11 +568,6 @@
                 </field-col-row>
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="investmentIncome"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
                     <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="bonusIncome"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
@@ -629,16 +579,6 @@
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                     <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="disabilityIncome"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="studentIncome"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="unemploymentIncome"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
