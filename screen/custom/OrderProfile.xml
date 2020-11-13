@@ -58,6 +58,8 @@
             <econdition field-name="statusId" from="orderHeader.statusId"/>
             <order-by field-name="transitionSequence"/>
         </entity-find>
+
+        <set field="editableOrderState" from="['OrderOpen', 'OrderRequested', 'OrderProposed']"/>
     </actions>
 
     <widgets>
@@ -111,8 +113,8 @@
                         </form-single>
                     </container-dialog>
                     <button-menu text="More" icon="fa fa-ellipsis-v">
-                        <link url="addParty" text="Add Party"/>
-                        <link url="secureSign" text="Secure Sign" target-window="_blank" />
+                        <link url="addParty" text="Add Party" condition="editableOrderState.contains(orderHeader.statusId)"/>
+                        <link url="secureSign" text="Secure Sign" target-window="_blank"/>
                         <link url="cancelOrder" text="Cancel Order" btn-type="danger"/>
                     </button-menu>
                 </container>
