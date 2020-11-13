@@ -583,6 +583,16 @@ class OrderServices {
                     .parameter("employmentStatusEnumId", employmentStatusEnumId)
                     .call()
 
+            // update party role
+            sf.sync().name("delete#mantle.party.PartyRole")
+                    .parameter("partyId", partyId)
+                    .parameter("roleTypeId", "*")
+                    .call()
+            sf.sync().name("create#mantle.party.PartyRole")
+                    .parameter("partyId", partyId)
+                    .parameter("roleTypeId", roleTypeId)
+                    .call()
+
             // update postal address
             EntityValue postalAddress = ef.find("mantle.party.contact.PartyContactMechPostalAddress")
                     .condition("partyId", partyId)
@@ -646,6 +656,7 @@ class OrderServices {
                     .parameter("birthDate", birthDate)
                     .parameter("maritalStatusEnumId", maritalStatusEnumId)
                     .parameter("employmentStatusEnumId", employmentStatusEnumId)
+                    .parameter("roleTypeId", roleTypeId)
                     .call()
             partyId = (String) personResp.get("partyId")
 
