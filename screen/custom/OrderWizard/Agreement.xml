@@ -36,7 +36,7 @@
             </field>
             <field name="agreementText">
                 <default-field>
-                    <label text="By clicking &lt;strong&gt;&quot;Open&quot;&lt;/strong&gt; or &lt;strong&gt;&quot;Request&quot;&lt;/strong&gt; below, I, the dealer salesperson submitting this credit application, represent and agree to the following:" encode="false" type="div" style="margin-b-1"/>
+                    <label text="By clicking &lt;strong&gt;&quot;Save&quot;&lt;/strong&gt; or &lt;strong&gt;&quot;Submit&quot;&lt;/strong&gt; below, I, the dealer salesperson submitting this credit application, represent and agree to the following:" encode="false" type="div" style="margin-b-1"/>
                     <label text="The application information is true and correct in all respects." type="div"/>
                     <label text="I made the applicant(s) aware they are applying for credit." type="div"/>
                     <label text="The applicant(s) were provided with all disclosures required by applicable federal, state and local law." type="div"/>
@@ -48,8 +48,8 @@
             </field>
 
             <field name="buttons">
-                <default-field title="Request">
-                    <link url="openOrder" text="Open"/>
+                <default-field title="Submit">
+                    <link url="openOrder" text="Save"/>
                     <submit/>
                 </default-field>
             </field>
