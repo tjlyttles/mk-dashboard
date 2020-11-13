@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
         default-menu-title="Co-Applicant"
         default-menu-include="false"
-        default-menu-index="5">
+        default-menu-index="7">
 
     <parameter name="orderId" required="true"/>
     <parameter name="orderPartSeqId" required="true"/>
@@ -12,7 +12,7 @@
         <service-call name="mkdecision.dashboard.OrderServices.store#Applicant" in-map="context" out-map="context">
             <field-map field-name="roleTypeId" value="CoApplicant"/>
         </service-call>
-        <conditional-response url="../CoApplicantEmployment">
+        <conditional-response url="../CoApplicantIdentity">
             <condition>
                 <expression>partyId != null</expression>
             </condition>
@@ -60,6 +60,7 @@
             <set field="suffix" from="party?.suffix ?: ''"/>
             <set field="birthDate" from="ec.l10n.format(party?.birthDate, 'MM-dd-yyyy') ?: ''"/>
             <set field="maritalStatusEnumId" from="party?.maritalStatusEnumId ?: ''"/>
+            <set field="employmentStatusEnumId" from="party?.employmentStatusEnumId ?: ''"/>
 
             <entity-find entity-name="mantle.party.contact.PartyContactMechPostalAddress" list="postalAddressList">
                 <econdition field-name="partyId" from="partyId"/>
@@ -98,16 +99,6 @@
                 <econdition field-name="partyIdTypeEnumId" value="PtidSsn"/>
             </entity-find>
             <set field="socialSecurityNumber" from="socialSecurityNumberList?.getFirst()?.idValue ?: ''"/>
-
-            <entity-find entity-name="mantle.party.PartyIdentification" list="idList">
-                <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="partyIdTypeEnumId" operator="not-equals" value="PtidSsn"/>
-            </entity-find>
-            <set field="idTypeEnumId" from="idList?.getFirst()?.partyIdTypeEnumId ?: ''"/>
-            <set field="idIssuedBy" from="idList?.getFirst()?.issuedBy ?: ''"/>
-            <set field="idValue" from="idList?.getFirst()?.idValue ?: ''"/>
-            <set field="idIssueDate" from="ec.l10n.format(idList?.getFirst()?.issueDate, 'MM-dd-yyyy') ?: ''"/>
-            <set field="idExpiryDate" from="ec.l10n.format(idList?.getFirst()?.expireDate, 'MM-dd-yyyy') ?: ''"/>
         </if>
     </actions>
 
@@ -151,6 +142,40 @@
                     <text-line/>
                 </default-field>
             </field>
+            <field name="socialSecurityNumber">
+                <default-field>
+                    <text-line mask="###-##-####"/>
+                </default-field>
+            </field>
+            <field name="birthDate">
+                <default-field title="Date of Birth">
+                    <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                </default-field>
+            </field>
+            <field name="maritalStatusEnumId">
+                <default-field title="Marital Status">
+                    <drop-down allow-empty="true">
+                        <entity-options text="${description}" key="${enumId}">
+                            <entity-find entity-name="moqui.basic.Enumeration">
+                                <econdition field-name="enumTypeId" value="MaritalStatus"/>
+                                <order-by field-name="sequenceNum,description"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
+            <field name="employmentStatusEnumId">
+                <default-field title="Employment Status">
+                    <drop-down allow-empty="true">
+                        <entity-options text="${description}" key="${enumId}">
+                            <entity-find entity-name="moqui.basic.Enumeration">
+                                <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                <order-by field-name="sequenceNum,description"/>
+                            </entity-find>
+                        </entity-options>
+                    </drop-down>
+                </default-field>
+            </field>
 
             <field name="addressHeader">
                 <default-field>
@@ -186,75 +211,6 @@
                                 <econdition field-name="geoId" value="USA"/>
                                 <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
                                 <order-by field-name="geoName"/>
-                            </entity-find>
-                        </entity-options>
-                    </drop-down>
-                </default-field>
-            </field>
-
-            <field name="identityHeader">
-                <default-field>
-                    <label text="Identity Information" type="h5" style="margin-tb-1"/>
-                    <container style="h-separator margin-tb-1"/>
-                </default-field>
-            </field>
-            <field name="socialSecurityNumber">
-                <default-field>
-                    <text-line mask="###-##-####"/>
-                </default-field>
-            </field>
-            <field name="birthDate">
-                <default-field title="Date of Birth">
-                    <date-time type="date" size="200" format="MM-dd-yyyy"/>
-                </default-field>
-            </field>
-            <field name="idTypeEnumId">
-                <default-field title="ID Type (Optional)">
-                    <drop-down allow-empty="true">
-                        <entity-options text="${description}" key="${enumId}">
-                            <entity-find entity-name="moqui.basic.EnumAndGroup">
-                                <econdition field-name="enumGroupEnumId" value="DefaultDashboardIdGroup"/>
-                                <order-by field-name="sequenceNum,description"/>
-                            </entity-find>
-                        </entity-options>
-                    </drop-down>
-                </default-field>
-            </field>
-            <field name="idIssuedBy">
-                <default-field title="ID State Issued (Optional)">
-                    <drop-down allow-empty="true">
-                        <entity-options text="${geoName}" key="${geoName}">
-                            <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
-                                <econdition field-name="geoId" value="USA"/>
-                                <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
-                                <order-by field-name="geoName"/>
-                            </entity-find>
-                        </entity-options>
-                    </drop-down>
-                </default-field>
-            </field>
-            <field name="idValue">
-                <default-field title="ID Number (Optional)">
-                    <text-line/>
-                </default-field>
-            </field>
-            <field name="idIssueDate">
-                <default-field title="Issue Date (Optional)">
-                    <date-time type="date" size="200" format="MM-dd-yyyy"/>
-                </default-field>
-            </field>
-            <field name="idExpiryDate">
-                <default-field title="Expiration Date (Optional)">
-                    <date-time type="date" size="200" format="MM-dd-yyyy"/>
-                </default-field>
-            </field>
-            <field name="maritalStatusEnumId">
-                <default-field title="Marital Status">
-                    <drop-down allow-empty="true">
-                        <entity-options text="${description}" key="${enumId}">
-                            <entity-find entity-name="moqui.basic.Enumeration">
-                                <econdition field-name="enumTypeId" value="MaritalStatus"/>
-                                <order-by field-name="sequenceNum,description"/>
                             </entity-find>
                         </entity-options>
                     </drop-down>
@@ -327,6 +283,22 @@
                     <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="suffix"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="birthDate"/></field-col>
+                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="socialSecurityNumber"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="maritalStatusEnumId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
+                <field-col-row>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                    <field-col xs="0" sm="1" md="3" lg="3"/>
+                </field-col-row>
 
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
@@ -346,42 +318,6 @@
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                     <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="city"/></field-col>
                     <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="stateProvinceGeoId"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6">
-                        <field-ref name="identityHeader"/>
-                    </field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="socialSecurityNumber"/></field-col>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="birthDate"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idTypeEnumId"/></field-col>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idIssuedBy"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="idValue"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idIssueDate"/></field-col>
-                    <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="idExpiryDate"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="maritalStatusEnumId"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
 

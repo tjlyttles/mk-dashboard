@@ -430,12 +430,8 @@ class OrderServices {
         String stateProvinceGeoId = (String) cs.getOrDefault("stateProvinceGeoId", null)
         String socialSecurityNumber = (String) cs.getOrDefault("socialSecurityNumber", null)
         Date birthDate = (Date) cs.getOrDefault("birthDate", null)
-        String idTypeEnumId = (String) cs.getOrDefault("idTypeEnumId", null)
-        String idIssuedBy = (String) cs.getOrDefault("idIssuedBy", null)
-        String idValue = (String) cs.getOrDefault("idValue", null)
-        Date idIssueDate = (Date) cs.getOrDefault("idIssueDate", null)
-        Date idExpiryDate = (Date) cs.getOrDefault("idExpiryDate", null)
         String maritalStatusEnumId = (String) cs.getOrDefault("maritalStatusEnumId", null)
+        String employmentStatusEnumId = (String) cs.getOrDefault("employmentStatusEnumId", null)
         String contactNumber = (String) cs.getOrDefault("contactNumber", null)
         String contactMechPurposeId = (String) cs.getOrDefault("contactMechPurposeId", null)
         String email = (String) cs.getOrDefault("email", null)
@@ -499,6 +495,12 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
+        // validate employment status
+        if (StringUtils.isBlank(employmentStatusEnumId)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_STATUS"))
+            return new HashMap<String, Object>()
+        }
+
         // validate contact number
         if (StringUtils.isBlank(contactNumber)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PHONE_NUMBER"))
@@ -550,12 +552,8 @@ class OrderServices {
         String stateProvinceGeoId = (String) cs.getOrDefault("stateProvinceGeoId", null)
         String socialSecurityNumber = (String) cs.getOrDefault("socialSecurityNumber", null)
         Date birthDate = (Date) cs.getOrDefault("birthDate", null)
-        String idTypeEnumId = (String) cs.getOrDefault("idTypeEnumId", null)
-        String idIssuedBy = (String) cs.getOrDefault("idIssuedBy", null)
-        String idValue = (String) cs.getOrDefault("idValue", null)
-        Date idIssueDate = (Date) cs.getOrDefault("idIssueDate", null)
-        Date idExpiryDate = (Date) cs.getOrDefault("idExpiryDate", null)
         String maritalStatusEnumId = (String) cs.getOrDefault("maritalStatusEnumId", null)
+        String employmentStatusEnumId = (String) cs.getOrDefault("employmentStatusEnumId", null)
         String contactNumber = (String) cs.getOrDefault("contactNumber", null)
         String contactMechPurposeId = (String) cs.getOrDefault("contactMechPurposeId", null)
         String email = (String) cs.getOrDefault("email", null)
@@ -582,6 +580,17 @@ class OrderServices {
                     .parameter("suffix", suffix)
                     .parameter("birthDate", birthDate)
                     .parameter("maritalStatusEnumId", maritalStatusEnumId)
+                    .parameter("employmentStatusEnumId", employmentStatusEnumId)
+                    .call()
+
+            // update party role
+            sf.sync().name("delete#mantle.party.PartyRole")
+                    .parameter("partyId", partyId)
+                    .parameter("roleTypeId", "*")
+                    .call()
+            sf.sync().name("create#mantle.party.PartyRole")
+                    .parameter("partyId", partyId)
+                    .parameter("roleTypeId", roleTypeId)
                     .call()
 
             // update postal address
@@ -646,6 +655,8 @@ class OrderServices {
                     .parameter("suffix", suffix)
                     .parameter("birthDate", birthDate)
                     .parameter("maritalStatusEnumId", maritalStatusEnumId)
+                    .parameter("employmentStatusEnumId", employmentStatusEnumId)
+                    .parameter("roleTypeId", roleTypeId)
                     .call()
             partyId = (String) personResp.get("partyId")
 
@@ -695,7 +706,7 @@ class OrderServices {
         // delete identifications
         sf.sync().name("delete#mantle.party.PartyIdentification")
                 .parameter("partyId", partyId)
-                .parameter("partyIdTypeEnumId", "*")
+                .parameter("partyIdTypeEnumId", "PtidSsn")
                 .call()
 
         // create social security number
@@ -705,22 +716,129 @@ class OrderServices {
                 .parameter("idValue", socialSecurityNumber)
                 .call()
 
-        // create identification
-        if (StringUtils.isNotBlank(idValue)) {
-            sf.sync().name("create#mantle.party.PartyIdentification")
-                    .parameter("partyId", partyId)
-                    .parameter("partyIdTypeEnumId", idTypeEnumId)
-                    .parameter("idValue", idValue)
-                    .parameter("issuedBy", idIssuedBy)
-                    .parameter("issueDate", idIssueDate)
-                    .parameter("expireDate", idExpiryDate)
-                    .call()
-        }
-
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()
         outParams.put("partyId", partyId)
         return outParams
+    }
+
+    static Map<String, Object> validateIdentityFields(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String partyId = (String) cs.getOrDefault("partyId", null)
+        String partyIdTypeEnumId = (String) cs.getOrDefault("partyIdTypeEnumId", null)
+        String idIssuedBy = (String) cs.getOrDefault("idIssuedBy", null)
+        String idValue = (String) cs.getOrDefault("idValue", null)
+        Date idIssueDate = (Date) cs.getOrDefault("idIssueDate", null)
+        Date idExpiryDate = (Date) cs.getOrDefault("idExpiryDate", null)
+
+        // validate ID type
+        if (StringUtils.isBlank(partyIdTypeEnumId)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ID_TYPE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate ID value
+        if (StringUtils.isBlank(idValue)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ID_VALUE"))
+            return new HashMap<String, Object>()
+        }
+
+        // return the output parameters
+        return new HashMap<>()
+    }
+
+    static Map<String, Object> addIdentity(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String partyId = (String) cs.getOrDefault("partyId", null)
+        String partyIdTypeEnumId = (String) cs.getOrDefault("partyIdTypeEnumId", null)
+        String idIssuedBy = (String) cs.getOrDefault("idIssuedBy", null)
+        String idValue = (String) cs.getOrDefault("idValue", null)
+        Date idIssueDate = (Date) cs.getOrDefault("idIssueDate", null)
+        Date idExpiryDate = (Date) cs.getOrDefault("idExpiryDate", null)
+
+        // validate fields
+        sf.sync().name("mkdecision.dashboard.OrderServices.validate#IdentityFields")
+                .parameters(cs)
+                .call()
+        if (mf.hasError()) {
+            return new HashMap<String, Object>()
+        }
+
+        // create identity
+        sf.sync().name("create#mantle.party.PartyIdentification")
+                .parameter("partyId", partyId)
+                .parameter("partyIdTypeEnumId", partyIdTypeEnumId)
+                .parameter("idValue", idValue)
+                .parameter("issuedBy", idIssuedBy)
+                .parameter("issueDate", idIssueDate)
+                .parameter("expireDate", idExpiryDate)
+                .call()
+
+        // return the output parameters
+        Map<String, Object> outParams = new HashMap<>()
+        outParams.put("partyId", partyId)
+        outParams.put("partyIdTypeEnumId", partyIdTypeEnumId)
+        return outParams
+    }
+
+    static Map<String, Object> deleteIdentity(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String partyId = (String) cs.getOrDefault("partyId", null)
+        String partyIdTypeEnumId = (String) cs.getOrDefault("partyIdTypeEnumId", null)
+
+        // find identity
+        EntityValue relationship = ef.find("mantle.party.PartyIdentification")
+                .condition("partyId", partyId)
+                .condition("partyIdTypeEnumId", partyIdTypeEnumId)
+                .one()
+
+        // validate identity
+        if (relationship == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_IDENTITY"))
+            return new HashMap<String, Object>()
+        }
+
+        // delete identity
+        sf.sync().name("delete#mantle.party.PartyIdentification")
+                .parameter("partyId", partyId)
+                .parameter("partyIdTypeEnumId", partyIdTypeEnumId)
+                .call()
+
+        // return the output parameters
+        return new HashMap<>()
     }
 
     static Map<String, Object> validateEmploymentFields(ExecutionContext ec) {
@@ -738,7 +856,6 @@ class OrderServices {
         String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String partyId = (String) cs.getOrDefault("partyId", null)
         String occupation = (String) cs.getOrDefault("occupation", null)
-        String employmentStatusEnumId = (String) cs.getOrDefault("employmentStatusEnumId", null)
         String employerName = (String) cs.getOrDefault("employerName", null)
         String jobTitle = (String) cs.getOrDefault("jobTitle", null)
         Integer years = (Integer) cs.getOrDefault("years", null)
@@ -774,12 +891,6 @@ class OrderServices {
                 .condition("fromPartyId", partyId)
                 .count()
         if (employmentCount == 0) {
-
-            // validate employment status
-            if (StringUtils.isBlank(employmentStatusEnumId)) {
-                mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_STATUS"))
-                return new HashMap<String, Object>()
-            }
 
             // validate employer name
             if (StringUtils.isBlank(employerName)) {
@@ -897,7 +1008,6 @@ class OrderServices {
         String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String partyId = (String) cs.getOrDefault("partyId", null)
         String occupation = (String) cs.getOrDefault("occupation", null)
-        String employmentStatusEnumId = (String) cs.getOrDefault("employmentStatusEnumId", null)
         String employerName = (String) cs.getOrDefault("employerName", null)
         String jobTitle = (String) cs.getOrDefault("jobTitle", null)
         Integer years = (Integer) cs.getOrDefault("years", null)
@@ -932,7 +1042,6 @@ class OrderServices {
         // update person
         sf.sync().name("update#mantle.party.Person")
                 .parameter("partyId", partyId)
-                .parameter("employmentStatusEnumId", employmentStatusEnumId)
                 .parameter("occupation", occupation)
                 .call()
 

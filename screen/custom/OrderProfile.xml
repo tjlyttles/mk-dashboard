@@ -15,6 +15,11 @@
             <parameter name="orderPartSeqId" value="01"/>
         </default-response>
     </transition>
+    <transition name="secureSign">
+        <default-response url="https://mkdecision.customer.alpha.mkdecision.com">
+            <parameter name="orderId" from="orderId"/>
+        </default-response>
+    </transition>
     <transition name="addNote">
         <service-call name="create#mantle.order.OrderNote" in-map="context"/>
         <default-response url="."/>
@@ -33,7 +38,7 @@
     </transition>
 
     <subscreens default-item="OrderOverview"/>
-    
+        
     <actions>
         <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
         <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
@@ -53,6 +58,8 @@
             <econdition field-name="statusId" from="orderHeader.statusId"/>
             <order-by field-name="transitionSequence"/>
         </entity-find>
+
+        <set field="editableOrderState" from="['OrderOpen', 'OrderRequested', 'OrderProposed']"/>
     </actions>
 
     <widgets>
@@ -67,7 +74,7 @@
                                     <hidden default-value="${orderId}"/>
                                 </default-field>
                             </field>
-                            <field name="internalNote">
+                            <field name="internalNote" hide="!ec.user.hasPermission('MK_DASHBOARD_ORDER_NOTES_ADD_INTERNAL')">
                                 <default-field title="Make this note private?">
                                     <check>
                                         <option key="Y" text=" "/>
@@ -106,8 +113,9 @@
                         </form-single>
                     </container-dialog>
                     <button-menu text="More" icon="fa fa-ellipsis-v">
-                        <link url="addParty" text="Add Party"/>
-                        <link url="cancelOrder" text="Cancel Order" btn-type="danger"/>
+                        <link url="addParty" text="Add Party" condition="editableOrderState.contains(orderHeader.statusId)"/>
+                        <link url="secureSign" text="Secure Sign" target-window="_blank"/>
+                        <link url="cancelOrder" text="Cancel" btn-type="danger"/>
                     </button-menu>
                 </container>
             </row-col>
