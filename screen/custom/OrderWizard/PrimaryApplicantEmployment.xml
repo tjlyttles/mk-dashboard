@@ -245,7 +245,7 @@
                                 </field>
                                 <field name="relationshipAction">
                                     <default-field>
-                                        <link text="Remove Employment" btn-type="danger" url="deleteEmployment" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, partyRelationshipId: employmentRelation.partyRelationshipId]" />
+                                        <link text="Remove Employment" btn-type="danger" url="deleteEmployment" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, partyRelationshipId: employmentRelation.partyRelationshipId]"/>
                                     </default-field>
                                 </field>
 
