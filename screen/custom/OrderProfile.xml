@@ -15,8 +15,18 @@
             <parameter name="orderPartSeqId" value="01"/>
         </default-response>
     </transition>
+
     <transition name="secureSign">
-        <default-response url="https://mkdecision.customer.alpha.mkdecision.com">
+        <parameter name="orderId" from="orderId"/>
+        <actions>
+            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader">
+                <field-map field-name="orderId" from="orderId"/>
+            </entity-find-one>
+            <set field="productStoreId" from="orderHeader?.productStoreId"/>
+            <service-call name="close.dashboard.StoreServices.get#CustomerPortalUrl" in-map="context" out-map="context"/>
+            <set field="url" from="_graphql_result_primitive + '/' + orderId"/>
+        </actions>
+        <default-response url="${url}" type="url" url-type="plain">
             <parameter name="orderId" from="orderId"/>
         </default-response>
     </transition>
