@@ -182,12 +182,6 @@
             </entity-find>
             <set field="productCategoryId" from="productCategoryParamList?.getFirst()?.parameterValue ?: ''"/>
 
-            <entity-find entity-name="mantle.product.ProductParameterValue" list="productCategoryParamList">
-                <econdition field-name="productParameterId" value="ProductCategory"/>
-                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
-            </entity-find>
-            <set field="productCategoryId" from="productCategoryParamList?.getFirst()?.parameterValue ?: ''"/>
-
             <entity-find entity-name="mantle.product.ProductParameterValue" list="totalPurchasePriceParamList">
                 <econdition field-name="productParameterId" value="TotalPurchasePrice"/>
                 <econdition field-name="productParameterSetId" from="productParameterSetId"/>
