@@ -114,9 +114,9 @@
                             </field>
                         </form-single>
                     </container-dialog>
+                    <link url="${customerPortalUrl}" text="Secure Sign" condition="customerPortalUrl != null" url-type="plain" target-window="_blank"/>
                     <button-menu text="More" icon="fa fa-ellipsis-v">
                         <link url="addParty" text="Add Party" condition="editableOrderState.contains(orderHeader.statusId)"/>
-                        <link url="${customerPortalUrl}" text="Secure Sign" condition="customerPortalUrl != null" url-type="plain" target-window="_blank"/>
                         <link url="cancelOrder" text="Cancel" btn-type="danger"/>
                     </button-menu>
                 </container>
