@@ -40,14 +40,9 @@
             </field>
             <field name="agreementText">
                 <default-field>
-                    <label text="By clicking &lt;strong&gt;&quot;Save&quot;&lt;/strong&gt; or &lt;strong&gt;&quot;Submit&quot;&lt;/strong&gt; below, I, the dealer salesperson submitting this credit application, represent and agree to the following:" encode="false" type="div" style="margin-b-1"/>
-                    <label text="The application information is true and correct in all respects." type="div"/>
-                    <label text="I made the applicant(s) aware they are applying for credit." type="div"/>
-                    <label text="The applicant(s) were provided with all disclosures required by applicable federal, state and local law." type="div"/>
-                    <label text="The applicant(s) acknowledge and agree to provide identity verification information to lenders." type="div"/>
-                    <label text="The applicant(s) consent to sharing credit application information to lenders." type="div"/>
-                    <label text="The applicant(s) authorize lenders to share credit application information with third parties, including credit reporting agencies and our contracting company." type="div"/>
-                    <label text="If application contains information regarding a co-applicant, both applicants have clearly expressed their intent to apply jointly for credit." type="div"/>
+                    <render-mode>
+                        <text type="html,vuet,qvt" location="component://mk-dashboard/template/OrderWizard/Agreement.html"/>
+                    </render-mode>
                 </default-field>
             </field>
 
