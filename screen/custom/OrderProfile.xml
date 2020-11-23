@@ -6,8 +6,8 @@
 
     <parameter name="orderId" required="true"/>
 
-    <transition name="dashboard">
-        <default-response url="../Dashboard"/>
+    <transition name="orders">
+        <default-response url="../Orders"/>
     </transition>
     <transition name="addParty">
         <default-response url="../OrderParty">
@@ -68,7 +68,7 @@
         <container-row>
             <row-col lg="6">
                 <container>
-                    <link url="dashboard" text="Back" icon="fa fa-arrow-left"/>
+                    <link url="orders" text="Back" icon="fa fa-arrow-left"/>
                     <container-dialog id="AddNoteDialog" button-text="Add Note" width="960">
                         <form-single name="AddNoteForm" transition="addNote">
                             <field name="orderId">
@@ -114,7 +114,7 @@
                             </field>
                         </form-single>
                     </container-dialog>
-                    <link url="${customerPortalUrl}" text="Secure Sign" condition="customerPortalUrl != null" url-type="plain" target-window="_blank"/>
+                    <link url="${customerPortalUrl}" text="Customer Portal" condition="customerPortalUrl != null" icon="fa fa-handshake-o" url-type="plain" target-window="_blank"/>
                     <button-menu text="More" icon="fa fa-ellipsis-v">
                         <link url="addParty" text="Add Party" condition="editableOrderState.contains(orderHeader.statusId)"/>
                         <link url="cancelOrder" text="Cancel" btn-type="danger"/>

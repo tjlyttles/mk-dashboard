@@ -26,7 +26,7 @@
         </default-response>
     </transition>
     <transition name="cancelOrder">
-        <default-response url="../../Dashboard"/>
+        <default-response url="../../Orders"/>
     </transition>
     <transition name="getStoreSalesReps">
         <actions>

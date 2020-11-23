@@ -14,10 +14,10 @@ along with this software (see the LICENSE.md file). If not, see
 -->
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
-        default-menu-title="MK Dashboard"
+        default-menu-title="Dashboard"
         allow-extra-path="true">
 
-    <subscreens default-item="Dashboard"/>
+    <subscreens default-item="Orders"/>
 
     <widgets>
         <!-- just a placeholder screen, nothing here because rendering gets skipped by capps.xml wrapper -->
