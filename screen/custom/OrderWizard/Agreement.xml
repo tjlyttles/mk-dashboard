@@ -9,7 +9,7 @@
     <parameter name="orderPartSeqId" required="true"/>
 
     <transition name="openOrder">
-        <default-response url="../../Dashboard"/>
+        <default-response url="../../Orders"/>
     </transition>
     <transition name="requestAgreement">
         <service-call name="mantle.order.OrderServices.update#OrderStatus">
