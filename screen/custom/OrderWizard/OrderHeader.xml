@@ -26,7 +26,7 @@
         </default-response>
     </transition>
     <transition name="cancelOrder">
-        <default-response url="../../Dashboard"/>
+        <default-response url="../../Orders"/>
     </transition>
     <transition name="getStoreSalesReps">
         <actions>
@@ -175,12 +175,6 @@
             <set field="productParameterSetId" from="orderItemList?.getFirst()?.productParameterSetId ?: ''"/>
             <set field="productId" from="orderItemList?.getFirst()?.productId ?: ''"/>
             <set field="amount" from="orderItemList?.getFirst()?.unitAmount ?: ''"/>
-
-            <entity-find entity-name="mantle.product.ProductParameterValue" list="productCategoryParamList">
-                <econdition field-name="productParameterId" value="ProductCategory"/>
-                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
-            </entity-find>
-            <set field="productCategoryId" from="productCategoryParamList?.getFirst()?.parameterValue ?: ''"/>
 
             <entity-find entity-name="mantle.product.ProductParameterValue" list="productCategoryParamList">
                 <econdition field-name="productParameterId" value="ProductCategory"/>
