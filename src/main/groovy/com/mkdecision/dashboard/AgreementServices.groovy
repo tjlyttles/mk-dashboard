@@ -1,0 +1,163 @@
+package com.mkdecision.dashboard
+
+import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3.time.DateUtils
+import org.moqui.context.ExecutionContext
+import org.moqui.context.L10nFacade
+import org.moqui.context.MessageFacade
+import org.moqui.context.UserFacade
+import org.moqui.entity.*
+import org.moqui.impl.entity.EntityFacadeImpl
+import org.moqui.service.ServiceFacade
+import org.moqui.util.ContextStack
+
+class AgreementServices {
+
+    static Map<String, Object> countOrderAgreementSignatures(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        UserFacade uf = ec.getUser()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+
+        // find order agreements
+        EntityList orderAgreements = ef.find("mantle.order.OrderAgreement")
+                .condition("orderId", orderId)
+                .list()
+
+        // find order parties
+        EntityList orderParties = ef.find("mantle.order.OrderPartParty")
+                .condition("orderId", orderId)
+                .condition("orderPartSeqId", "01")
+                .list()
+
+        // count agreement signatures
+        long customersSigned = 0
+        long customersPending = 0
+        long dealersSigned = 0
+        long dealersPending = 0
+        long userSigned = 0
+        long userPending = 0
+        String userPartyId = uf.userAccount.getString("partyId")
+        for (EntityValue orderAgreement : orderAgreements) {
+            String agreementId = orderAgreement.getString("agreementId")
+            for (EntityValue orderParty : orderParties) {
+                String partyId = orderParty.getString("partyId")
+                String roleTypeId = orderParty.getString("roleTypeId")
+                long signatureCount = ef.find("mantle.party.agreement.AgreementSignature")
+                        .condition("agreementId", agreementId)
+                        .condition("partyId", partyId)
+                        .count()
+                if (signatureCount > 0) {
+                    if (roleTypeId == "PrimaryApplicant" || roleTypeId == "CoApplicant") {
+                        customersSigned++
+                    } else {
+                        dealersSigned++
+                    }
+                    if (partyId == userPartyId) {
+                        userSigned++
+                    }
+                } else {
+                    if (roleTypeId == "PrimaryApplicant" || roleTypeId == "CoApplicant") {
+                        customersPending++
+                    } else {
+                        dealersPending++
+                    }
+                    if (partyId == userPartyId) {
+                        userPending++
+                    }
+                }
+            }
+        }
+
+        // return the output parameters
+        Map<String, Object> outParams = new HashMap<>()
+        outParams.put("orderId", orderId)
+        outParams.put("customersSigned", customersSigned)
+        outParams.put("customersPending", customersPending)
+        outParams.put("dealersSigned", dealersSigned)
+        outParams.put("dealersPending", dealersPending)
+        outParams.put("userSigned", userSigned)
+        outParams.put("userPending", userPending)
+        return outParams
+    }
+
+    static Map<String, Object> signOrderAgreement(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String agreementTypeEnumId = (String) cs.getOrDefault("agreementTypeEnumId", null)
+        String partyId = uf.userAccount.getString("partyId")
+
+        // validate order
+        EntityValue orderHeader = ef.find("mantle.order.OrderHeader")
+                .condition("orderId", orderId)
+                .one()
+        if (orderHeader == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ORDER"))
+            return new HashMap<String, Object>()
+        }
+
+        // find order part
+        EntityValue orderPart = ef.find("mantle.order.OrderPart")
+            .condition("orderId", orderId)
+            .condition("orderPartSeqId", "01")
+            .one()
+
+        // find product store
+        EntityValue productStore = ef.find("mantle.product.store.ProductStore")
+                .condition("productStoreId", orderHeader.getString("productStoreId"))
+                .one()
+
+        // create agreement
+        Map<String, Object> agreementResp = sf.sync().name("create#mantle.party.agreement.Agreement")
+                .parameter("agreementTypeEnumId", agreementTypeEnumId)
+                .parameter("organizationPartyId", productStore.getString("organizationPartyId"))
+                .parameter("organizationRoleTypeId", "Vendor")
+                .parameter("otherPartyId", orderPart.getString("customerPartyId"))
+                .parameter("otherRoleTypeId", "PrimaryApplicant")
+                .parameter("textData", "")
+                .call()
+        String agreementId = (String) agreementResp.get("agreementId")
+
+        // create agreement party
+        sf.sync().name("create#mantle.party.agreement.AgreementParty")
+            .parameter("agreementId", agreementId)
+            .parameter("partyId", partyId)
+            .parameter("roleTypeId", "FinanceManager")
+            .call()
+
+        // create order agreement
+        sf.sync().name("create#mantle.order.OrderAgreement")
+                .parameter("orderId", orderId)
+                .parameter("orderPartSeqId", orderPart.getString("orderPartSeqId"))
+                .parameter("agreementId", agreementId)
+                .call()
+
+        // sign agreement
+        sf.sync().name("create#mantle.party.agreement.AgreementSignature")
+            .parameter("agreementId", agreementId)
+            .parameter("partyId", uf.userAccount.getString("partyId"))
+            .parameter("signatureDate", uf.nowTimestamp)
+            .parameter("visitId", uf.visitId)
+            .call()
+
+        // return the output parameters
+        Map<String, Object> outParams = new HashMap<>()
+        outParams.put("orderId", orderId)
+        outParams.put("partyId", partyId)
+        outParams.put("agreementId", agreementId)
+        return outParams
+    }
+}
