@@ -17,7 +17,7 @@ along with this software (see the LICENSE.md file). If not, see
     <input type="hidden" id="confAppRootPath" value="${ec.web.servletContext.contextPath}">
     <!-- ===== NOTE CHANGED: versus moqui-quasar file only these 2 lines changed: ===== -->
     <input type="hidden" id="confBasePath" value="${ec.web.servletContext.contextPath}/custom">
-    <input type="hidden" id="confLinkBasePath" value="${ec.web.servletContext.contextPath}/capps">
+    <input type="hidden" id="confLinkBasePath" value="${ec.web.servletContext.contextPath}/dashboard">
     <input type="hidden" id="confUserId" value="${ec.user.userId!''}">
     <input type="hidden" id="confLocale" value="${ec.user.locale.toLanguageTag()}">
     <input type="hidden" id="confDarkMode" value="${ec.user.getPreference("QUASAR_DARK")!"false"}">

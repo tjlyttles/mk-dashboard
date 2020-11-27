@@ -2,6 +2,11 @@
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
 
     <!-- Order -->
+    <service verb="validate" noun="OrderAccess" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateOrderAccess">
+        <in-parameters>
+            <parameter name="orderId"/>
+        </in-parameters>
+    </service>
     <service verb="validate" noun="OrderFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateOrderFields">
         <in-parameters>
             <parameter name="orderId"/>
