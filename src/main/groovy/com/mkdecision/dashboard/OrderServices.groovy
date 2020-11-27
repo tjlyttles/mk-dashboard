@@ -820,6 +820,24 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
+        // validate ID issued by
+        if (StringUtils.isBlank(idIssuedBy)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ID_ISSUER"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate issue date
+        if (idIssueDate == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ID_ISSUE_DATE"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate expiry date
+        if (idExpiryDate == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ID_EXPIRY_DATE"))
+            return new HashMap<String, Object>()
+        }
+
         // return the output parameters
         return new HashMap<>()
     }
