@@ -2,11 +2,13 @@
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
         default-menu-title="Launcher"
+        menu-image="fa fa-tachometer"
+        menu-image-type="icon"
         require-authentication="anonymous-all">
 
     <widgets>
         <render-mode>
-            <text type="html"><![CDATA[
+            <text type="html,vuet"><![CDATA[
                 //<script>window.location = '/dashboard'</script>
             ]]></text>
         </render-mode>
