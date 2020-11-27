@@ -98,6 +98,8 @@
     <subscreens default-item="OrderOverview"/>
         
     <actions>
+        <service-call name="mkdecision.dashboard.OrderServices.validate#OrderAccess" in-map="context"/>
+
         <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
         <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
             <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>

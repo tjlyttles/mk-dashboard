@@ -8,6 +8,10 @@
 
     <subscreens default-item="CertificateOfCompletion"/>
 
+    <actions>
+        <service-call name="mkdecision.dashboard.OrderServices.validate#OrderAccess" in-map="context"/>
+    </actions>
+
     <widgets>
         <subscreens-menu id="AgreementMenu"/>
         <subscreens-active/>

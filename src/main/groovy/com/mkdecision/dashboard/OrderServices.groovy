@@ -20,6 +20,72 @@ import java.time.temporal.ChronoUnit
 
 class OrderServices {
 
+    static Map<String, Object> validateOrderAccess(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String partyId = uf.getUserAccount().getString("partyId")
+
+        // validate order
+        EntityFacadeImpl efi = (EntityFacadeImpl) ef
+        EntityConditionFactory ecf = efi.getConditionFactory()
+        long orderCount = ef.find("mkdecision.dashboard.OrderHeaderDetail")
+                .condition(ecf.makeCondition(
+                        ecf.makeCondition("orderId", EntityCondition.ComparisonOperator.EQUALS, orderId),
+                        EntityCondition.JoinOperator.AND,
+                        ecf.makeCondition(
+                                Arrays.asList(
+                                        ecf.makeCondition(
+                                                Arrays.asList(
+                                                        ecf.makeCondition("orderPartPartyId", EntityCondition.ComparisonOperator.EQUALS, partyId),
+                                                        ecf.makeCondition("orderPartRoleTypeId", EntityCondition.ComparisonOperator.EQUALS, "SalesRepresentative")
+                                                ),
+                                                EntityCondition.JoinOperator.AND
+                                        ),
+                                        ecf.makeCondition(
+                                                Arrays.asList(
+                                                        ecf.makeCondition("storePartyId", EntityCondition.ComparisonOperator.EQUALS, partyId),
+                                                        ecf.makeCondition("storeRoleTypeId", EntityCondition.ComparisonOperator.EQUALS, "SalesRepresentative"),
+                                                        ecf.makeCondition("storeAllowSalesRepViewAll", EntityCondition.ComparisonOperator.EQUALS, "Y"),
+                                                ),
+                                                EntityCondition.JoinOperator.AND
+                                        ),
+                                        ecf.makeCondition(
+                                                Arrays.asList(
+                                                        ecf.makeCondition("storePartyId", EntityCondition.ComparisonOperator.EQUALS, partyId),
+                                                        ecf.makeCondition("storeRoleTypeId", EntityCondition.ComparisonOperator.EQUALS, "FinanceManager")
+                                                ),
+                                                EntityCondition.JoinOperator.AND
+                                        ),
+                                        ecf.makeCondition(
+                                                Arrays.asList(
+                                                        ecf.makeCondition("vendorRelationshipTypeId", EntityCondition.ComparisonOperator.EQUALS, "PrtEmployee"),
+                                                        ecf.makeCondition("vendorRelationshipFromPartyId", EntityCondition.ComparisonOperator.EQUALS, partyId),
+                                                        ecf.makeCondition("vendorRelationshipFromRoleTypeId", EntityCondition.ComparisonOperator.EQUALS, "Underwriter")
+                                                ),
+                                                EntityCondition.JoinOperator.AND
+                                        )
+                                ),
+                                EntityCondition.JoinOperator.OR
+                        )
+                ))
+                .count()
+        if (orderCount == 0) {
+            mf.addError(lf.localize("DASHBOARD_ORDER_ACCESS_DENIED"))
+            return new HashMap<String, Object>()
+        }
+
+        // return the output parameters
+        return new HashMap<>()
+    }
+
     static Map<String, Object> validateOrderFields(ExecutionContext ec) {
 
         // shortcuts for convenience
