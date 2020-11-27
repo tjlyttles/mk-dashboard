@@ -8,7 +8,7 @@
             <subscreens-item name="static" menu-include="false" location="component://mk-dashboard/screen/static.xml"/>
         </screen>
         <screen location="component://webroot/screen/webroot/apps.xml">
-            <subscreens-item name="launcher" menu-title="Dashboard" menu-index="1" location="component://mk-dashboard/screen/launcher.xml"/>
+            <subscreens-item name="dashboard" menu-title="Dashboard" menu-index="1" location="component://mk-dashboard/screen/launcher.xml"/>
         </screen>
     </screen-facade>
 </moqui-conf>
