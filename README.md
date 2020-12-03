@@ -12,4 +12,7 @@ The custom.xml screen requires authentication so also requires authorization. Th
 When rendering screens through dashboard (just like qapps and vapps) the apps root screen (in this case custom.xml) is just a placeholder and is never rendered.
 To access the screens under /custom go to /dashboard instead (just like going to /qapps instead of /apps), ie something like:
 
-http://localhost:8080/dashboard 
+http://localhost:8080/dashboard
+
+
+TODO:
