@@ -40,9 +40,10 @@
                         </econditions>
                     </econditions>
                     <select-field field-name="orderId"/>
+                    <select-field field-name="statusId"/>
+                    <select-field field-name="statusDescription"/>
                     <select-field field-name="unitAmount"/>
                     <select-field field-name="currencyUomId"/>
-                    <select-field field-name="statusDescription"/>
                 </entity-find>
 
                 <row-actions>
