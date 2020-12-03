@@ -362,6 +362,9 @@
                     <column>
                         <field-ref name="status"/>
                     </column>
+                    <column>
+                        <field-ref name="options"/>
+                    </column>
                 </columns>
             </form-list>
             <section name="EmptyItemList" condition="itemList == null || itemList.isEmpty()">
@@ -556,6 +559,9 @@
                     <column>
                         <field-ref name="telecomNumber"/>
                         <field-ref name="emailAddress"/>
+                    </column>
+                    <column>
+                        <field-ref name="options"/>
                     </column>
                 </columns>
             </form-list>
