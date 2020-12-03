@@ -8,7 +8,7 @@
 
     <widgets>
         <render-mode>
-            <text type="html,vuet"><![CDATA[
+            <text type="html,vuet,qvt"><![CDATA[
                 //<script>window.location = '/dashboard'</script>
             ]]></text>
         </render-mode>
