@@ -13,6 +13,3 @@ When rendering screens through dashboard (just like qapps and vapps) the apps ro
 To access the screens under /custom go to /dashboard instead (just like going to /qapps instead of /apps), ie something like:
 
 http://localhost:8080/dashboard
-
-
-TODO:
