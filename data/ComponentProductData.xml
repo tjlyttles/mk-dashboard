@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed">
+
+    <!-- Eligibility form -->
+    <moqui.screen.form.DbForm formId="100153" description="Eligibility" purposeEnumId="DbfpSurvey"/>
+
+    <!-- Eligibility form fields -->
+    <moqui.screen.form.DbFormField formId="100153" layoutSequenceNum="1" fieldName="eligibilityQuestion1" title="Applicant(s) own the property." fieldTypeEnumId="DBFFT_check"/>
+    <moqui.screen.form.DbFormField formId="100153" layoutSequenceNum="2" fieldName="eligibilityQuestion2" title="Applicant(s) reside in the property." fieldTypeEnumId="DBFFT_check"/>
+    <moqui.screen.form.DbFormField formId="100153" layoutSequenceNum="3" fieldName="eligibilityQuestion3" title="The property type is a single family (detached), townhome, 2-unit, or condo." fieldTypeEnumId="DBFFT_check"/>
+    <moqui.screen.form.DbFormField formId="100153" layoutSequenceNum="4" fieldName="eligibilityQuestion4" title="Applicant(s) are a U.S. Citizen or Permanent Resident Alien" fieldTypeEnumId="DBFFT_check"/>
+
+    <!-- Eligibility form field options -->
+    <moqui.screen.form.DbFormFieldOption formId="100153" fieldName="eligibilityQuestion1" sequenceNum="1" keyValue="true" text="Yes"/>
+    <moqui.screen.form.DbFormFieldOption formId="100153" fieldName="eligibilityQuestion2" sequenceNum="1" keyValue="true" text="Yes"/>
+    <moqui.screen.form.DbFormFieldOption formId="100153" fieldName="eligibilityQuestion3" sequenceNum="1" keyValue="true" text="Yes"/>
+    <moqui.screen.form.DbFormFieldOption formId="100153" fieldName="eligibilityQuestion4" sequenceNum="1" keyValue="true" text="Yes"/>
+
+</entity-facade-xml>
