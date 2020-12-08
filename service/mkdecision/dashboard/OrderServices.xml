@@ -255,7 +255,9 @@
                 <matches regexp="^[- A-Za-z']+$" message="Please enter an occupation using only letters, apostrophes or hyphens."/>
             </parameter>
             <parameter name="employmentStatusEnumId"/>
-            <parameter name="employerName" required="true"/>
+            <parameter name="employerName" required="true">
+                <matches regexp="^[- #a-zA-Z0-9.]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, and - or #."/>
+            </parameter>
             <parameter name="jobTitle" required="true"/>
             <parameter name="years" type="Integer" required="true">
                 <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
@@ -280,17 +282,39 @@
             <parameter name="employerContactNumber">
                 <matches regexp="^[0,2-9]{1}\d{2}([-])\d{3}([-])\d{4}" message="Please enter a valid phone number"/>
             </parameter>
-            <parameter name="rentIncome" type="BigDecimal"/>
-            <parameter name="retirementIncome" type="BigDecimal"/>
-            <parameter name="investmentIncome" type="BigDecimal"/>
-            <parameter name="bonusIncome" type="BigDecimal"/>
-            <parameter name="socialSecurityIncome" type="BigDecimal"/>
-            <parameter name="disabilityIncome" type="BigDecimal"/>
-            <parameter name="studentIncome" type="BigDecimal"/>
-            <parameter name="unemploymentIncome" type="BigDecimal"/>
-            <parameter name="alimonyIncome" type="BigDecimal"/>
-            <parameter name="childSupportIncome" type="BigDecimal"/>
-            <parameter name="otherIncome" type="BigDecimal"/>
+            <parameter name="rentIncome" type="BigDecimal">
+                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            </parameter>
+            <parameter name="retirementIncome" type="BigDecimal">
+                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            </parameter>
+            <parameter name="investmentIncome" type="BigDecimal">
+                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            </parameter>
+            <parameter name="bonusIncome" type="BigDecimal">
+                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            </parameter>
+            <parameter name="socialSecurityIncome" type="BigDecimal">
+                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            </parameter>
+            <parameter name="disabilityIncome" type="BigDecimal">
+                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            </parameter>
+            <parameter name="studentIncome" type="BigDecimal">
+                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            </parameter>
+            <parameter name="unemploymentIncome" type="BigDecimal">
+                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            </parameter>
+            <parameter name="alimonyIncome" type="BigDecimal">
+                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            </parameter>
+            <parameter name="childSupportIncome" type="BigDecimal">
+                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            </parameter>
+            <parameter name="otherIncome" type="BigDecimal">
+                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            </parameter>
         </in-parameters>
         <out-parameters>
             <parameter name="partyId"/>
@@ -352,12 +376,12 @@
             <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal" required="true">
                 <number-range min="0" min-include-equals="true" message="Please enter the Insurance Costs Annually"/>
             </parameter>
-            <parameter name="lenderName"/>
-            <parameter name="mortgageBalance" type="BigDecimal">
+            <parameter name="lenderName" required="true"/>
+            <parameter name="mortgageBalance" type="BigDecimal" required="true">
                 <number-range min="0" min-include-equals="false" message="Please enter the current Mortgage Balance"/>
             </parameter>
 
-            <parameter name="mortgagePaymentMonthly" type="BigDecimal">
+            <parameter name="mortgagePaymentMonthly" type="BigDecimal" required="true">
                 <number-range min="0" min-include-equals="false" message="Please enter the Mortgage Payment Monthly"/>
             </parameter>
         </in-parameters>
