@@ -140,7 +140,7 @@
                 <matches regexp="^[- A-Za-z']+$" message="Please enter a first name."/>
             </parameter>
             <parameter name="middleName">
-                <matches regexp="^[- A-Za-z']+$" message="Please enter a middle initial using only letters."/>
+                <matches regexp="^[- A-Za-z']{1}$" message="Please enter a middle initial using only letters."/>
             </parameter>
             <parameter name="lastName" required="true">
                 <matches regexp="^[- A-Za-z']+$" message="Please enter a last name."/>
@@ -278,7 +278,7 @@
             </parameter>
             <parameter name="employerStateProvinceGeoId"/>
             <parameter name="employerContactNumber">
-                <matches regexp="^[0,2-9]{1}\d{2}([-])\d{3}([-])\d{4}" message="Please enter a valid phone number"/>
+                <matches regexp="^([0,2-9]{1}\d{2}([-])\d{3}([-])\d{4})|(___\-___\-____)" message="Please enter a valid phone number"/>
             </parameter>
             <parameter name="rentIncome" type="BigDecimal"/>
             <parameter name="retirementIncome" type="BigDecimal"/>
