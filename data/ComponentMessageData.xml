@@ -8,10 +8,11 @@
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_SALES_REP" locale="en" localized="Invalid sales representative selection."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PRODUCT_CATEGORY" locale="en" localized="Invalid product category selection."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PRODUCT" locale="en" localized="Invalid product selection."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_TOTAL_PURCHASE_PRICE" locale="en" localized="Invalid total purchase price."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_TOTAL_PURCHASE_AMOUNT" locale="en" localized="Invalid total purchase amount."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_DOWN_PAYMENT" locale="en" localized="Invalid down payment."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_NET_PURCHASE_AMOUNT" locale="en" localized="Invalid net purchase amount."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_LOAN_FEE" locale="en" localized="Invalid loan fee."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_AMOUNT" locale="en" localized="Invalid amount."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_FINANCED_AMOUNT" locale="en" localized="Invalid financed amount."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ESTIMATED_AMOUNT" locale="en" localized="Invalid estimated amount."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ELIGIBILITY_FORM" locale="en" localized="No eligibility form setup for the selected product."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_FIRST_NAME" locale="en" localized="Invalid first name."/>

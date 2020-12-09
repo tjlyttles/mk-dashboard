@@ -16,10 +16,11 @@
             <parameter name="salesRepresentativeId"/>
             <parameter name="productCategoryId"/>
             <parameter name="productId"/>
-            <parameter name="totalPurchasePrice" type="BigDecimal"/>
+            <parameter name="totalPurchaseAmount" type="BigDecimal"/>
             <parameter name="downPayment" type="BigDecimal"/>
+            <parameter name="netPurchaseAmount" type="BigDecimal"/>
             <parameter name="loanFee" type="BigDecimal"/>
-            <parameter name="amount" type="BigDecimal"/>
+            <parameter name="financedAmount" type="BigDecimal"/>
             <parameter name="estimatedPayment" type="BigDecimal"/>
         </in-parameters>
     </service>
@@ -33,14 +34,15 @@
             <parameter name="productCategoryId" required="true"/>
             <parameter name="productId" required="true"/>
             <parameter name="formResponseId" required="true"/>
-            <parameter name="totalPurchasePrice" type="BigDecimal" required="true">
+            <parameter name="totalPurchaseAmount" type="BigDecimal" required="true">
                 <number-range min="0" min-include-equals="false" message="Please enter total purchase price"/>
             </parameter>
             <parameter name="downPayment" type="BigDecimal" required="true">
                 <number-range min="0" message="Please enter a down payment."/>
             </parameter>
+            <parameter name="netPurchaseAmount" type="BigDecimal" required="true"/>
             <parameter name="loanFee" type="BigDecimal" required="true"/>
-            <parameter name="amount" type="BigDecimal" required="true"/>
+            <parameter name="financedAmount" type="BigDecimal" required="true"/>
             <parameter name="estimatedPayment" type="BigDecimal" required="true"/>
         </in-parameters>
         <out-parameters>
@@ -54,10 +56,11 @@
             <parameter name="orderPartSeqId"/>
             <parameter name="productCategoryId"/>
             <parameter name="productId"/>
-            <parameter name="totalPurchasePrice" type="BigDecimal"/>
+            <parameter name="totalPurchaseAmount" type="BigDecimal"/>
             <parameter name="downPayment" type="BigDecimal"/>
-            <parameter name="loanFee" type="BigDecimal"/>
-            <parameter name="amount" type="BigDecimal"/>
+            <parameter name="downPayment" type="BigDecimal"/>
+            <parameter name="netPurchaseAmount" type="BigDecimal"/>
+            <parameter name="financedAmount" type="BigDecimal"/>
             <parameter name="estimatedPayment" type="BigDecimal"/>
         </in-parameters>
     </service>
@@ -67,10 +70,11 @@
             <parameter name="orderPartSeqId"/>
             <parameter name="productCategoryId" required="true"/>
             <parameter name="productId" required="true"/>
-            <parameter name="totalPurchasePrice" type="BigDecimal" required="true"/>
+            <parameter name="totalPurchaseAmount" type="BigDecimal" required="true"/>
             <parameter name="downPayment" type="BigDecimal" required="true"/>
+            <parameter name="netPurchaseAmount" type="BigDecimal" required="true"/>
             <parameter name="loanFee" type="BigDecimal" required="true"/>
-            <parameter name="amount" type="BigDecimal" required="true"/>
+            <parameter name="financedAmount" type="BigDecimal" required="true"/>
             <parameter name="estimatedPayment" type="BigDecimal" required="true"/>
         </in-parameters>
         <out-parameters>
@@ -84,10 +88,11 @@
             <parameter name="orderPartSeqId"/>
             <parameter name="productCategoryId" required="true"/>
             <parameter name="productId" required="true"/>
-            <parameter name="totalPurchasePrice" type="BigDecimal" required="true"/>
+            <parameter name="totalPurchaseAmount" type="BigDecimal" required="true"/>
             <parameter name="downPayment" type="BigDecimal" required="true"/>
+            <parameter name="netPurchaseAmount" type="BigDecimal" required="true"/>
             <parameter name="loanFee" type="BigDecimal" required="true"/>
-            <parameter name="amount" type="BigDecimal" required="true"/>
+            <parameter name="financedAmount" type="BigDecimal" required="true"/>
             <parameter name="estimatedPayment" type="BigDecimal" required="true"/>
         </in-parameters>
         <out-parameters>
