@@ -381,12 +381,11 @@
             <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal" required="true">
                 <number-range min="0" min-include-equals="true" message="Please enter the Insurance Costs Annually"/>
             </parameter>
-            <parameter name="lenderName" required="true"/>
-            <parameter name="mortgageBalance" type="BigDecimal" required="true">
+            <parameter name="lenderName"/>
+            <parameter name="mortgageBalance" type="BigDecimal">
                 <number-range min="0" min-include-equals="false" message="Please enter the current Mortgage Balance"/>
             </parameter>
-
-            <parameter name="mortgagePaymentMonthly" type="BigDecimal" required="true">
+            <parameter name="mortgagePaymentMonthly" type="BigDecimal">
                 <number-range min="0" min-include-equals="false" message="Please enter the Mortgage Payment Monthly"/>
             </parameter>
         </in-parameters>
