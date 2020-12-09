@@ -480,12 +480,12 @@
                 </field-col-row>
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentTipHeader"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="employmentTipHeader"/></field-col>
+                    <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
                     <field-col xs="0" sm="1" md="3" lg="3"/>
                 </field-col-row>
                 <field-col-row>
