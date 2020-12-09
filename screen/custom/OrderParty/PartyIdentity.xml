@@ -133,6 +133,54 @@
                             </widgets>
                         </section>
 
+                        <section name="AddStateIssued">
+                            <widgets>
+                                <container-dialog id="AddStateIssuedDialog" button-text="Add State Issued ID" width="960" button-style="block margin-tb-1">
+                                    <form-single name="AddStateIssuedForm" transition="addIdentity">
+                                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                        <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidStateId"/></default-field></field>
+
+                                        <field name="idValue">
+                                            <default-field title="ID Number">
+                                                <text-line/>
+                                            </default-field>
+                                        </field>
+                                        <field name="idIssuedBy">
+                                            <default-field title="State Issued">
+                                                <drop-down allow-empty="true">
+                                                    <entity-options text="${geoName}" key="${geoName}">
+                                                        <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                                            <econdition field-name="geoId" value="USA"/>
+                                                            <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                                            <order-by field-name="geoName"/>
+                                                        </entity-find>
+                                                    </entity-options>
+                                                </drop-down>
+                                            </default-field>
+                                        </field>
+                                        <field name="idIssueDate">
+                                            <default-field title="Issue Date">
+                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                            </default-field>
+                                        </field>
+                                        <field name="idExpiryDate">
+                                            <default-field title="Expiration Date">
+                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                            </default-field>
+                                        </field>
+
+                                        <field name="submit">
+                                            <default-field>
+                                                <submit text="Save"/>
+                                            </default-field>
+                                        </field>
+                                    </form-single>
+                                </container-dialog>
+                            </widgets>
+                        </section>
+
                         <section name="AddPassport">
                             <widgets>
                                 <container-dialog id="AddPassportDialog" button-text="Add Passport" width="960" button-style="block margin-tb-1">
