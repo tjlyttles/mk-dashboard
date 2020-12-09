@@ -11,6 +11,10 @@
     </transition>
 
     <transition-include name="searchPartyList" location="component://SimpleScreens/template/party/PartyForms.xml"/>
+
+    <actions>
+        <set field="evergreenOrderState" from="['OrderOpen', 'OrderRequested', 'OrderProposed', 'OrderConditionalApproved', 'OrderCustomerProcessing', 'OrderFundingRequested', 'OrderApproved', 'OrderSent', 'OrderPendingRejected', 'OrderRejected', 'OrderCancelled', 'OrderCancelledTest']"/>
+    </actions>
     
     <widgets>
         <container>
@@ -69,6 +73,7 @@
                             <entity-options text="${description}" key="${statusId}">
                                 <entity-find entity-name="moqui.basic.StatusItem">
                                     <econdition field-name="statusTypeId" value="OrderHeader"/>
+                                    <econdition field-name="statusId" operator="in" from="evergreenOrderState"/>
                                     <order-by field-name="description"/>
                                 </entity-find>
                             </entity-options>
