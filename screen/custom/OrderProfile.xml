@@ -211,11 +211,11 @@
                                 </service-call>
 
                                 <set field="productParameterSetId" from="orderItem.productParameterSetId ?: ''"/>
-                                <entity-find entity-name="mantle.product.ProductParameterValue" list="totalPurchasePriceParamList">
-                                    <econdition field-name="productParameterId" value="TotalPurchasePrice"/>
+                                <entity-find entity-name="mantle.product.ProductParameterValue" list="totalPurchaseAmountParamList">
+                                    <econdition field-name="productParameterId" value="TotalPurchaseAmount"/>
                                     <econdition field-name="productParameterSetId" from="productParameterSetId"/>
                                 </entity-find>
-                                <set field="totalPurchasePrice" from="totalPurchasePriceParamList?.getFirst()?.parameterValue ?: ''"/>
+                                <set field="totalPurchaseAmount" from="totalPurchaseAmountParamList?.getFirst()?.parameterValue ?: ''"/>
 
                                 <entity-find entity-name="mantle.product.ProductParameterValue" list="downPaymentParamList">
                                     <econdition field-name="productParameterId" value="DownPayment"/>
@@ -244,7 +244,7 @@
                                         </container-row>
                                         <container-row style="margin-b-1">
                                             <row-col lg="12" md="12" sm="12" xs="12"><label text="Total Purchase Price" style="text-light-grey"/></row-col>
-                                            <row-col lg="12" md="12" sm="12" xs="12"><label text="${ec.l10n.formatCurrency(totalPurchasePrice, orderHeader.currencyUomId, 2) ?: ''}"/></row-col>
+                                            <row-col lg="12" md="12" sm="12" xs="12"><label text="${ec.l10n.formatCurrency(totalPurchaseAmount, orderHeader.currencyUomId, 2) ?: ''}"/></row-col>
                                         </container-row>
                                         <container-row style="margin-b-1">
                                             <row-col lg="12" md="12" sm="12" xs="12"><label text="Down Payment" style="text-light-grey"/></row-col>

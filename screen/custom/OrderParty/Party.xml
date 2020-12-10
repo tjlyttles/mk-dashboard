@@ -78,6 +78,8 @@
             </entity-find>
             <set field="socialSecurityNumber" from="socialSecurityNumberList?.getFirst()?.idValue ?: ''"/>
         </if>
+
+        <set field="productRoleTypes" from="['PrimaryApplicant', 'CoApplicant', 'NonBorrowerOwner', 'NonApplicantSpouse']"/>
     </actions>
 
     <widgets>
@@ -107,6 +109,7 @@
                     <drop-down>
                         <entity-options text="${description}" key="${roleTypeId}">
                             <entity-find entity-name="mantle.party.RoleType">
+                                <econdition field-name="roleTypeId" operator="in" from="productRoleTypes"/>
                                 <order-by field-name="description"/>
                             </entity-find>
                         </entity-options>
