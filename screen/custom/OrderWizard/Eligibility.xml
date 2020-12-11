@@ -12,10 +12,11 @@
     <parameter name="salesRepresentativeId"/>
     <parameter name="productCategoryId"/>
     <parameter name="productId"/>
-    <parameter name="totalPurchasePrice"/>
+    <parameter name="totalPurchaseAmount"/>
     <parameter name="downPayment"/>
+    <parameter name="netPurchaseAmount"/>
     <parameter name="loanFee"/>
-    <parameter name="amount"/>
+    <parameter name="financedAmount"/>
     <parameter name="estimatedPayment"/>
 
     <transition name="storeOrder">
@@ -40,10 +41,11 @@
             <parameter name="salesRepresentativeId"/>
             <parameter name="productCategoryId"/>
             <parameter name="productId"/>
-            <parameter name="totalPurchasePrice"/>
+            <parameter name="totalPurchaseAmount"/>
             <parameter name="downPayment"/>
+            <parameter name="netPurchaseAmount"/>
             <parameter name="loanFee"/>
-            <parameter name="amount"/>
+            <parameter name="financedAmount"/>
             <parameter name="estimatedPayment"/>
         </default-response>
     </transition>
@@ -103,10 +105,11 @@
                     <field name="salesRepresentativeId"><default-field><hidden/></default-field></field>
                     <field name="productCategoryId"><default-field><hidden/></default-field></field>
                     <field name="productId"><default-field><hidden/></default-field></field>
-                    <field name="totalPurchasePrice"><default-field><hidden/></default-field></field>
+                    <field name="totalPurchaseAmount"><default-field><hidden/></default-field></field>
                     <field name="downPayment"><default-field><hidden/></default-field></field>
+                    <field name="netPurchaseAmount"><default-field><hidden/></default-field></field>
                     <field name="loanFee"><default-field><hidden/></default-field></field>
-                    <field name="amount"><default-field><hidden/></default-field></field>
+                    <field name="financedAmount"><default-field><hidden/></default-field></field>
                     <field name="estimatedPayment"><default-field><hidden/></default-field></field>
 
                     <field name="backButton">

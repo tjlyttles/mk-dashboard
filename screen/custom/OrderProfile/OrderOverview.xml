@@ -47,6 +47,18 @@
         </actions>
         <default-response type="none"/>
     </transition>
+    <transition name="calculateNetPurchaseAmount">
+        <actions>
+            <if condition="totalPurchaseAmount == null || downPayment == null">
+                <script>ec.web.sendTextResponse('"Enter all amounts above"')</script>
+                <else>
+                    <set field="netPurchaseAmount" from="(ec.l10n.parseNumber(totalPurchaseAmount, null)).subtract(ec.l10n.parseNumber(downPayment,null))" type="BigDecimal"/>
+                    <script>ec.web.sendTextResponse(String.format("%f", netPurchaseAmount))</script>
+                </else>
+            </if>
+        </actions>
+        <default-response type="none"/>
+    </transition>
     <transition name="calculateLoanFee">
         <actions>
             <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
@@ -59,13 +71,13 @@
         </actions>
         <default-response type="none"/>
     </transition>
-    <transition name="calculateOrderAmount">
+    <transition name="calculateFinancedAmount">
         <actions>
-            <if condition="totalPurchasePrice == null || loanFee == null || downPayment == null">
+            <if condition="totalPurchaseAmount == null || loanFee == null || downPayment == null">
                 <script>ec.web.sendTextResponse('"Enter all amounts above"')</script>
                 <else>
-                    <set field="orderAmount" from="(new BigDecimal(totalPurchasePrice)).add(new BigDecimal(loanFee)).subtract(new BigDecimal(downPayment))" type="BigDecimal"/>
-                    <script>ec.web.sendTextResponse(String.format("%f", orderAmount))</script>
+                    <set field="financedAmount" from="(new BigDecimal(totalPurchaseAmount)).add(new BigDecimal(loanFee)).subtract(new BigDecimal(downPayment))" type="BigDecimal"/>
+                    <script>ec.web.sendTextResponse(String.format("%f", financedAmount))</script>
                 </else>
             </if>
         </actions>
@@ -73,10 +85,10 @@
     </transition>
     <transition name="calculateEstimatedPayment">
         <actions>
-            <if condition="totalPurchasePrice == null || loanFee == null || downPayment == null">
+            <if condition="totalPurchaseAmount == null || loanFee == null || downPayment == null">
                 <script>ec.web.sendTextResponse('"Enter all amounts above"')</script>
                 <else>
-                    <set field="orderAmount" from="(new BigDecimal(totalPurchasePrice)).add(new BigDecimal(loanFee)).subtract(new BigDecimal(downPayment))" type="BigDecimal"/>
+                    <set field="orderAmount" from="(new BigDecimal(totalPurchaseAmount)).add(new BigDecimal(loanFee)).subtract(new BigDecimal(downPayment))" type="BigDecimal"/>
                     <service-call name="close.ProductServices.calculate#EstimatedPayment" out-map="estimatedPayment">
                         <field-map field-name="productId"/>
                         <field-map field-name="creditLine" from="orderAmount"/>
@@ -224,7 +236,7 @@
                     <entity-find-one entity-name="moqui.basic.StatusItem" value-field="orderPartStatus">
                         <field-map field-name="statusId" from="orderPart.statusId"/>
                     </entity-find-one>
-                    <set field="amount" from="unitAmount"/>
+                    <set field="netPurchaseAmount" from="unitAmount"/>
 
                     <entity-find entity-name="mantle.product.ProductParameterValue" list="productCategoryParamList">
                         <econdition field-name="productParameterId" value="ProductCategory"/>
@@ -238,11 +250,11 @@
                     </entity-find>
                     <set field="productCategoryId" from="productCategoryParamList?.getFirst()?.parameterValue ?: ''"/>
 
-                    <entity-find entity-name="mantle.product.ProductParameterValue" list="totalPurchasePriceParamList">
-                        <econdition field-name="productParameterId" value="TotalPurchasePrice"/>
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="totalPurchaseAmountParamList">
+                        <econdition field-name="productParameterId" value="TotalPurchaseAmount"/>
                         <econdition field-name="productParameterSetId" from="productParameterSetId"/>
                     </entity-find>
-                    <set field="totalPurchasePrice" from="totalPurchasePriceParamList?.getFirst()?.parameterValue ?: ''"/>
+                    <set field="totalPurchaseAmount" from="totalPurchaseAmountParamList?.getFirst()?.parameterValue ?: ''"/>
 
                     <entity-find entity-name="mantle.product.ProductParameterValue" list="downPaymentParamList">
                         <econdition field-name="productParameterId" value="DownPayment"/>
@@ -255,6 +267,12 @@
                         <econdition field-name="productParameterSetId" from="productParameterSetId"/>
                     </entity-find>
                     <set field="loanFee" from="loanFeeParamList?.getFirst()?.parameterValue ?: ''"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="financedAmountParamList">
+                        <econdition field-name="productParameterId" value="FinancedAmount"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="financedAmount" from="financedAmount?.getFirst()?.parameterValue ?: ''"/>
 
                     <entity-find entity-name="mantle.product.ProductParameterValue" list="estimatedPaymentParamList">
                         <econdition field-name="productParameterId" value="EstimatedPayment"/>
@@ -307,14 +325,22 @@
                                         </drop-down>
                                     </default-field>
                                 </field>
-                                <field name="totalPurchasePrice">
-                                    <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="totalPurchasePrice">
+                                <field name="totalPurchaseAmount">
+                                    <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order">
                                         <text-line/>
                                     </default-field>
                                 </field>
                                 <field name="downPayment">
-                                    <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="downPayment">
+                                    <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order">
                                         <text-line/>
+                                    </default-field>
+                                </field>
+                                <field name="netPurchaseAmount">
+                                    <default-field>
+                                        <display dynamic-transition="calculateNetPurchaseAmount" depends-optional="true" style="bg-grey-1">
+                                            <depends-on field="totalPurchaseAmount"/>
+                                            <depends-on field="downPayment"/>
+                                        </display>
                                     </default-field>
                                 </field>
                                 <field name="loanFee">
@@ -324,10 +350,10 @@
                                         </display>
                                     </default-field>
                                 </field>
-                                <field name="amount">
+                                <field name="financedAmount">
                                     <default-field>
-                                        <display dynamic-transition="calculateOrderAmount" depends-optional="true" style="bg-grey-1">
-                                            <depends-on field="totalPurchasePrice"/>
+                                        <display dynamic-transition="calculateFinancedAmount" depends-optional="true" style="bg-grey-1">
+                                            <depends-on field="totalPurchaseAmount"/>
                                             <depends-on field="downPayment"/>
                                             <depends-on field="loanFee"/>
                                         </display>
@@ -337,7 +363,7 @@
                                     <default-field>
                                         <display dynamic-transition="calculateEstimatedPayment" depends-optional="true" style="bg-grey-1">
                                             <depends-on field="productId"/>
-                                            <depends-on field="totalPurchasePrice"/>
+                                            <depends-on field="totalPurchaseAmount"/>
                                             <depends-on field="downPayment"/>
                                             <depends-on field="loanFee"/>
                                         </display>

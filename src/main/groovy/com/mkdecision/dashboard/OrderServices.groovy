@@ -15,9 +15,7 @@ import org.moqui.impl.entity.EntityFacadeImpl
 import org.moqui.service.ServiceFacade
 import org.moqui.util.ContextStack
 
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
-
+@SuppressWarnings("unused")
 class OrderServices {
 
     static Map<String, Object> validateOrderAccess(ExecutionContext ec) {
@@ -103,10 +101,11 @@ class OrderServices {
         String salesRepresentativeId = (String) cs.getOrDefault("salesRepresentativeId", null)
         String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
         String productId = (String) cs.getOrDefault("productId", null)
-        BigDecimal totalPurchasePrice = (BigDecimal) cs.getOrDefault("totalPurchasePrice", null)
+        BigDecimal totalPurchaseAmount = (BigDecimal) cs.getOrDefault("totalPurchaseAmount", null)
         BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
+        BigDecimal netPurchaseAmount = (BigDecimal) cs.getOrDefault("netPurchaseAmount", null)
         BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
-        String amount = (String) cs.getOrDefault("amount", null)
+        String financedAmount = (String) cs.getOrDefault("financedAmount", null)
         BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
 
         // validate product store
@@ -175,15 +174,21 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
-        // validate total purchase price
-        if (totalPurchasePrice == null || totalPurchasePrice <= 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_TOTAL_PURCHASE_PRICE"))
+        // validate total purchase amount
+        if (totalPurchaseAmount == null || totalPurchaseAmount <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_TOTAL_PURCHASE_AMOUNT"))
             return new HashMap<String, Object>()
         }
 
         // validate down payment
-        if (downPayment == null || downPayment < 0 || downPayment > totalPurchasePrice) {
+        if (downPayment == null || downPayment < 0 || downPayment > totalPurchaseAmount) {
             mf.addError(lf.localize("DASHBOARD_INVALID_DOWN_PAYMENT"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate net purchase amount
+        if (netPurchaseAmount == null || netPurchaseAmount != (totalPurchaseAmount - downPayment)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_NET_PURCHASE_AMOUNT"))
             return new HashMap<String, Object>()
         }
 
@@ -193,10 +198,10 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
-        // validate amount
-        BigDecimal amountBigDecimal = new BigDecimal(amount)
-        if (amountBigDecimal == null || amountBigDecimal != ((totalPurchasePrice + loanFee) - downPayment)) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_AMOUNT"))
+        // validate financed amount
+        BigDecimal financedAmountBigDecimal = new BigDecimal(financedAmount)
+        if (financedAmountBigDecimal == null || financedAmountBigDecimal != ((totalPurchaseAmount + loanFee) - downPayment)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_FINANCED_AMOUNT"))
             return new HashMap<String, Object>()
         }
 
@@ -229,10 +234,11 @@ class OrderServices {
         String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
         String productId = (String) cs.getOrDefault("productId", null)
         String formResponseId = (String) cs.getOrDefault("formResponseId", null)
-        BigDecimal totalPurchasePrice = (BigDecimal) cs.getOrDefault("totalPurchasePrice", null)
+        BigDecimal totalPurchaseAmount = (BigDecimal) cs.getOrDefault("totalPurchaseAmount", null)
         BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
+        BigDecimal netPurchaseAmount = (BigDecimal) cs.getOrDefault("netPurchaseAmount", null)
         BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
-        BigDecimal amount = (BigDecimal) cs.getOrDefault("amount", null)
+        BigDecimal financedAmount = (BigDecimal) cs.getOrDefault("financedAmount", null)
         BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
 
         // validate fields
@@ -272,7 +278,7 @@ class OrderServices {
         }
 
         // store order
-        boolean updateOrder = StringUtils.isNotBlank(orderId) && StringUtils.isNotBlank(orderPartSeqId);
+        boolean updateOrder = StringUtils.isNotBlank(orderId) && StringUtils.isNotBlank(orderPartSeqId)
         if (updateOrder) {
 
             // update order header
@@ -314,7 +320,7 @@ class OrderServices {
                     .parameter("orderPartSeqId", orderPartSeqId)
                     .parameter("orderItemSeqId", orderItemSeqId)
                     .parameter("productId", productId)
-                    .parameter("unitAmount", amount)
+                    .parameter("unitAmount", netPurchaseAmount)
                     .call()
 
             // delete order item form response
@@ -342,15 +348,15 @@ class OrderServices {
                     .parameter("parameterValue", productCategoryId)
                     .call()
 
-            // update total purchase price
-            EntityValue totalPurchasePriceParam = ef.find("mantle.product.ProductParameterValue")
-                    .condition("productParameterId", "TotalPurchasePrice")
+            // update total purchase amount
+            EntityValue totalPurchaseAmountParam = ef.find("mantle.product.ProductParameterValue")
+                    .condition("productParameterId", "TotalPurchaseAmount")
                     .condition("productParameterSetId", productParameterSetId)
                     .list()
                     .getFirst()
             sf.sync().name("update#mantle.product.ProductParameterValue")
-                    .parameter("productParameterValueId", totalPurchasePriceParam.getString("productParameterValueId"))
-                    .parameter("parameterValue", totalPurchasePrice)
+                    .parameter("productParameterValueId", totalPurchaseAmountParam.getString("productParameterValueId"))
+                    .parameter("parameterValue", totalPurchaseAmount)
                     .call()
 
             // update down payment
@@ -373,6 +379,17 @@ class OrderServices {
             sf.sync().name("update#mantle.product.ProductParameterValue")
                     .parameter("productParameterValueId", loanFeeParam.getString("productParameterValueId"))
                     .parameter("parameterValue", loanFee)
+                    .call()
+
+            // update financed amount
+            EntityValue financedAmountParam = ef.find("mantle.product.ProductParameterValue")
+                    .condition("productParameterId", "FinancedAmount")
+                    .condition("productParameterSetId", productParameterSetId)
+                    .list()
+                    .getFirst()
+            sf.sync().name("update#mantle.product.ProductParameterValue")
+                    .parameter("productParameterValueId", financedAmountParam.getString("productParameterValueId"))
+                    .parameter("parameterValue", financedAmount)
                     .call()
 
             // update estimated amount
@@ -416,7 +433,7 @@ class OrderServices {
                     .parameter("orderPartSeqId", orderPartSeqId)
                     .parameter("productId", productId)
                     .parameter("productParameterSetId", productParameterSetId)
-                    .parameter("unitAmount", amount)
+                    .parameter("unitAmount", netPurchaseAmount)
                     .call()
             String orderItemSeqId = (String) orderItemResp.get("orderItemSeqId")
 
@@ -434,11 +451,11 @@ class OrderServices {
                     .parameter("parameterValue", productCategoryId)
                     .call()
 
-            // create total purchase price
+            // create total purchase amount
             sf.sync().name("create#mantle.product.ProductParameterValue")
-                    .parameter("productParameterId", "TotalPurchasePrice")
+                    .parameter("productParameterId", "TotalPurchaseAmount")
                     .parameter("productParameterSetId", productParameterSetId)
-                    .parameter("parameterValue", totalPurchasePrice)
+                    .parameter("parameterValue", totalPurchaseAmount)
                     .call()
 
             // create down payment
@@ -453,6 +470,13 @@ class OrderServices {
                     .parameter("productParameterId", "LoanFee")
                     .parameter("productParameterSetId", productParameterSetId)
                     .parameter("parameterValue", loanFee)
+                    .call()
+
+            // create finance amount
+            sf.sync().name("create#mantle.product.ProductParameterValue")
+                    .parameter("productParameterId", "FinancedAmount")
+                    .parameter("productParameterSetId", productParameterSetId)
+                    .parameter("parameterValue", financedAmount)
                     .call()
 
             // create estimated payment
@@ -474,9 +498,6 @@ class OrderServices {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
         L10nFacade lf = ec.getL10n()
 
@@ -600,7 +621,6 @@ class OrderServices {
         ServiceFacade sf = ec.getService()
         UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
 
         // get the parameters
         String orderId = (String) cs.getOrDefault("orderId", null)
@@ -623,7 +643,6 @@ class OrderServices {
         String contactNumber = (String) cs.getOrDefault("contactNumber", null)
         String contactMechPurposeId = (String) cs.getOrDefault("contactMechPurposeId", null)
         String email = (String) cs.getOrDefault("email", null)
-        String emailVerify = (String) cs.getOrDefault("emailVerify", null)
 
         // validate fields
         sf.sync().name("mkdecision.dashboard.OrderServices.validate#ApplicantFields")
@@ -634,7 +653,7 @@ class OrderServices {
         }
 
         // store party
-        boolean updateParty = StringUtils.isNotBlank(partyId);
+        boolean updateParty = StringUtils.isNotBlank(partyId)
         if (updateParty) {
 
             // update person
@@ -792,9 +811,6 @@ class OrderServices {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
         L10nFacade lf = ec.getL10n()
 
@@ -846,11 +862,8 @@ class OrderServices {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
         ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
 
         // get the parameters
         String orderId = (String) cs.getOrDefault("orderId", null)
@@ -893,7 +906,6 @@ class OrderServices {
         ContextStack cs = ec.getContext()
         EntityFacade ef = ec.getEntity()
         ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
         L10nFacade lf = ec.getL10n()
 
@@ -930,8 +942,6 @@ class OrderServices {
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
         EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
         L10nFacade lf = ec.getL10n()
 
@@ -1326,13 +1336,10 @@ class OrderServices {
         ContextStack cs = ec.getContext()
         EntityFacade ef = ec.getEntity()
         ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
         L10nFacade lf = ec.getL10n()
 
         // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String partyId = (String) cs.getOrDefault("partyId", null)
         String partyRelationshipId = (String) cs.getOrDefault("partyRelationshipId", null)
 
@@ -1364,7 +1371,6 @@ class OrderServices {
         ContextStack cs = ec.getContext()
         EntityFacade ef = ec.getEntity()
         ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
         L10nFacade lf = ec.getL10n()
 
@@ -1410,9 +1416,6 @@ class OrderServices {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
         L10nFacade lf = ec.getL10n()
 
@@ -1497,7 +1500,6 @@ class OrderServices {
         ServiceFacade sf = ec.getService()
         UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
 
         // get the parameters
         String orderId = (String) cs.getOrDefault("orderId", null)
@@ -1654,7 +1656,6 @@ class OrderServices {
         ContextStack cs = ec.getContext()
         EntityFacade ef = ec.getEntity()
         ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
         L10nFacade lf = ec.getL10n()
 
@@ -1700,10 +1701,11 @@ class OrderServices {
         String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
         String productId = (String) cs.getOrDefault("productId", null)
-        BigDecimal totalPurchasePrice = (BigDecimal) cs.getOrDefault("totalPurchasePrice", null)
+        BigDecimal totalPurchaseAmount = (BigDecimal) cs.getOrDefault("totalPurchaseAmount", null)
         BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
+        BigDecimal netPurchaseAmount = (BigDecimal) cs.getOrDefault("netPurchaseAmount", null)
         BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
-        String amount = (String) cs.getOrDefault("amount", null)
+        String financedAmount = (String) cs.getOrDefault("financedAmount", null)
         BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
 
         // validate order header
@@ -1758,15 +1760,21 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
-        // validate total purchase price
-        if (totalPurchasePrice == null || totalPurchasePrice <= 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_TOTAL_PURCHASE_PRICE"))
+        // validate total purchase amount
+        if (totalPurchaseAmount == null || totalPurchaseAmount <= 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_TOTAL_PURCHASE_AMOUNT"))
             return new HashMap<String, Object>()
         }
 
         // validate down payment
-        if (downPayment == null || downPayment < 0 || downPayment > totalPurchasePrice) {
+        if (downPayment == null || downPayment < 0 || downPayment > totalPurchaseAmount) {
             mf.addError(lf.localize("DASHBOARD_INVALID_DOWN_PAYMENT"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate net purchase amount
+        if (netPurchaseAmount == null || netPurchaseAmount != (totalPurchaseAmount - downPayment)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_NET_PURCHASE_AMOUNT"))
             return new HashMap<String, Object>()
         }
 
@@ -1776,10 +1784,10 @@ class OrderServices {
             return new HashMap<String, Object>()
         }
 
-        // validate amount
-        BigDecimal amountBigDecimal = new BigDecimal(amount)
-        if (amountBigDecimal == null || amountBigDecimal != ((totalPurchasePrice + loanFee) - downPayment)) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_AMOUNT"))
+        // validate financed amount
+        BigDecimal financedAmountBigDecimal = new BigDecimal(financedAmount)
+        if (financedAmountBigDecimal == null || financedAmountBigDecimal != ((totalPurchaseAmount + loanFee) - downPayment)) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_FINANCED_AMOUNT"))
             return new HashMap<String, Object>()
         }
 
@@ -1797,21 +1805,19 @@ class OrderServices {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
         ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
 
         // get the parameters
         String orderId = (String) cs.getOrDefault("orderId", null)
         String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
         String productId = (String) cs.getOrDefault("productId", null)
-        BigDecimal totalPurchasePrice = (BigDecimal) cs.getOrDefault("totalPurchasePrice", null)
+        BigDecimal totalPurchaseAmount = (BigDecimal) cs.getOrDefault("totalPurchaseAmount", null)
         BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
+        BigDecimal netPurchaseAmount = (BigDecimal) cs.getOrDefault("netPurchaseAmount", null)
         BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
-        BigDecimal amount = (BigDecimal) cs.getOrDefault("amount", null)
+        BigDecimal financedAmount = (BigDecimal) cs.getOrDefault("financedAmount", null)
         BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
 
         // validate fields
@@ -1834,7 +1840,7 @@ class OrderServices {
                 .parameter("orderPartSeqId", orderPartSeqId)
                 .parameter("productId", productId)
                 .parameter("productParameterSetId", productParameterSetId)
-                .parameter("unitAmount", amount)
+                .parameter("unitAmount", netPurchaseAmount)
                 .call()
         String orderItemSeqId = (String) orderItemResp.get("orderItemSeqId")
 
@@ -1845,11 +1851,11 @@ class OrderServices {
                 .parameter("parameterValue", productCategoryId)
                 .call()
 
-        // create total purchase price
+        // create total purchase amount
         sf.sync().name("create#mantle.product.ProductParameterValue")
-                .parameter("productParameterId", "TotalPurchasePrice")
+                .parameter("productParameterId", "TotalPurchaseAmount")
                 .parameter("productParameterSetId", productParameterSetId)
-                .parameter("parameterValue", totalPurchasePrice)
+                .parameter("parameterValue", totalPurchaseAmount)
                 .call()
 
         // create down payment
@@ -1864,6 +1870,13 @@ class OrderServices {
                 .parameter("productParameterId", "LoanFee")
                 .parameter("productParameterSetId", productParameterSetId)
                 .parameter("parameterValue", loanFee)
+                .call()
+
+        // create financed amount
+        sf.sync().name("create#mantle.product.ProductParameterValue")
+                .parameter("productParameterId", "FinancedAmount")
+                .parameter("productParameterSetId", productParameterSetId)
+                .parameter("parameterValue", financedAmount)
                 .call()
 
         // create estimated payment
@@ -1886,19 +1899,18 @@ class OrderServices {
         ContextStack cs = ec.getContext()
         EntityFacade ef = ec.getEntity()
         ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
 
         // get the parameters
         String orderId = (String) cs.getOrDefault("orderId", null)
         String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
         String productId = (String) cs.getOrDefault("productId", null)
-        BigDecimal totalPurchasePrice = (BigDecimal) cs.getOrDefault("totalPurchasePrice", null)
+        BigDecimal totalPurchaseAmount = (BigDecimal) cs.getOrDefault("totalPurchaseAmount", null)
         BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
+        BigDecimal netPurchaseAmount = (BigDecimal) cs.getOrDefault("netPurchaseAmount", null)
         BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
-        BigDecimal amount = (BigDecimal) cs.getOrDefault("amount", null)
+        BigDecimal financedAmount = (BigDecimal) cs.getOrDefault("financedAmount", null)
         BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
 
         // validate fields
@@ -1925,7 +1937,7 @@ class OrderServices {
                 .parameter("orderPartSeqId", orderPartSeqId)
                 .parameter("orderItemSeqId", orderItemSeqId)
                 .parameter("productId", productId)
-                .parameter("unitAmount", amount)
+                .parameter("unitAmount", netPurchaseAmount)
                 .call()
 
         // update product category
@@ -1939,15 +1951,15 @@ class OrderServices {
                 .parameter("parameterValue", productCategoryId)
                 .call()
 
-        // update total purchase price
-        EntityValue totalPurchasePriceParam = ef.find("mantle.product.ProductParameterValue")
-                .condition("productParameterId", "TotalPurchasePrice")
+        // update total purchase amount
+        EntityValue totalPurchaseAmountParam = ef.find("mantle.product.ProductParameterValue")
+                .condition("productParameterId", "TotalPurchaseAmount")
                 .condition("productParameterSetId", productParameterSetId)
                 .list()
                 .getFirst()
         sf.sync().name("update#mantle.product.ProductParameterValue")
-                .parameter("productParameterValueId", totalPurchasePriceParam.getString("productParameterValueId"))
-                .parameter("parameterValue", totalPurchasePrice)
+                .parameter("productParameterValueId", totalPurchaseAmountParam.getString("productParameterValueId"))
+                .parameter("parameterValue", totalPurchaseAmount)
                 .call()
 
         // update down payment
@@ -1970,6 +1982,17 @@ class OrderServices {
         sf.sync().name("update#mantle.product.ProductParameterValue")
                 .parameter("productParameterValueId", loanFeeParam.getString("productParameterValueId"))
                 .parameter("parameterValue", loanFee)
+                .call()
+
+        // update financed amount
+        EntityValue financedAmountParam = ef.find("mantle.product.ProductParameterValue")
+                .condition("productParameterId", "FinancedAmount")
+                .condition("productParameterSetId", productParameterSetId)
+                .list()
+                .getFirst()
+        sf.sync().name("update#mantle.product.ProductParameterValue")
+                .parameter("productParameterValueId", financedAmountParam.getString("productParameterValueId"))
+                .parameter("parameterValue", financedAmount)
                 .call()
 
         // update estimated amount
@@ -1996,7 +2019,6 @@ class OrderServices {
         ContextStack cs = ec.getContext()
         EntityFacade ef = ec.getEntity()
         ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
         L10nFacade lf = ec.getL10n()
 
