@@ -65,7 +65,7 @@
                                             <label text="${id.idValue}" style="text-weight-light"/>
                                         </container>
                                         <container style="margin-b-1">
-                                            <label text="${idType.enumId == 'PtidPassport' ? 'Country Issued' : 'State Issued'}" style="text-weight-medium block"/>
+                                            <label text="${idType.enumId == 'PtidPassport' || idType.enumId == 'PtidArn' || idType.enumId == 'PtidMilitaryId' ? 'Country Issued' : 'State Issued'}" style="text-weight-medium block"/>
                                             <label text="${id.issuedBy}" style="text-weight-light"/>
                                         </container>
                                         <container style="margin-b-1">
@@ -243,12 +243,58 @@
                                             </default-field>
                                         </field>
                                         <field name="idIssuedBy">
-                                            <default-field title="State Issued">
+                                            <default-field title="Country Issued">
                                                 <drop-down>
                                                     <entity-options text="${geoName}" key="${geoName}">
-                                                        <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
-                                                            <econdition field-name="geoId" value="USA"/>
-                                                            <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                                        <entity-find entity-name="moqui.basic.Geo">
+                                                            <econdition field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
+                                                            <order-by field-name="geoName"/>
+                                                        </entity-find>
+                                                    </entity-options>
+                                                </drop-down>
+                                            </default-field>
+                                        </field>
+                                        <field name="idIssueDate">
+                                            <default-field title="Issue Date">
+                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                            </default-field>
+                                        </field>
+                                        <field name="idExpiryDate">
+                                            <default-field title="Expiration Date">
+                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                            </default-field>
+                                        </field>
+
+                                        <field name="submit">
+                                            <default-field>
+                                                <submit text="Save"/>
+                                            </default-field>
+                                        </field>
+                                    </form-single>
+                                </container-dialog>
+                            </widgets>
+                        </section>
+
+                        <section name="AddPermRegId">
+                            <widgets>
+                                <container-dialog id="AddPermRegIdDialog" button-text="Add Alien Registration Card (Permanent Resident Card)" width="960" button-style="block margin-tb-1">
+                                    <form-single name="AddPermRegIdForm" transition="addIdentity">
+                                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                        <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidArn"/></default-field></field>
+
+                                        <field name="idValue">
+                                            <default-field title="ID Number">
+                                                <text-line/>
+                                            </default-field>
+                                        </field>
+                                         <field name="idIssuedBy">
+                                            <default-field title="Country Issued">
+                                                <drop-down>
+                                                    <entity-options text="${geoName}" key="${geoName}">
+                                                        <entity-find entity-name="moqui.basic.Geo">
+                                                            <econdition field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
                                                             <order-by field-name="geoName"/>
                                                         </entity-find>
                                                     </entity-options>
