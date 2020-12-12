@@ -152,7 +152,7 @@
             </parameter>
             <parameter name="suffix"/>
             <parameter name="address1" required="true">
-                <matches regexp="^[- #a-zA-Z0-9.]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, and - or #."/>
+                <matches regexp="^[- #a-zA-Z0-9.',\/]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, commas, and -, /, ', or #."/>
             </parameter>
             <parameter name="unitNumber"/>
             <parameter name="postalCode" required="true">

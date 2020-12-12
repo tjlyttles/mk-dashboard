@@ -154,7 +154,7 @@
             </field>
             <field name="birthDate">
                 <default-field title="Date of Birth">
-                    <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; (!!value &amp;&amp; value.indexOf('_') === -1) || 'Please enter a valid date of birth.', value =&gt; !value || value.indexOf('_') !== -1 || moment(value,'MM-DD-YYYY').add(18,'y') &lt; Date.now() || 'Please enter a valid date of birth.'"/>
+                    <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; (!!value &amp;&amp; value.indexOf('_') === -1) || 'Please enter a valid date of birth.', value =&gt; !value || value.indexOf('_') !== -1 || moment(value,'MM-DD-YYYY').add(18,'y') &lt; Date.now() || 'Applicants must be at least 18 years of age to apply for an account. If they are 18 or over, please re-enter your date of birth.'"/>
                 </default-field>
             </field>
             <field name="maritalStatusEnumId">
