@@ -25,6 +25,14 @@
         </default-response>
     </transition>
     <transition name="viewPartyEmployment">
+        <actions>
+            <entity-find-count entity-name="mantle.party.PartyIdentification" count-field="idCount">
+                <econdition field-name="partyId" from="partyId"/>
+            </entity-find-count>
+            <if condition="idCount == 0">
+                <return message="${ec.l10n.localize('DASHBOARD_INVALID_ID_COUNT')}" error="true"/>
+            </if>
+        </actions>
         <default-response url="../PartyEmployment">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
@@ -114,12 +122,12 @@
                                         </field>
                                         <field name="idIssueDate">
                                             <default-field title="Issue Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &lt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
                                         <field name="idExpiryDate">
                                             <default-field title="Expiration Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
 
@@ -197,7 +205,7 @@
                                         </field>
                                         <field name="idIssuedBy">
                                             <default-field title="Country Issued">
-                                                <drop-down>
+                                                <drop-down allow-empty="true">
                                                     <entity-options text="${geoName}" key="${geoName}">
                                                         <entity-find entity-name="moqui.basic.Geo">
                                                             <econdition field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
@@ -244,7 +252,7 @@
                                         </field>
                                         <field name="idIssuedBy">
                                             <default-field title="Country Issued">
-                                                <drop-down>
+                                                <drop-down allow-empty="true">
                                                     <entity-options text="${geoName}" key="${geoName}">
                                                         <entity-find entity-name="moqui.basic.Geo">
                                                             <econdition field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
@@ -277,7 +285,7 @@
 
                         <section name="AddPermRegId">
                             <widgets>
-                                <container-dialog id="AddPermRegIdDialog" button-text="Add Alien Registration Card (Permanent Resident Card)" width="960" button-style="block margin-tb-1">
+                                <container-dialog id="AddPermRegIdDialog" button-text="Add Permanent Resident Card" width="960" button-style="block margin-tb-1">
                                     <form-single name="AddPermRegIdForm" transition="addIdentity">
                                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -291,7 +299,7 @@
                                         </field>
                                          <field name="idIssuedBy">
                                             <default-field title="Country Issued">
-                                                <drop-down>
+                                                <drop-down allow-empty="true">
                                                     <entity-options text="${geoName}" key="${geoName}">
                                                         <entity-find entity-name="moqui.basic.Geo">
                                                             <econdition field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
@@ -299,11 +307,6 @@
                                                         </entity-find>
                                                     </entity-options>
                                                 </drop-down>
-                                            </default-field>
-                                        </field>
-                                        <field name="idIssueDate">
-                                            <default-field title="Issue Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
                                             </default-field>
                                         </field>
                                         <field name="idExpiryDate">

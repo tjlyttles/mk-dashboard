@@ -23,6 +23,14 @@
         </default-response>
     </transition>
     <transition name="viewPrimaryApplicantEmployment">
+        <actions>
+            <entity-find-count entity-name="mantle.party.PartyIdentification" count-field="idCount">
+                <econdition field-name="partyId" from="partyId"/>
+            </entity-find-count>
+            <if condition="idCount == 0">
+                <return message="${ec.l10n.localize('DASHBOARD_INVALID_ID_COUNT')}" error="true"/>
+            </if>
+        </actions>
         <default-response url="../PrimaryApplicantEmployment">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>

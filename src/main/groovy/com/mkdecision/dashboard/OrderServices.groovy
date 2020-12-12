@@ -843,7 +843,7 @@ class OrderServices {
         }
 
         // validate issue date
-        if (idIssueDate == null) {
+        if (idIssueDate == null && !StringUtils.equals(partyIdTypeEnumId, "PtidArn")) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ID_ISSUE_DATE"))
             return new HashMap<String, Object>()
         }

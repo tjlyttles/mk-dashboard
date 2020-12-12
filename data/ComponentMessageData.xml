@@ -31,6 +31,7 @@
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMAIL_VERIFY" locale="en" localized="Invalid email address verification."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ID_TYPE" locale="en" localized="Invalid ID type."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ID_VALUE" locale="en" localized="Invalid ID value."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ID_COUNT" locale="en" localized="At least 1 ID is required."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ID_ISSUER" locale="en" localized="Invalid ID issuer."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ID_ISSUE_DATE" locale="en" localized="Invalid ID issue date."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ID_EXPIRY_DATE" locale="en" localized="Invalid ID expiration date."/>
