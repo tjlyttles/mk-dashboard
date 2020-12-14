@@ -170,12 +170,12 @@
                                         </field>
                                         <field name="idIssueDate">
                                             <default-field title="Issue Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &lt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
                                         <field name="idExpiryDate">
                                             <default-field title="Expiration Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
 
@@ -217,12 +217,12 @@
                                         </field>
                                         <field name="idIssueDate">
                                             <default-field title="Issue Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &lt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
                                         <field name="idExpiryDate">
                                             <default-field title="Expiration Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
 
@@ -264,12 +264,12 @@
                                         </field>
                                         <field name="idIssueDate">
                                             <default-field title="Issue Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &lt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
                                         <field name="idExpiryDate">
                                             <default-field title="Expiration Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
 
@@ -311,7 +311,7 @@
                                         </field>
                                         <field name="idExpiryDate">
                                             <default-field title="Expiration Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
 
