@@ -78,8 +78,8 @@
                                             <label text="${id.issuedBy}" style="text-weight-light"/>
                                         </container>
                                         <container style="margin-b-1">
-                                            <label text="Issue Date" style="text-weight-medium block"/>
-                                            <label text="${id.issueDate}" style="text-weight-light"/>
+                                            <label text="${idType.enumId == 'PtidArn' ? '' : 'Issue Date'}" style="text-weight-medium block"/>
+                                            <label text="${idType.enumId == 'PtidArn' ? '' : id.issueDate}" style="text-weight-light"/>
                                         </container>
                                         <container>
                                             <label text="Expiration Date" style="text-weight-medium block"/>
