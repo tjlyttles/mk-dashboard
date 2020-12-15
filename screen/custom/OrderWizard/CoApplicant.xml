@@ -112,7 +112,7 @@
                 <default-field>
                     <label text="New Application" type="h4" style="margin-b-1"/>
                     <label text="Add Co-Applicant (Optional)" type="h5" style="margin-b-1"/>
-                    <label text="Co-applicant must be reside and be a spouse or co-owner of the property." style="margin-b-1"/>
+                    <label text="Co-applicant must reside in the property and be a spouse or be a co-owner of the property." style="margin-b-1"/>
                     <container style="h-separator margin-tb-2"/>
                 </default-field>
             </field>
