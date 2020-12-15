@@ -149,7 +149,7 @@
                                         </field>
                                         <field name="idIssuedBy">
                                             <default-field title="Country Issued">
-                                                <drop-down>
+                                                <drop-down required-manual-select="true">
                                                     <entity-options text="${geoName}" key="${geoName}">
                                                         <entity-find entity-name="moqui.basic.Geo">
                                                             <econdition field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
@@ -196,7 +196,7 @@
                                         </field>
                                         <field name="idIssuedBy">
                                             <default-field title="State Issued">
-                                                <drop-down>
+                                                <drop-down required-manual-select="true">
                                                     <entity-options text="${geoName}" key="${geoName}">
                                                         <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
                                                             <econdition field-name="geoId" value="USA"/>

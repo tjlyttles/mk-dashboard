@@ -402,7 +402,7 @@
                 </default-field>
             </field>
             <field name="employerContactNumber">
-                <default-field title="Employer Phone Number (Optional)">
+                <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
                     <text-line  mask="###-###-####" input-type="tel"/>
                 </default-field>
             </field>
