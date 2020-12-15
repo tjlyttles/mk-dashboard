@@ -190,17 +190,17 @@
                             </widgets>
                         </section>
 
-                        <section name="AddPassport">
+                        <section name="AddMilitaryId">
                             <widgets>
-                                <container-dialog id="AddPassportDialog" button-text="Add Passport" width="960" button-style="block margin-tb-1">
-                                    <form-single name="AddPassportForm" transition="addIdentity">
+                                <container-dialog id="AddMilitaryIdDialog" button-text="Add Military ID" width="960" button-style="block margin-tb-1">
+                                    <form-single name="AddMilitaryIdForm" transition="addIdentity">
                                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
                                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
-                                        <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidPassport"/></default-field></field>
+                                        <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidMilitaryId"/></default-field></field>
 
                                         <field name="idValue">
-                                            <default-field title="Passport Number">
+                                            <default-field title="ID Number">
                                                 <text-line/>
                                             </default-field>
                                         </field>
@@ -236,18 +236,17 @@
                                 </container-dialog>
                             </widgets>
                         </section>
-
-                        <section name="AddMilitaryId">
+                        <section name="AddPassport">
                             <widgets>
-                                <container-dialog id="AddMilitaryIdDialog" button-text="Add Military ID" width="960" button-style="block margin-tb-1">
-                                    <form-single name="AddMilitaryIdForm" transition="addIdentity">
+                                <container-dialog id="AddPassportDialog" button-text="Add Passport" width="960" button-style="block margin-tb-1">
+                                    <form-single name="AddPassportForm" transition="addIdentity">
                                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
                                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
-                                        <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidMilitaryId"/></default-field></field>
+                                        <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidPassport"/></default-field></field>
 
                                         <field name="idValue">
-                                            <default-field title="ID Number">
+                                            <default-field title="Passport Number">
                                                 <text-line/>
                                             </default-field>
                                         </field>
