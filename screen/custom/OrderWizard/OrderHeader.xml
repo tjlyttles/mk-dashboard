@@ -242,7 +242,7 @@
             </field>
             <field name="salesChannelEnumId">
                 <default-field title="Method" validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="salesChannelEnumId">
-                    <drop-down>
+                    <drop-down required-manual-select="true">
                         <entity-options key="${enumId}" text="${description}">
                             <entity-find entity-name="moqui.basic.EnumAndGroup">
                                 <econdition field-name="enumGroupEnumId" value="RequestChannelTypes"/>
@@ -255,7 +255,7 @@
             </field>
             <field name="productStoreId">
                 <default-field title="Referrer" validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="productStoreId">
-                    <drop-down>
+                    <drop-down required-manual-select="true">
                         <entity-options key="${productStoreId}" text="${productStoreId}: ${storeName}">
                             <entity-find entity-name="mantle.product.store.ProductStore">
                                 <econdition field-name="productStoreId" operator="in" from="productStoreIdSet"/>
@@ -267,7 +267,7 @@
             </field>
             <field name="salesRepresentativeId">
                 <default-field title="Sales Representative" validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="salesRepresentativeId">
-                    <drop-down>
+                    <drop-down required-manual-select="true">
                         <dynamic-options transition="getStoreSalesReps">
                             <depends-on field="productStoreId"/>
                         </dynamic-options>
@@ -284,7 +284,7 @@
             </field>
             <field name="productCategoryId">
                 <default-field title="Merchandise" validate-service="mkdecision.dashboard.OrderServices.store#Order" validate-field="productCategoryId">
-                    <drop-down>
+                    <drop-down required-manual-select="true">
                         <dynamic-options transition="getStoreProductCategories">
                             <depends-on field="productStoreId"/>
                         </dynamic-options>
@@ -293,7 +293,7 @@
             </field>
             <field name="productId">
                 <default-field title="Product" validate-service="mkdecision.dashboard.OrderServices.store#Order">
-                    <drop-down>
+                    <drop-down required-manual-select="true">
                         <dynamic-options transition="getStoreProducts">
                             <depends-on field="productStoreId"/>
                             <depends-on field="productCategoryId"/>
@@ -338,7 +338,7 @@
             </field>
             <field name="estimatedPayment">
                 <default-field>
-                    <display dynamic-transition="calculateEstimatedPayment" depends-optional="true" style="bg-grey-1">
+                    <display dynamic-transition="calculateEstimatedPayment" depends-optional="true" style="bg-grey-1" format="">
                         <depends-on field="productId"/>
                         <depends-on field="totalPurchaseAmount"/>
                         <depends-on field="downPayment"/>

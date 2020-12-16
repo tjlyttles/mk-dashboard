@@ -106,7 +106,7 @@
             </field>
             <field name="roleTypeId">
                 <default-field title="Role">
-                    <drop-down>
+                    <drop-down required-manual-select="true">
                         <entity-options text="${description}" key="${roleTypeId}">
                             <entity-find entity-name="mantle.party.RoleType">
                                 <econdition field-name="roleTypeId" operator="in" from="productRoleTypes"/>
@@ -159,7 +159,7 @@
             </field>
             <field name="maritalStatusEnumId">
                 <default-field title="Marital Status">
-                    <drop-down>
+                    <drop-down required-manual-select="true">
                         <entity-options text="${description}" key="${enumId}">
                             <entity-find entity-name="moqui.basic.Enumeration">
                                 <econdition field-name="enumTypeId" value="MaritalStatus"/>
@@ -171,7 +171,7 @@
             </field>
             <field name="employmentStatusEnumId">
                 <default-field title="Employment Status">
-                    <drop-down>
+                    <drop-down required-manual-select="true">
                         <entity-options text="${description}" key="${enumId}">
                             <entity-find entity-name="moqui.basic.Enumeration">
                                 <econdition field-name="enumTypeId" value="EmploymentStatus"/>
@@ -210,7 +210,7 @@
             </field>
             <field name="stateProvinceGeoId">
                 <default-field title="State">
-                    <drop-down>
+                    <drop-down required-manual-select="true">
                         <entity-options text="${geoName}" key="${toGeoId}">
                             <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
                                 <econdition field-name="geoId" value="USA"/>
@@ -235,7 +235,7 @@
             </field>
             <field name="contactMechPurposeId">
                 <default-field title="Type">
-                    <drop-down>
+                    <drop-down required-manual-select="true">
                         <entity-options text="${description}" key="${contactMechPurposeId}">
                             <entity-find entity-name="mantle.party.contact.ContactMechPurpose">
                                 <econdition field-name="contactMechTypeEnumId" value="CmtTelecomNumber"/>
