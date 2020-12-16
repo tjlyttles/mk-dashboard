@@ -25,6 +25,15 @@
         </default-response>
     </transition>
     <transition name="viewPartyEmployment">
+        <actions>
+            <entity-find-count entity-name="mantle.party.PartyIdentification" count-field="idCount">
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="partyIdTypeEnumId" operator="not-equals" value="PtidSsn"/>
+            </entity-find-count>
+            <if condition="idCount == 0">
+                <return message="${ec.l10n.localize('DASHBOARD_INVALID_ID_COUNT')}" error="true"/>
+            </if>
+        </actions>
         <default-response url="../PartyEmployment">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
@@ -65,12 +74,12 @@
                                             <label text="${id.idValue}" style="text-weight-light"/>
                                         </container>
                                         <container style="margin-b-1">
-                                            <label text="${idType.enumId == 'PtidPassport' ? 'Country Issued' : 'State Issued'}" style="text-weight-medium block"/>
+                                            <label text="${idType.enumId == 'PtidPassport' || idType.enumId == 'PtidArn' || idType.enumId == 'PtidMilitaryId' ? 'Country Issued' : 'State Issued'}" style="text-weight-medium block"/>
                                             <label text="${id.issuedBy}" style="text-weight-light"/>
                                         </container>
                                         <container style="margin-b-1">
-                                            <label text="Issue Date" style="text-weight-medium block"/>
-                                            <label text="${id.issueDate}" style="text-weight-light"/>
+                                            <label text="${idType.enumId == 'PtidArn' ? '' : 'Issue Date'}" style="text-weight-medium block"/>
+                                            <label text="${idType.enumId == 'PtidArn' ? '' : id.issueDate}" style="text-weight-light"/>
                                         </container>
                                         <container>
                                             <label text="Expiration Date" style="text-weight-medium block"/>
@@ -101,7 +110,7 @@
                                         </field>
                                         <field name="idIssuedBy">
                                             <default-field title="State Issued">
-                                                <drop-down allow-empty="true">
+                                                <drop-down required-manual-select="true">
                                                     <entity-options text="${geoName}" key="${geoName}">
                                                         <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
                                                             <econdition field-name="geoId" value="USA"/>
@@ -114,12 +123,12 @@
                                         </field>
                                         <field name="idIssueDate">
                                             <default-field title="Issue Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &lt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
                                         <field name="idExpiryDate">
                                             <default-field title="Expiration Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
 
@@ -133,26 +142,27 @@
                             </widgets>
                         </section>
 
-                        <section name="AddPassport">
+                        <section name="AddStateIssued">
                             <widgets>
-                                <container-dialog id="AddPassportDialog" button-text="Add Passport" width="960" button-style="block margin-tb-1">
-                                    <form-single name="AddPassportForm" transition="addIdentity">
+                                <container-dialog id="AddStateIssuedDialog" button-text="Add State Issued ID" width="960" button-style="block margin-tb-1">
+                                    <form-single name="AddStateIssuedForm" transition="addIdentity">
                                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
                                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
-                                        <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidPassport"/></default-field></field>
+                                        <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidStateId"/></default-field></field>
 
                                         <field name="idValue">
-                                            <default-field title="Passport Number">
+                                            <default-field title="ID Number">
                                                 <text-line/>
                                             </default-field>
                                         </field>
                                         <field name="idIssuedBy">
-                                            <default-field title="Country Issued">
+                                            <default-field title="State Issued">
                                                 <drop-down required-manual-select="true">
                                                     <entity-options text="${geoName}" key="${geoName}">
-                                                        <entity-find entity-name="moqui.basic.Geo">
-                                                            <econdition field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
+                                                        <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                                            <econdition field-name="geoId" value="USA"/>
+                                                            <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
                                                             <order-by field-name="geoName"/>
                                                         </entity-find>
                                                     </entity-options>
@@ -161,12 +171,12 @@
                                         </field>
                                         <field name="idIssueDate">
                                             <default-field title="Issue Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &lt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
                                         <field name="idExpiryDate">
                                             <default-field title="Expiration Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
 
@@ -195,12 +205,11 @@
                                             </default-field>
                                         </field>
                                         <field name="idIssuedBy">
-                                            <default-field title="State Issued">
+                                            <default-field title="Country Issued">
                                                 <drop-down required-manual-select="true">
                                                     <entity-options text="${geoName}" key="${geoName}">
-                                                        <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
-                                                            <econdition field-name="geoId" value="USA"/>
-                                                            <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                                        <entity-find entity-name="moqui.basic.Geo">
+                                                            <econdition field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
                                                             <order-by field-name="geoName"/>
                                                         </entity-find>
                                                     </entity-options>
@@ -209,12 +218,100 @@
                                         </field>
                                         <field name="idIssueDate">
                                             <default-field title="Issue Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &lt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
                                         <field name="idExpiryDate">
                                             <default-field title="Expiration Date">
-                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
+                                            </default-field>
+                                        </field>
+
+                                        <field name="submit">
+                                            <default-field>
+                                                <submit text="Save"/>
+                                            </default-field>
+                                        </field>
+                                    </form-single>
+                                </container-dialog>
+                            </widgets>
+                        </section>
+                        <section name="AddPassport">
+                            <widgets>
+                                <container-dialog id="AddPassportDialog" button-text="Add Passport" width="960" button-style="block margin-tb-1">
+                                    <form-single name="AddPassportForm" transition="addIdentity">
+                                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                        <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidPassport"/></default-field></field>
+
+                                        <field name="idValue">
+                                            <default-field title="Passport Number">
+                                                <text-line/>
+                                            </default-field>
+                                        </field>
+                                        <field name="idIssuedBy">
+                                            <default-field title="Country Issued">
+                                                <drop-down required-manual-select="true">
+                                                    <entity-options text="${geoName}" key="${geoName}">
+                                                        <entity-find entity-name="moqui.basic.Geo">
+                                                            <econdition field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
+                                                            <order-by field-name="geoName"/>
+                                                        </entity-find>
+                                                    </entity-options>
+                                                </drop-down>
+                                            </default-field>
+                                        </field>
+                                        <field name="idIssueDate">
+                                            <default-field title="Issue Date">
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &lt; Date.now() || 'Please enter a valid date.'"/>
+                                            </default-field>
+                                        </field>
+                                        <field name="idExpiryDate">
+                                            <default-field title="Expiration Date">
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
+                                            </default-field>
+                                        </field>
+
+                                        <field name="submit">
+                                            <default-field>
+                                                <submit text="Save"/>
+                                            </default-field>
+                                        </field>
+                                    </form-single>
+                                </container-dialog>
+                            </widgets>
+                        </section>
+
+                        <section name="AddPermRegId">
+                            <widgets>
+                                <container-dialog id="AddPermRegIdDialog" button-text="Add Permanent Resident Card" width="960" button-style="block margin-tb-1">
+                                    <form-single name="AddPermRegIdForm" transition="addIdentity">
+                                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                        <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidArn"/></default-field></field>
+
+                                        <field name="idValue">
+                                            <default-field title="ID Number">
+                                                <text-line/>
+                                            </default-field>
+                                        </field>
+                                         <field name="idIssuedBy">
+                                            <default-field title="Country Issued">
+                                                <drop-down required-manual-select="true">
+                                                    <entity-options text="${geoName}" key="${geoName}">
+                                                        <entity-find entity-name="moqui.basic.Geo">
+                                                            <econdition field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
+                                                            <order-by field-name="geoName"/>
+                                                        </entity-find>
+                                                    </entity-options>
+                                                </drop-down>
+                                            </default-field>
+                                        </field>
+                                        <field name="idExpiryDate">
+                                            <default-field title="Expiration Date">
+                                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
                                             </default-field>
                                         </field>
 
@@ -237,7 +334,7 @@
                         <link url="viewParty" text="Back" style="text-black"/>
                     </row-col>
                     <row-col xs="6" sm="6" md="6" lg="6" style="padding-all-0 text-right">
-                        <link url="viewPartyEmployment" text="Continue" btn-type="default"/>
+                        <link url="viewPartyEmployment" text="Continue" btn-type="default" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId]"/>
                     </row-col>
                 </container-row>
             </row-col>
