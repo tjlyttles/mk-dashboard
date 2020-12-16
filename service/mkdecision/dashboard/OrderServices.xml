@@ -201,12 +201,12 @@
             <parameter name="orderPartSeqId"/>
             <parameter name="partyId"/>
             <parameter name="partyIdTypeEnumId"/>
-            <parameter name="idIssuedBy"/>
-            <parameter name="idValue">
+            <parameter name="idIssuedBy" required="true"/>
+            <parameter name="idValue" required="true">
                 <matches regexp="^(?=.*\d)[A-Za-z0-9]+$" message="Please enter a valid ID number using only letters and numbers (at least one number is required)"/>
             </parameter>
             <parameter name="idIssueDate" type="Date" format="MM-dd-yyyy"/>
-            <parameter name="idExpiryDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="idExpiryDate" type="Date" format="MM-dd-yyyy" required="true"/>
         </in-parameters>
         <out-parameters>
             <parameter name="partyId"/>
