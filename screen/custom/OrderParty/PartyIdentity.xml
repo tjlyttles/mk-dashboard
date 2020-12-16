@@ -77,13 +77,17 @@
                                             <label text="${idType.enumId == 'PtidPassport' || idType.enumId == 'PtidArn' || idType.enumId == 'PtidMilitaryId' ? 'Country Issued' : 'State Issued'}" style="text-weight-medium block"/>
                                             <label text="${id.issuedBy}" style="text-weight-light"/>
                                         </container>
-                                        <container style="margin-b-1">
-                                            <label text="${idType.enumId == 'PtidArn' ? '' : 'Issue Date'}" style="text-weight-medium block"/>
-                                            <label text="${idType.enumId == 'PtidArn' ? '' : id.issueDate}" style="text-weight-light"/>
-                                        </container>
+                                        <section name="idIssueDate" condition="idType.enumId != 'PtidArn'">
+                                            <widgets>
+                                                <container style="margin-b-1">
+                                                    <label text="Issue Date" style="text-weight-medium block"/>
+                                                    <label text="${ec.l10n.format(id.issueDate, 'MM-dd-yyyy')}" style="text-weight-light"/>
+                                                </container>
+                                            </widgets>
+                                        </section>
                                         <container>
                                             <label text="Expiration Date" style="text-weight-medium block"/>
-                                            <label text="${id.expireDate}" style="text-weight-light"/>
+                                            <label text="${ec.l10n.format(id.expireDate, 'MM-dd-yyyy')}" style="text-weight-light"/>
                                         </container>
                                     </row-col>
                                     <row-col xs="6" sm="6" md="6" lg="6" style="text-right">
