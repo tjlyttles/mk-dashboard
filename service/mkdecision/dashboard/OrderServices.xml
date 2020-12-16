@@ -152,7 +152,7 @@
             </parameter>
             <parameter name="suffix"/>
             <parameter name="address1" required="true">
-                <matches regexp="^[- #a-zA-Z0-9.]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, and - or #."/>
+                <matches regexp="^[- #a-zA-Z0-9.',\/]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, commas, and -, /, ', or #."/>
             </parameter>
             <parameter name="unitNumber"/>
             <parameter name="postalCode" required="true">
@@ -261,7 +261,7 @@
             </parameter>
             <parameter name="employmentStatusEnumId"/>
             <parameter name="employerName" required="true">
-                <matches regexp="^[- #a-zA-Z0-9.]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, and - or #."/>
+                <matches regexp="^[- A-Za-z0-9']+$" message="Please enter a name using only letters, numbers, apostrophes or hyphens."/>
             </parameter>
             <parameter name="jobTitle" required="true"/>
             <parameter name="years" type="Integer" required="true">
@@ -274,7 +274,7 @@
                 <number-range min="0" min-include-equals="false" message="Please enter a valid income."/>
             </parameter>
             <parameter name="employerAddress1">
-                <matches regexp="^[- #a-zA-Z0-9.]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, and - or #."/>
+                <matches regexp="^[- #a-zA-Z0-9.',\/]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, commas, and -, /, ', or #."/>
             </parameter>
             <parameter name="employerUnitNumber"/>
             <parameter name="employerPostalCode">
