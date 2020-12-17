@@ -59,6 +59,27 @@
         <container-row>
             <row-col xs="0" sm="1" md="3" lg="3"/>
             <row-col xs="12" sm="10" md="6" lg="6">
+                <container style="stepper margin-b-1">
+                    <render-mode>
+                        <text type="qvt"><![CDATA[
+                            <q-stepper ref="stepper" value="s3" color="primary" :flat="true">
+                                <q-step name="s1" title="Order Items" icon="shopping_cart"/>
+                                <q-step name="s2" title="Eligibility" icon="policy"/>
+                                <q-step name="s3" title="Primary Applicant" icon="person"/>
+                                <q-step name="s4" title="Co-Applicant" icon="person_add"/>
+                                <q-step name="s5" title="Property" icon="home"/>
+                                <q-step name="s6" title="Agreements" icon="done"/>
+                            </q-stepper>
+                        ]]></text>
+                    </render-mode>
+                </container>
+            </row-col>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+        </container-row>
+
+        <container-row style="form-no-margin">
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+            <row-col xs="12" sm="10" md="6" lg="6">
                 <label text="New Application" type="h4" style="margin-b-1"/>
                 <label text="Previous Employment" type="h5" style="margin-b-1"/>
                 <label text="Add all previous employment sources for the past 2 years" style="margin-b-1"/>

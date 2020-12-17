@@ -32,7 +32,7 @@
             <parameter name="orderPartSeqId"/>
         </default-response>
     </transition>
-    <transition name="viewOrderHeader">
+    <transition name="orderHeader">
         <default-response url="../OrderHeader">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
@@ -81,110 +81,133 @@
     </actions>
 
     <widgets>
-        <section name="EligibilitySection">
-            <condition>
-                <expression>formId != null</expression>
-            </condition>
-            <widgets>
-                <form-single name="EligibilityForm" extends="DbForm#${formId}" dynamic="true" transition="storeOrder" map="responseMap">
-                    <field name="eligibilityHeader">
-                        <default-field>
-                            <label text="New Application" type="h4" style="margin-b-1"/>
-                            <label text="Eligibility" type="h5" style="margin-tb-1"/>
-                            <label text="Please verify the applicant's eligibility." style="margin-b-1"/>
-                            <container style="h-separator margin-tb-2"/>
-                        </default-field>
-                    </field>
+        <container-row>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+            <row-col xs="12" sm="10" md="6" lg="6">
+                <container style="stepper margin-b-1">
+                    <render-mode>
+                        <text type="qvt"><![CDATA[
+                            <q-stepper ref="stepper" value="s2" color="primary" :flat="true">
+                                <q-step name="s1" title="Order Items" icon="shopping_cart"/>
+                                <q-step name="s2" title="Eligibility" icon="policy"/>
+                                <q-step name="s3" title="Primary Applicant" icon="person"/>
+                                <q-step name="s4" title="Co-Applicant" icon="person_add"/>
+                                <q-step name="s5" title="Property" icon="home"/>
+                                <q-step name="s6" title="Agreements" icon="done"/>
+                            </q-stepper>
+                        ]]></text>
+                    </render-mode>
+                </container>
+            </row-col>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+        </container-row>
 
-                    <field name="orderId"><default-field><hidden/></default-field></field>
-                    <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
-                    <field name="formLocation"><default-field><hidden default-value="DbForm#${formId}"/></default-field></field>
-                    <field name="formId" from="formId"><default-field><hidden/></default-field></field>
-                    <field name="salesChannelEnumId"><default-field><hidden/></default-field></field>
-                    <field name="productStoreId"><default-field><hidden/></default-field></field>
-                    <field name="salesRepresentativeId"><default-field><hidden/></default-field></field>
-                    <field name="productCategoryId"><default-field><hidden/></default-field></field>
-                    <field name="productId"><default-field><hidden/></default-field></field>
-                    <field name="totalPurchaseAmount"><default-field><hidden/></default-field></field>
-                    <field name="downPayment"><default-field><hidden/></default-field></field>
-                    <field name="netPurchaseAmount"><default-field><hidden/></default-field></field>
-                    <field name="loanFee"><default-field><hidden/></default-field></field>
-                    <field name="financedAmount"><default-field><hidden/></default-field></field>
-                    <field name="estimatedPayment"><default-field><hidden/></default-field></field>
+        <container style="form-no-margin">
+            <section name="EligibilitySection">
+                <condition>
+                    <expression>formId != null</expression>
+                </condition>
+                <widgets>
+                    <form-single name="EligibilityForm" extends="DbForm#${formId}" dynamic="true" transition="storeOrder" map="responseMap">
+                        <field name="eligibilityHeader">
+                            <default-field>
+                                <label text="New Application" type="h4" style="margin-b-1"/>
+                                <label text="Eligibility" type="h5" style="margin-tb-1"/>
+                                <label text="Please verify the applicant's eligibility." style="margin-b-1"/>
+                                <container style="h-separator margin-tb-2"/>
+                            </default-field>
+                        </field>
 
-                    <field name="backButton">
-                        <default-field container-style="dark-link">
-                            <link url="viewOrderHeader" text="Back" btn-type="default"/>
-                        </default-field>
-                    </field>
-                    <field name="submitButton">
-                        <default-field container-style="text-primary">
-                            <submit text="Continue"/>
-                        </default-field>
-                    </field>
+                        <field name="orderId"><default-field><hidden/></default-field></field>
+                        <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
+                        <field name="formLocation"><default-field><hidden default-value="DbForm#${formId}"/></default-field></field>
+                        <field name="formId" from="formId"><default-field><hidden/></default-field></field>
+                        <field name="salesChannelEnumId"><default-field><hidden/></default-field></field>
+                        <field name="productStoreId"><default-field><hidden/></default-field></field>
+                        <field name="salesRepresentativeId"><default-field><hidden/></default-field></field>
+                        <field name="productCategoryId"><default-field><hidden/></default-field></field>
+                        <field name="productId"><default-field><hidden/></default-field></field>
+                        <field name="totalPurchaseAmount"><default-field><hidden/></default-field></field>
+                        <field name="downPayment"><default-field><hidden/></default-field></field>
+                        <field name="netPurchaseAmount"><default-field><hidden/></default-field></field>
+                        <field name="loanFee"><default-field><hidden/></default-field></field>
+                        <field name="financedAmount"><default-field><hidden/></default-field></field>
+                        <field name="estimatedPayment"><default-field><hidden/></default-field></field>
 
-                    <field-layout>
-                        <field-col-row>
-                            <field-col xs="0" sm="1" md="3" lg="3"/>
-                            <field-col xs="12" sm="10" md="6" lg="6">
-                                <field-ref name="eligibilityHeader"/>
-                                <fields-not-referenced/>
-                            </field-col>
-                            <field-col xs="0" sm="1" md="3" lg="3"/>
-                        </field-col-row>
+                        <field name="backButton">
+                            <default-field container-style="dark-link">
+                                <link url="orderHeader" text="Back" btn-type="default"/>
+                            </default-field>
+                        </field>
+                        <field name="submitButton">
+                            <default-field container-style="text-primary">
+                                <submit text="Continue"/>
+                            </default-field>
+                        </field>
 
-                        <field-col-row>
-                            <field-col xs="0" sm="1" md="3" lg="3"/>
-                            <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="backButton"/></field-col>
-                            <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="submitButton"/></field-col>
-                            <field-col xs="0" sm="1" md="3" lg="3"/>
-                        </field-col-row>
-                    </field-layout>
-                </form-single>
-            </widgets>
-            <fail-widgets>
-                <form-single name="NoEligibilityForm">
-                    <field name="eligibilityHeader">
-                        <default-field>
-                            <label text="New Application" type="h4" style="margin-b-1"/>
-                            <label text="Eligibility" type="h5" style="margin-tb-1"/>
-                            <label text="Please verify the applicant's eligibility." style="margin-b-1"/>
-                            <container style="h-separator margin-tb-2"/>
-                        </default-field>
-                    </field>
-                    <field name="errorField">
-                        <default-field>
-                            <label text="No eligibility form set for the select product." style="text-red margin-b-1"/>
-                        </default-field>
-                    </field>
+                        <field-layout>
+                            <field-col-row>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                                <field-col xs="12" sm="10" md="6" lg="6">
+                                    <field-ref name="eligibilityHeader"/>
+                                    <fields-not-referenced/>
+                                </field-col>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                            </field-col-row>
 
-                    <field name="backButton">
-                        <default-field container-style="dark-link">
-                            <link url="viewOrderHeader" text="Back" btn-type="default"/>
-                        </default-field>
-                    </field>
+                            <field-col-row>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                                <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="backButton"/></field-col>
+                                <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="submitButton"/></field-col>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                            </field-col-row>
+                        </field-layout>
+                    </form-single>
+                </widgets>
+                <fail-widgets>
+                    <form-single name="NoEligibilityForm">
+                        <field name="eligibilityHeader">
+                            <default-field>
+                                <label text="New Application" type="h4" style="margin-b-1"/>
+                                <label text="Eligibility" type="h5" style="margin-tb-1"/>
+                                <label text="Please verify the applicant's eligibility." style="margin-b-1"/>
+                                <container style="h-separator margin-tb-2"/>
+                            </default-field>
+                        </field>
+                        <field name="errorField">
+                            <default-field>
+                                <label text="No eligibility form set for the select product." style="text-red margin-b-1"/>
+                            </default-field>
+                        </field>
 
-                    <field-layout>
-                        <field-col-row>
-                            <field-col xs="0" sm="1" md="3" lg="3"/>
-                            <field-col xs="12" sm="10" md="6" lg="6">
-                                <field-ref name="eligibilityHeader"/>
-                                <fields-not-referenced/>
-                            </field-col>
-                            <field-col xs="0" sm="1" md="3" lg="3"/>
-                        </field-col-row>
+                        <field name="backButton">
+                            <default-field container-style="dark-link">
+                                <link url="orderHeader" text="Back" btn-type="default"/>
+                            </default-field>
+                        </field>
 
-                        <fields-not-referenced/>
+                        <field-layout>
+                            <field-col-row>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                                <field-col xs="12" sm="10" md="6" lg="6">
+                                    <field-ref name="eligibilityHeader"/>
+                                    <fields-not-referenced/>
+                                </field-col>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                            </field-col-row>
 
-                        <field-col-row>
-                            <field-col xs="0" sm="1" md="3" lg="3"/>
-                            <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="backButton"/></field-col>
-                            <field-col xs="0" sm="1" md="3" lg="3"/>
-                        </field-col-row>
-                    </field-layout>
-                </form-single>
-            </fail-widgets>
-        </section>
+                            <fields-not-referenced/>
+
+                            <field-col-row>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                                <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="backButton"/></field-col>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                            </field-col-row>
+                        </field-layout>
+                    </form-single>
+                </fail-widgets>
+            </section>
+        </container>
     </widgets>
 
 </screen>

@@ -8,82 +8,70 @@
     <parameter name="orderId" required="true"/>
     <parameter name="orderPartSeqId" required="true"/>
 
-    <transition name="viewCoApplicant">
+    <transition name="coApplicant">
         <default-response url="../CoApplicant">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
         </default-response>
     </transition>
-    <transition name="viewProperty">
-        <default-response url="../Property">
+    <transition name="primaryApplicantEmployment">
+        <default-response url="../PrimaryApplicantEmployment">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
         </default-response>
     </transition>
-    <transition name="viewPrimaryApplicantEmployment">
-        <default-response url="../PrimaryApplicantEmployment">
+    <transition name="property">
+        <default-response url="../Property">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
         </default-response>
     </transition>
 
     <widgets>
-        <form-single name="ApplicantForm">
-            <field name="orderId"><default-field><hidden/></default-field></field>
-            <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
-            <field name="partyId"><default-field><hidden/></default-field></field>
+        <container-row>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+            <row-col xs="12" sm="10" md="6" lg="6">
+                <container style="stepper margin-b-1">
+                    <render-mode>
+                        <text type="qvt"><![CDATA[
+                            <q-stepper ref="stepper" value="s4" color="primary" :flat="true">
+                                <q-step name="s1" title="Order Items" icon="shopping_cart"/>
+                                <q-step name="s2" title="Eligibility" icon="policy"/>
+                                <q-step name="s3" title="Primary Applicant" icon="person"/>
+                                <q-step name="s4" title="Co-Applicant" icon="person_add"/>
+                                <q-step name="s5" title="Property" icon="home"/>
+                                <q-step name="s6" title="Agreements" icon="done"/>
+                            </q-stepper>
+                        ]]></text>
+                    </render-mode>
+                </container>
+            </row-col>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+        </container-row>
 
-            <field name="applicantHeader">
-                <default-field>
-                    <label text="New Application" type="h4" style="margin-b-1"/>
-                    <label text="Add Co-Applicant (Optional)" type="h5" style="margin-b-1"/>
-                    <label text="Co-applicant must reside in the property and be a spouse or be a co-owner of the property." style="margin-b-1"/>
-                    <container style="h-separator margin-tb-2"/>
-                </default-field>
-            </field>
+        <container-row style="form-no-margin">
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+            <row-col xs="12" sm="10" md="6" lg="6">
+                <label text="New Application" type="h4" style="margin-b-1"/>
+                <label text="Add Co-Applicant (Optional)" type="h5" style="margin-b-1"/>
+                <label text="Co-applicant must reside in the property and be a spouse or be a co-owner of the property." style="margin-b-1"/>
+                <container style="h-separator margin-tb-2"/>
 
-            <field name="addButton">
-                <default-field container-style="text-primary">
-                    <link url="viewCoApplicant" text="Add Co-Applicant" btn-type="default" icon="fa fa-plus"/>
-                </default-field>
-            </field>
-            <field name="continueButton">
-                <default-field container-style="text-primary">
-                    <link url="viewProperty" text="Continue" btn-type="default"/>
-                </default-field>
-            </field>
-            <field name="backButton">
-                <default-field container-style="dark-link">
-                    <link url="viewPrimaryApplicantEmployment" text="Back" btn-type="default"/>
-                </default-field>
-            </field>
+                <container style="margin-b-2">
+                    <link url="coApplicant" text="Add Co-Applicant" btn-type="default" icon="fa fa-plus"/>
+                </container>
 
-            <field-layout>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6">
-                        <field-ref name="applicantHeader"/>
-                    </field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-                <field-col-row style="margin-b-1">
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6">
-                        <field-ref name="addButton"/>
-                    </field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-
-                <fields-not-referenced/>
-
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="backButton"/></field-col>
-                    <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="continueButton"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-            </field-layout>
-        </form-single>
+                <container-row>
+                    <row-col xs="6" sm="6" md="6" lg="6" style="padding-all-0">
+                        <link url="primaryApplicantEmployment" text="Back" style="text-black"/>
+                    </row-col>
+                    <row-col xs="6" sm="6" md="6" lg="6" style="padding-all-0 text-right">
+                        <link url="property" text="Continue" btn-type="default" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId]"/>
+                    </row-col>
+                </container-row>
+            </row-col>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+        </container-row>
     </widgets>
 
 </screen>
