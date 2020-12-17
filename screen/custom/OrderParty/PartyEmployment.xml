@@ -65,7 +65,24 @@
         <container-row>
             <row-col xs="0" sm="1" md="3" lg="3"/>
             <row-col xs="12" sm="10" md="6" lg="6">
-                <label text="New Application" type="h4" style="margin-b-1"/>
+                <container style="stepper margin-b-1">
+                    <render-mode>
+                        <text type="qvt"><![CDATA[
+                            <q-stepper ref="stepper" value="s3" color="primary" :flat="true">
+                                <q-step name="s1" title="Party" icon="person"/>
+                                <q-step name="s2" title="Identity" icon="fingerprint"/>
+                                <q-step name="s3" title="Employment" icon="work"/>
+                            </q-stepper>
+                        ]]></text>
+                    </render-mode>
+                </container>
+            </row-col>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+        </container-row>
+
+        <container-row style="form-no-margin">
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+            <row-col xs="12" sm="10" md="6" lg="6">
                 <label text="Current Employment" type="h5" style="margin-b-1"/>
                 <label text="Add all current employment sources" style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>

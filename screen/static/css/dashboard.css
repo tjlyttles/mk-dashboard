@@ -40,6 +40,9 @@
 /* Quasar hacks */
 .nested-form-field .q-ma-sm { margin: 8px 0px !important; }
 .dark-link .q-link { color:black; }
+.stepper .q-stepper__step-inner { padding: 0px !important; }
+.form-no-margin > .q-my-md { margin: 0px !important; }
+.form-no-margin .q-btn { margin-left: 0px !important; margin-right: 0px !important; }
 
 /* Quasar overrides */
 .q-field--auto-height.q-field--dense .q-field__control, .q-field--auto-height.q-field--dense .q-field__native {
@@ -50,7 +53,4 @@
 }
 .q-field--focused .q-field__input {
     border-bottom: none !important;
-}
-.stepper .q-stepper__step-inner {
-    padding: 0px !important;
 }
