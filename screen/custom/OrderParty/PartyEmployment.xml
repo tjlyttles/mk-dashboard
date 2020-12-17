@@ -195,6 +195,11 @@
                                                                 <text-line/>
                                                             </default-field>
                                                         </field>
+                                                        <field name="employerContactNumber">
+                                                            <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
+                                                                <text-line  mask="###-###-####" input-type="tel"/>
+                                                            </default-field>
+                                                        </field>
                                                         <field name="employerAddress1">
                                                             <default-field title="Employer Address (Optional)">
                                                                 <text-line/>
@@ -228,11 +233,6 @@
                                                                 </drop-down>
                                                             </default-field>
                                                         </field>
-                                                        <field name="employerContactNumber">
-                                                            <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
-                                                                <text-line  mask="###-###-####" input-type="tel"/>
-                                                            </default-field>
-                                                        </field>
 
                                                         <field name="submit">
                                                             <default-field>
@@ -261,6 +261,9 @@
                                                             </field-col-row>
 
                                                             <field-col-row>
+                                                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                                                            </field-col-row>
+                                                            <field-col-row>
                                                                 <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
                                                             </field-col-row>
                                                             <field-col-row>
@@ -270,9 +273,6 @@
                                                             <field-col-row>
                                                                 <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
                                                                 <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
-                                                            </field-col-row>
-                                                            <field-col-row>
-                                                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
                                                             </field-col-row>
 
                                                             <fields-not-referenced/>
@@ -345,6 +345,12 @@
                                                                 <text-line input-type="number"/>
                                                             </default-field>
                                                         </field>
+
+                                                        <field name="employerContactNumber">
+                                                            <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
+                                                                <text-line  mask="###-###-####" input-type="tel"/>
+                                                            </default-field>
+                                                        </field>
                                                         <field name="employerAddress1">
                                                             <default-field title="Employer Address (Optional)">
                                                                 <text-line/>
@@ -378,11 +384,6 @@
                                                                 </drop-down>
                                                             </default-field>
                                                         </field>
-                                                        <field name="employerContactNumber">
-                                                            <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
-                                                                <text-line  mask="###-###-####" input-type="tel"/>
-                                                            </default-field>
-                                                        </field>
 
                                                         <field name="submit">
                                                             <default-field>
@@ -409,6 +410,9 @@
                                                             </field-col-row>
 
                                                             <field-col-row>
+                                                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                                                            </field-col-row>
+                                                            <field-col-row>
                                                                 <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
                                                             </field-col-row>
                                                             <field-col-row>
@@ -418,9 +422,6 @@
                                                             <field-col-row>
                                                                 <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
                                                                 <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
-                                                            </field-col-row>
-                                                            <field-col-row>
-                                                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
                                                             </field-col-row>
 
                                                             <fields-not-referenced/>
@@ -561,6 +562,9 @@
                                     </field-col-row>
 
                                     <field-col-row>
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row>
                                         <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
                                     </field-col-row>
                                     <field-col-row>
@@ -570,9 +574,6 @@
                                     <field-col-row>
                                         <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
                                         <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
-                                    </field-col-row>
-                                    <field-col-row>
-                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
                                     </field-col-row>
 
                                     <fields-not-referenced/>
@@ -645,6 +646,12 @@
                                         <text-line input-type="number"/>
                                     </default-field>
                                 </field>
+
+                                <field name="employerContactNumber">
+                                    <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
+                                        <text-line  mask="###-###-####" input-type="tel"/>
+                                    </default-field>
+                                </field>
                                 <field name="employerAddress1">
                                     <default-field title="Employer Address (Optional)">
                                         <text-line/>
@@ -678,11 +685,6 @@
                                         </drop-down>
                                     </default-field>
                                 </field>
-                                <field name="employerContactNumber">
-                                    <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
-                                        <text-line  mask="###-###-####" input-type="tel"/>
-                                    </default-field>
-                                </field>
 
                                 <field name="submit">
                                     <default-field>
@@ -709,6 +711,9 @@
                                     </field-col-row>
 
                                     <field-col-row>
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row>
                                         <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
                                     </field-col-row>
                                     <field-col-row>
@@ -718,9 +723,6 @@
                                     <field-col-row>
                                         <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
                                         <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
-                                    </field-col-row>
-                                    <field-col-row>
-                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
                                     </field-col-row>
 
                                     <fields-not-referenced/>
