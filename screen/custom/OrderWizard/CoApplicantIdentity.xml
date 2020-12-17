@@ -81,7 +81,7 @@
             <row-col xs="12" sm="10" md="6" lg="6">
                 <label text="New Application" type="h4" style="margin-b-1"/>
                 <label text="Co-Applicant Identity" type="h5" style="margin-b-1"/>
-                <label text="Please add all parties associated with the new application." style="margin-b-1"/>
+                <label text="Add a United States of America Government or State issued identification." style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>
 
                 <section-include name="idSection" location="component://mk-dashboard/screen/custom/OrderParty/PartyIdentity.xml"/>

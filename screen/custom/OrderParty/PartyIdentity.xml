@@ -65,7 +65,7 @@
             <row-col xs="0" sm="1" md="3" lg="3"/>
             <row-col xs="12" sm="10" md="6" lg="6">
                 <label text="Identity" type="h5" style="margin-b-1"/>
-                <label text="Add a Driver's license or any other identification" style="margin-b-1"/>
+                <label text="Add a United States of America Government or State issued identification." style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>
 
                 <section name="idSection" condition="idList.size() > 0">
@@ -221,7 +221,7 @@
                                                 <drop-down required-manual-select="true">
                                                     <entity-options text="${geoName}" key="${geoName}">
                                                         <entity-find entity-name="moqui.basic.Geo">
-                                                            <econdition field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
+                                                            <econdition field-name="geoId" value="USA"/>
                                                             <order-by field-name="geoName"/>
                                                         </entity-find>
                                                     </entity-options>
@@ -267,7 +267,7 @@
                                                 <drop-down required-manual-select="true">
                                                     <entity-options text="${geoName}" key="${geoName}">
                                                         <entity-find entity-name="moqui.basic.Geo">
-                                                            <econdition field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
+                                                            <econdition field-name="geoId" value="USA"/>
                                                             <order-by field-name="geoName"/>
                                                         </entity-find>
                                                     </entity-options>
@@ -314,7 +314,7 @@
                                                 <drop-down required-manual-select="true">
                                                     <entity-options text="${geoName}" key="${geoName}">
                                                         <entity-find entity-name="moqui.basic.Geo">
-                                                            <econdition field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
+                                                            <econdition field-name="geoId" value="USA"/>
                                                             <order-by field-name="geoName"/>
                                                         </entity-find>
                                                     </entity-options>
