@@ -107,6 +107,13 @@
             <parameter name="orderItemSeqId" required="true"/>
         </in-parameters>
     </service>
+    <service verb="archive" noun="OrderParty" type="java" location="com.mkdecision.dashboard.OrderServices" method="archiveOrderParty">
+        <in-parameters>
+            <parameter name="orderId" required="true"/>
+            <parameter name="orderPartSeqId" required="true"/>
+            <parameter name="partyId" required="true"/>
+        </in-parameters>
+    </service>
 
     <!-- Applicants -->
     <service verb="validate" noun="ApplicantFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateApplicantFields">
@@ -183,6 +190,8 @@
             <parameter name="partyId"/>
         </out-parameters>
     </service>
+
+    <!-- Identity -->
     <service verb="validate" noun="IdentityFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateIdentityFields">
         <in-parameters>
             <parameter name="orderId"/>
@@ -221,16 +230,22 @@
             <parameter name="partyIdTypeEnumId" required="true"/>
         </in-parameters>
     </service>
+
+    <!-- Employment -->
     <service verb="validate" noun="EmploymentFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateEmploymentFields">
         <in-parameters>
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
             <parameter name="partyId"/>
-            <parameter name="occupation"/>
+            <parameter name="relationshipTypeEnumId"/>
             <parameter name="employerName"/>
+            <parameter name="employmentStatusEnumId"/>
+            <parameter name="employerClassificationId"/>
             <parameter name="jobTitle"/>
             <parameter name="years" type="Integer"/>
             <parameter name="months" type="Integer"/>
+            <parameter name="fromDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="toDate" type="Date" format="MM-dd-yyyy"/>
             <parameter name="monthlyIncome" type="BigDecimal"/>
             <parameter name="employerAddress1"/>
             <parameter name="employerUnitNumber"/>
@@ -238,17 +253,6 @@
             <parameter name="employerCity"/>
             <parameter name="employerStateProvinceGeoId"/>
             <parameter name="employerContactNumber"/>
-            <parameter name="rentIncome" type="BigDecimal"/>
-            <parameter name="retirementIncome" type="BigDecimal"/>
-            <parameter name="investmentIncome" type="BigDecimal"/>
-            <parameter name="bonusIncome" type="BigDecimal"/>
-            <parameter name="socialSecurityIncome" type="BigDecimal"/>
-            <parameter name="disabilityIncome" type="BigDecimal"/>
-            <parameter name="studentIncome" type="BigDecimal"/>
-            <parameter name="unemploymentIncome" type="BigDecimal"/>
-            <parameter name="alimonyIncome" type="BigDecimal"/>
-            <parameter name="childSupportIncome" type="BigDecimal"/>
-            <parameter name="otherIncome" type="BigDecimal"/>
         </in-parameters>
     </service>
     <service verb="add" noun="Employment" type="java" location="com.mkdecision.dashboard.OrderServices" method="addEmployment">
@@ -256,20 +260,21 @@
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
             <parameter name="partyId"/>
-            <parameter name="occupation" required="true">
-                <matches regexp="^[- A-Za-z']+$" message="Please enter an occupation using only letters, apostrophes or hyphens."/>
-            </parameter>
-            <parameter name="employmentStatusEnumId"/>
+            <parameter name="relationshipTypeEnumId"/>
             <parameter name="employerName" required="true">
                 <matches regexp="^[- A-Za-z0-9']+$" message="Please enter a name using only letters, numbers, apostrophes or hyphens."/>
             </parameter>
-            <parameter name="jobTitle" required="true"/>
-            <parameter name="years" type="Integer" required="true">
+            <parameter name="employmentStatusEnumId" required="true"/>
+            <parameter name="employerClassificationId"/>
+            <parameter name="jobTitle"/>
+            <parameter name="years" type="Integer">
                 <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
             </parameter>
-            <parameter name="months" type="Integer" required="true">
+            <parameter name="months" type="Integer">
                 <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
             </parameter>
+            <parameter name="fromDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="toDate" type="Date" format="MM-dd-yyyy"/>
             <parameter name="monthlyIncome" type="BigDecimal" required="true">
                 <number-range min="0" min-include-equals="false" message="Please enter a valid income."/>
             </parameter>
@@ -287,42 +292,54 @@
             <parameter name="employerContactNumber">
                 <matches regexp="^([0,2-9]{1}\d{2}([-])\d{3}([-])\d{4})|(___\-___\-____)" message="Please enter a valid phone number"/>
             </parameter>
-            <parameter name="rentIncome" type="BigDecimal">
-                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyRelationshipId"/>
+        </out-parameters>
+    </service>
+    <service verb="update" noun="Employment" type="java" location="com.mkdecision.dashboard.OrderServices" method="updateEmployment">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="partyRelationshipId"/>
+            <parameter name="relationshipTypeEnumId"/>
+            <parameter name="employerName" required="true">
+                <matches regexp="^[- A-Za-z0-9']+$" message="Please enter a name using only letters, numbers, apostrophes or hyphens."/>
             </parameter>
-            <parameter name="retirementIncome" type="BigDecimal">
-                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            <parameter name="employmentStatusEnumId" required="true"/>
+            <parameter name="employerClassificationId"/>
+            <parameter name="jobTitle"/>
+            <parameter name="years" type="Integer">
+                <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
             </parameter>
-            <parameter name="investmentIncome" type="BigDecimal">
-                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            <parameter name="months" type="Integer">
+                <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
             </parameter>
-            <parameter name="bonusIncome" type="BigDecimal">
-                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            <parameter name="fromDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="toDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="monthlyIncome" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter a valid income."/>
             </parameter>
-            <parameter name="socialSecurityIncome" type="BigDecimal">
-                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            <parameter name="employerAddress1">
+                <matches regexp="^[- #a-zA-Z0-9.',\/]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, commas, and -, /, ', or #."/>
             </parameter>
-            <parameter name="disabilityIncome" type="BigDecimal">
-                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            <parameter name="employerUnitNumber"/>
+            <parameter name="employerPostalCode">
+                <matches regexp="^\d{5}$" message="Please enter a valid ZIP code."/>
             </parameter>
-            <parameter name="studentIncome" type="BigDecimal">
-                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            <parameter name="employerCity">
+                <matches regexp="^[- A-Za-z'.]+$" message="Please enter a city using only letters, spaces, periods, apostrophes or hyphens."/>
             </parameter>
-            <parameter name="unemploymentIncome" type="BigDecimal">
-                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
-            </parameter>
-            <parameter name="alimonyIncome" type="BigDecimal">
-                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
-            </parameter>
-            <parameter name="childSupportIncome" type="BigDecimal">
-                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
-            </parameter>
-            <parameter name="otherIncome" type="BigDecimal">
-                <number-range min="0" min-include-equals="true" message="Please enter a valid income."/>
+            <parameter name="employerStateProvinceGeoId"/>
+            <parameter name="employerContactNumber">
+                <matches regexp="^([0,2-9]{1}\d{2}([-])\d{3}([-])\d{4})|(___\-___\-____)" message="Please enter a valid phone number"/>
             </parameter>
         </in-parameters>
         <out-parameters>
             <parameter name="partyId"/>
+            <parameter name="partyRelationshipId"/>
         </out-parameters>
     </service>
     <service verb="delete" noun="Employment" type="java" location="com.mkdecision.dashboard.OrderServices" method="deleteEmployment">
@@ -333,11 +350,68 @@
             <parameter name="partyRelationshipId" required="true"/>
         </in-parameters>
     </service>
-    <service verb="archive" noun="OrderParty" type="java" location="com.mkdecision.dashboard.OrderServices" method="archiveOrderParty">
+
+    <!-- Income source -->
+    <service verb="validate" noun="IncomeSourceFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateIncomeSourceFields">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="financialFlowTypeEnumId"/>
+            <parameter name="amount" type="BigDecimal"/>
+            <parameter name="years" type="Integer"/>
+            <parameter name="months" type="Integer"/>
+        </in-parameters>
+    </service>
+    <service verb="add" noun="IncomeSource" type="java" location="com.mkdecision.dashboard.OrderServices" method="addIncomeSource">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="financialFlowTypeEnumId"/>
+            <parameter name="amount" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter a valid amount."/>
+            </parameter>
+            <parameter name="years" type="Integer" required="true">
+                <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
+            </parameter>
+            <parameter name="months" type="Integer" required="true">
+                <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="financialFlowId"/>
+        </out-parameters>
+    </service>
+    <service verb="update" noun="IncomeSource" type="java" location="com.mkdecision.dashboard.OrderServices" method="updateIncomeSource">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="financialFlowId"/>
+            <parameter name="financialFlowTypeEnumId"/>
+            <parameter name="amount" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter a valid amount."/>
+            </parameter>
+            <parameter name="years" type="Integer" required="true">
+                <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
+            </parameter>
+            <parameter name="months" type="Integer" required="true">
+                <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="financialFlowId"/>
+        </out-parameters>
+    </service>
+    <service verb="delete" noun="IncomeSource" type="java" location="com.mkdecision.dashboard.OrderServices" method="deleteIncomeSource">
         <in-parameters>
             <parameter name="orderId" required="true"/>
             <parameter name="orderPartSeqId" required="true"/>
             <parameter name="partyId" required="true"/>
+            <parameter name="financialFlowId" required="true"/>
         </in-parameters>
     </service>
 

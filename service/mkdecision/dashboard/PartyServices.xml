@@ -34,7 +34,7 @@
         </in-parameters>
         <out-parameters>
             <parameter name="partyId"/>
-            <parameter name="postalAddress"/>
+            <parameter name="postalAddress" type="Map"/>
         </out-parameters>
     </service>
     <service verb="get" noun="PartyProductStoreRoles" type="java" location="com.mkdecision.dashboard.PartyServices" method="getPartyProductStoreRoles">

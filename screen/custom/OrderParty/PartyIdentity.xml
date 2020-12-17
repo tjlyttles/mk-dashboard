@@ -17,23 +17,14 @@
         <service-call name="mkdecision.dashboard.OrderServices.delete#Identity" in-map="context"/>
         <default-response url="."/>
     </transition>
-    <transition name="viewParty">
+    <transition name="party">
         <default-response url="../Party">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
             <parameter name="partyId"/>
         </default-response>
     </transition>
-    <transition name="viewPartyEmployment">
-        <actions>
-            <entity-find-count entity-name="mantle.party.PartyIdentification" count-field="idCount">
-                <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="partyIdTypeEnumId" operator="not-equals" value="PtidSsn"/>
-            </entity-find-count>
-            <if condition="idCount == 0">
-                <return message="${ec.l10n.localize('DASHBOARD_INVALID_ID_COUNT')}" error="true"/>
-            </if>
-        </actions>
+    <transition name="partyEmployment">
         <default-response url="../PartyEmployment">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
@@ -55,9 +46,26 @@
         <container-row>
             <row-col xs="0" sm="1" md="3" lg="3"/>
             <row-col xs="12" sm="10" md="6" lg="6">
-                <label text="New Application" type="h4" style="margin-b-1"/>
-                <label text="Co-Applicant" type="h5" style="margin-b-1"/>
-                <label text="Please add all parties associated with the new application." style="margin-b-1"/>
+                <container style="stepper margin-b-1">
+                    <render-mode>
+                        <text type="qvt"><![CDATA[
+                            <q-stepper ref="stepper" value="s2" color="primary" :flat="true">
+                                <q-step name="s1" title="Party" icon="person"/>
+                                <q-step name="s2" title="Identity" icon="fingerprint"/>
+                                <q-step name="s3" title="Employment" icon="work"/>
+                            </q-stepper>
+                        ]]></text>
+                    </render-mode>
+                </container>
+            </row-col>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+        </container-row>
+
+        <container-row style="form-no-margin">
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+            <row-col xs="12" sm="10" md="6" lg="6">
+                <label text="Identity" type="h5" style="margin-b-1"/>
+                <label text="Add a Driver's license or any other identification" style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>
 
                 <section name="idSection" condition="idList.size() > 0">
@@ -77,13 +85,17 @@
                                             <label text="${idType.enumId == 'PtidPassport' || idType.enumId == 'PtidArn' || idType.enumId == 'PtidMilitaryId' ? 'Country Issued' : 'State Issued'}" style="text-weight-medium block"/>
                                             <label text="${id.issuedBy}" style="text-weight-light"/>
                                         </container>
-                                        <container style="margin-b-1">
-                                            <label text="${idType.enumId == 'PtidArn' ? '' : 'Issue Date'}" style="text-weight-medium block"/>
-                                            <label text="${idType.enumId == 'PtidArn' ? '' : id.issueDate}" style="text-weight-light"/>
-                                        </container>
+                                        <section name="idIssueDate" condition="idType.enumId != 'PtidArn'">
+                                            <widgets>
+                                                <container style="margin-b-1">
+                                                    <label text="Issue Date" style="text-weight-medium block"/>
+                                                    <label text="${ec.l10n.format(id.issueDate, 'MM-dd-yyyy')}" style="text-weight-light"/>
+                                                </container>
+                                            </widgets>
+                                        </section>
                                         <container>
                                             <label text="Expiration Date" style="text-weight-medium block"/>
-                                            <label text="${id.expireDate}" style="text-weight-light"/>
+                                            <label text="${ec.l10n.format(id.expireDate, 'MM-dd-yyyy')}" style="text-weight-light"/>
                                         </container>
                                     </row-col>
                                     <row-col xs="6" sm="6" md="6" lg="6" style="text-right">
@@ -331,10 +343,10 @@
 
                 <container-row>
                     <row-col xs="6" sm="6" md="6" lg="6" style="padding-all-0">
-                        <link url="viewParty" text="Back" style="text-black"/>
+                        <link url="party" text="Back" style="text-black"/>
                     </row-col>
                     <row-col xs="6" sm="6" md="6" lg="6" style="padding-all-0 text-right">
-                        <link url="viewPartyEmployment" text="Continue" btn-type="default" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId]"/>
+                        <link url="partyEmployment" text="Continue" btn-type="default" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId]"/>
                     </row-col>
                 </container-row>
             </row-col>

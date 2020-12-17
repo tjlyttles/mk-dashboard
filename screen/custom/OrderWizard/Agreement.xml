@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
         default-menu-title="Agreement"
         default-menu-include="false"
-        default-menu-index="10">
+        default-menu-index="13">
 
     <parameter name="orderId" required="true"/>
     <parameter name="orderPartSeqId" required="true"/>
@@ -18,7 +18,7 @@
         </service-call>
         <default-response url="../../OrderProfile"/>
     </transition>
-    <transition name="viewProperty">
+    <transition name="property">
         <default-response url="../Property">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
@@ -26,58 +26,81 @@
     </transition>
 
     <widgets>
-        <form-single name="AgreementForm" transition="requestAgreement">
-            <field name="orderId"><default-field><hidden/></default-field></field>
-            <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
-
-            <field name="agreementHeader">
-                <default-field>
-                    <label text="New Application" type="h4" style="margin-b-1"/>
-                    <label text="Agreements" type="h5" style="margin-b-1"/>
-                    <label text="Please read the disclosures below." style="margin-b-1"/>
-                    <container style="h-separator margin-tb-2"/>
-                </default-field>
-            </field>
-            <field name="agreementText">
-                <default-field>
+        <container-row>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+            <row-col xs="12" sm="10" md="6" lg="6">
+                <container style="stepper margin-b-1">
                     <render-mode>
-                        <text type="html,vuet,qvt" location="component://mk-dashboard/template/OrderWizard/Agreement.html"/>
+                        <text type="qvt"><![CDATA[
+                            <q-stepper ref="stepper" value="s6" color="primary" :flat="true">
+                                <q-step name="s1" title="Order Items" icon="shopping_cart"/>
+                                <q-step name="s2" title="Eligibility" icon="policy"/>
+                                <q-step name="s3" title="Primary Applicant" icon="person"/>
+                                <q-step name="s4" title="Co-Applicant" icon="person_add"/>
+                                <q-step name="s5" title="Property" icon="home"/>
+                                <q-step name="s6" title="Agreements" icon="done"/>
+                            </q-stepper>
+                        ]]></text>
                     </render-mode>
-                </default-field>
-            </field>
+                </container>
+            </row-col>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+        </container-row>
 
-            <field name="buttons">
-                <default-field title="Submit">
-                    <link url="openOrder" text="Save"/>
-                    <submit/>
-                </default-field>
-            </field>
-            <field name="backButton">
-                <default-field container-style="dark-link">
-                    <link url="viewProperty" text="Back" btn-type="default"/>
-                </default-field>
-            </field>
+        <container style="form-no-margin">
+            <form-single name="AgreementForm" transition="requestAgreement">
+                <field name="orderId"><default-field><hidden/></default-field></field>
+                <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
 
-            <field-layout>
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="12" sm="10" md="6" lg="6">
-                        <field-ref name="agreementHeader"/>
-                        <field-ref name="agreementText"/>
-                    </field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
+                <field name="agreementHeader">
+                    <default-field>
+                        <label text="New Application" type="h4" style="margin-b-1"/>
+                        <label text="Agreements" type="h5" style="margin-b-1"/>
+                        <label text="Please read the disclosures below." style="margin-b-1"/>
+                        <container style="h-separator margin-tb-2"/>
+                    </default-field>
+                </field>
+                <field name="agreementText">
+                    <default-field>
+                        <render-mode>
+                            <text type="html,vuet,qvt" location="component://mk-dashboard/template/OrderWizard/Agreement.html"/>
+                        </render-mode>
+                    </default-field>
+                </field>
 
-                <fields-not-referenced/>
+                <field name="buttons">
+                    <default-field title="Submit">
+                        <link url="openOrder" text="Save"/>
+                        <submit/>
+                    </default-field>
+                </field>
+                <field name="backButton">
+                    <default-field container-style="dark-link">
+                        <link url="property" text="Back" btn-type="default"/>
+                    </default-field>
+                </field>
 
-                <field-col-row>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                    <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="backButton"/></field-col>
-                    <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="buttons"/></field-col>
-                    <field-col xs="0" sm="1" md="3" lg="3"/>
-                </field-col-row>
-            </field-layout>
-        </form-single>
+                <field-layout>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6">
+                            <field-ref name="agreementHeader"/>
+                            <field-ref name="agreementText"/>
+                        </field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+
+                    <fields-not-referenced/>
+
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="backButton"/></field-col>
+                        <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="buttons"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                </field-layout>
+            </form-single>
+        </container>
     </widgets>
 
 </screen>
