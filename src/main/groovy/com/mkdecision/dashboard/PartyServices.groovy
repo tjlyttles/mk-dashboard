@@ -84,13 +84,7 @@ class PartyServices {
                 .condition("partyId", partyId)
                 .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
                 .list()
-
-        // prepare address
-        String postalAddress = null
-        if (postalAddresses != null && !postalAddresses.isEmpty()) {
-            EntityValue firstPostalAddress = postalAddresses.getFirst()
-            postalAddress = String.format("%s, %s %s", firstPostalAddress.getString("address1"), firstPostalAddress.getString("stateGeoCodeAlpha2"), firstPostalAddress.getString("postalCode"))
-        }
+        EntityValue postalAddress = postalAddresses != null && !postalAddresses.isEmpty() ? postalAddresses.getFirst() : null
 
         // return the output parameters
         HashMap<String, Object> outParams = new HashMap<>()

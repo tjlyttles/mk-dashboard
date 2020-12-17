@@ -10,6 +10,10 @@
 .margin-tb-1 { margin: 1em 0 1em 0; }
 .margin-tb-2 { margin: 2em 0 2em 0; }
 .margin-lr-1 { margin: 0 1em 0 1em; }
+.margin-t-05 { margin-top: 0.5em; }
+.margin-t-1 { margin-top: 1em; }
+.margin-t-2 { margin-top: 2em; }
+.margin-b-05 { margin-bottom: 0.5em; }
 .margin-b-1 { margin-bottom: 1em; }
 .margin-b-2 { margin-bottom: 2em; }
 .margin-l-05 { margin-left: 0.5em; }
@@ -26,6 +30,13 @@
 .h-separator { border-bottom: 1px solid rgb(211, 212, 216); }
 .v-separator { border-right: 1px solid rgb(211, 212, 216); }
 
+@media screen and (max-width: 800px) {
+    .stepper {
+        visibility: hidden;
+        display: none;
+    }
+}
+
 /* Quasar hacks */
 .nested-form-field .q-ma-sm { margin: 8px 0px !important; }
 .dark-link .q-link { color:black; }
@@ -39,4 +50,7 @@
 }
 .q-field--focused .q-field__input {
     border-bottom: none !important;
+}
+.stepper .q-stepper__step-inner {
+    padding: 0px !important;
 }

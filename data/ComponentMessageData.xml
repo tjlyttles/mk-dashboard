@@ -38,6 +38,7 @@
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_IDENTITY" locale="en" localized="Invalid identity."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_OCCUPATION" locale="en" localized="Invalid occupation."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYER_NAME" locale="en" localized="Invalid employer name."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYER_CLASS" locale="en" localized="Invalid employer classification."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_JOB_TITLE" locale="en" localized="Invalid job title."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYMENT_DURATION" locale="en" localized="Invalid employment duration."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_MONTHLY_INCOME" locale="en" localized="Invalid monthly income."/>
@@ -45,17 +46,10 @@
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYER_CITY" locale="en" localized="Invalid employer city."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYER_STATE" locale="en" localized="Invalid employer state."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_EMPLOYMENT" locale="en" localized="Invalid employment."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_RENT_INCOME" locale="en" localized="Invalid rent income."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_RETIREMENT_INCOME" locale="en" localized="Invalid retirement income."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_INVESTMENT_INCOME" locale="en" localized="Invalid investment income."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_BONUS_INCOME" locale="en" localized="Invalid bonus income."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_SOCIAL_SECURITY_INCOME" locale="en" localized="Invalid social security income."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_DISABILITY_INCOME" locale="en" localized="Invalid disability income."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_STUDENT_INCOME" locale="en" localized="Invalid student income."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_UNEMPLOYMENT_INCOME" locale="en" localized="Invalid unemployment income."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ALIMONY_INCOME" locale="en" localized="Invalid alimony income."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_CHILD_SUPPORT_INCOME" locale="en" localized="Invalid child support income."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_OTHER_INCOME" locale="en" localized="Invalid other income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_INCOME_SOURCE" locale="en" localized="Invalid income."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_INCOME_SOURCE_TYPE" locale="en" localized="Invalid income type."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_INCOME_SOURCE_AMOUNT" locale="en" localized="Invalid income amount."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_INCOME_SOURCE_DURATION" locale="en" localized="Invalid income duration."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ASSET_CLASS" locale="en" localized="Invalid property type."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_SALVAGE_VALUE" locale="en" localized="Invalid current property value."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ACQUIRE_COST" locale="en" localized="Invalid original purchase price."/>

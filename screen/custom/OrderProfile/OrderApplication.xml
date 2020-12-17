@@ -73,7 +73,7 @@
                                     <container style="q-pt-sm">
                                         <container-row>
                                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Address" style="text-light-grey"/></row-col>
-                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${postalAddress ?: '-'}"/></row-col>
+                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${postalAddress.address1 ?: '-'}, ${postalAddress.stateGeoCodeAlpha2} ${postalAddress.postalCode}"/></row-col>
                                         </container-row>
                                         <container-row>
                                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Type" style="text-light-grey"/></row-col>
@@ -209,7 +209,7 @@
                                                 </container-row>
                                                 <container-row>
                                                     <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Residential Address" style="text-light-grey"/></row-col>
-                                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${postalAddress ?: '-'}"/></row-col>
+                                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${postalAddress.address1 ?: '-'}, ${postalAddress.stateGeoCodeAlpha2} ${postalAddress.postalCode}"/></row-col>
                                                 </container-row>
                                             </container>
                                         </container>

@@ -15,4 +15,15 @@
     <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowAnnualPropertyTaxes" description="Annual Property Taxes"/>
     <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowHoaMonthlyFee" description="HOA Monthly Fee"/>
 
+    <!-- Income sources -->
+    <moqui.basic.Enumeration enumTypeId="EnumGroup" enumId="DefaultDashboardIncomeSourceGroup" description="Default Dashboard Income Source Group"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowAlimony"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowRent"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowRetirement"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowBonus"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowSocialSecurity"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowChildSupport"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowDisability"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowOther"/>
+
 </entity-facade-xml>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
-        default-menu-title="Party Current Employment"
+        default-menu-title="Party Previous Employment"
         default-menu-include="false"
-        default-menu-index="3">
+        default-menu-index="4">
 
     <parameter name="orderId" required="true"/>
     <parameter name="orderPartSeqId" required="true"/>
@@ -21,43 +21,25 @@
         <service-call name="mkdecision.dashboard.OrderServices.delete#Employment" in-map="context"/>
         <default-response url="."/>
     </transition>
-    <transition name="addIncomeSource">
-        <service-call name="mkdecision.dashboard.OrderServices.add#IncomeSource" in-map="context"/>
-        <default-response url="."/>
-    </transition>
-    <transition name="updateIncomeSource">
-        <service-call name="mkdecision.dashboard.OrderServices.update#IncomeSource" in-map="context"/>
-        <default-response url="."/>
-    </transition>
-    <transition name="deleteIncomeSource">
-        <service-call name="mkdecision.dashboard.OrderServices.delete#IncomeSource" in-map="context"/>
-        <default-response url="."/>
-    </transition>
-    <transition name="partyIdentity">
-        <default-response url="../PartyIdentity">
+    <transition name="partyEmployment">
+        <default-response url="../PartyEmployment">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
             <parameter name="partyId"/>
         </default-response>
     </transition>
-    <transition name="checkEmployment">
-        <default-response url="../PartyEmploymentPrevious">
+    <transition name="orderOverview">
+        <default-response url="../../OrderProfile/OrderOverview">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
-            <parameter name="partyId"/>
         </default-response>
     </transition>
 
     <actions>
         <entity-find entity-name="mantle.party.PartyToAndRelationship" list="employmentRelationList">
-            <econdition field-name="relationshipTypeEnumId" value="PrtEmployee"/>
+            <econdition field-name="relationshipTypeEnumId" value="PrtPreviousEmployee"/>
             <econdition field-name="fromPartyId" from="partyId"/>
             <econdition field-name="fromRoleTypeId" value="Employee"/>
-        </entity-find>
-        <entity-find entity-name="mk.close.FinancialFlow" list="incomeFinFlowList">
-            <econdition field-name="partyId" from="partyId"/>
-            <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
-            <econdition field-name="partyRelationshipId" operator="is-null" value=""/>
         </entity-find>
     </actions>
 
@@ -66,8 +48,8 @@
             <row-col xs="0" sm="1" md="3" lg="3"/>
             <row-col xs="12" sm="10" md="6" lg="6">
                 <label text="New Application" type="h4" style="margin-b-1"/>
-                <label text="Current Employment" type="h5" style="margin-b-1"/>
-                <label text="Add all current employment sources" style="margin-b-1"/>
+                <label text="Previous Employment" type="h5" style="margin-b-1"/>
+                <label text="Add all previous employment sources for the past 2 years" style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>
 
                 <section name="employmentSection">
@@ -78,6 +60,8 @@
                                     <actions>
                                         <set field="employerName" from="employmentRelation.organizationName"/>
                                         <set field="jobTitle" from="employmentRelation.relationshipName"/>
+                                        <set field="fromDate" from="ec.l10n.format(employmentRelation.fromDate, 'MM-dd-yyyy') ?: ''"/>
+                                        <set field="toDate" from="ec.l10n.format(employmentRelation.thruDate, 'MM-dd-yyyy') ?: ''"/>
 
                                         <entity-find entity-name="mantle.party.PartyClassificationAppl" list="partyClassList">
                                             <econdition field-name="partyId" from="employmentRelation.toPartyId"/>
@@ -98,11 +82,6 @@
                                             <econdition field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
                                         </entity-find>
                                         <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
-
-                                        <set field="millis" from="Math.abs(employmentRelation.fromDate.getTime() - ec.user.nowTimestamp.getTime())"/>
-                                        <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
-                                        <set field="years" from="Math.floor(days / 365)"/>
-                                        <set field="months" from="Math.floor(days / 30) - (years * 12)"/>
 
                                         <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryPostalAddress" in-map="[partyId: employmentRelation.toPartyId]" out-map="postalAddressResp"/>
                                         <log message="${postalAddressResp}" level="warn"/>
@@ -129,7 +108,7 @@
                                                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
                                                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
                                                         <field name="partyRelationshipId"><default-field><hidden default-value="${employmentRelation.partyRelationshipId}"/></default-field></field>
-                                                        <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtEmployee"/></default-field></field>
+                                                        <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtPreviousEmployee"/></default-field></field>
 
                                                         <field name="employerName">
                                                             <default-field>
@@ -163,14 +142,14 @@
                                                                 <label text="Duration" style="margin-tb-1"/>
                                                             </default-field>
                                                         </field>
-                                                        <field name="years">
+                                                        <field name="fromDate">
                                                             <default-field>
-                                                                <text-line input-type="number"/>
+                                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
                                                             </default-field>
                                                         </field>
-                                                        <field name="months">
+                                                        <field name="toDate">
                                                             <default-field>
-                                                                <text-line input-type="number"/>
+                                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
                                                             </default-field>
                                                         </field>
                                                         <field name="jobTitle">
@@ -236,8 +215,8 @@
                                                                 <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
                                                             </field-col-row>
                                                             <field-col-row>
-                                                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
-                                                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                                                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="fromDate"/></field-col>
+                                                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="toDate"/></field-col>
                                                             </field-col-row>
                                                             <field-col-row>
                                                                 <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="jobTitle"/></field-col>
@@ -272,7 +251,7 @@
                                                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
                                                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
                                                         <field name="partyRelationshipId"><default-field><hidden default-value="${employmentRelation.partyRelationshipId}"/></default-field></field>
-                                                        <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtEmployee"/></default-field></field>
+                                                        <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtPreviousEmployee"/></default-field></field>
 
                                                         <field name="employerName">
                                                             <default-field title="Business Name">
@@ -318,14 +297,14 @@
                                                                 <label text="Duration" style="margin-tb-1"/>
                                                             </default-field>
                                                         </field>
-                                                        <field name="years">
+                                                        <field name="fromDate">
                                                             <default-field>
-                                                                <text-line input-type="number"/>
+                                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
                                                             </default-field>
                                                         </field>
-                                                        <field name="months">
+                                                        <field name="toDate">
                                                             <default-field>
-                                                                <text-line input-type="number"/>
+                                                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
                                                             </default-field>
                                                         </field>
                                                         <field name="employerAddress1">
@@ -387,8 +366,8 @@
                                                                 <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
                                                             </field-col-row>
                                                             <field-col-row>
-                                                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
-                                                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                                                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="fromDate"/></field-col>
+                                                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="toDate"/></field-col>
                                                             </field-col-row>
 
                                                             <field-col-row>
@@ -429,7 +408,7 @@
                                 <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                                 <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
                                 <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
-                                <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtEmployee"/></default-field></field>
+                                <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtPreviousEmployee"/></default-field></field>
 
                                 <field name="employerName">
                                     <default-field>
@@ -463,14 +442,14 @@
                                         <label text="Duration" style="margin-tb-1"/>
                                     </default-field>
                                 </field>
-                                <field name="years">
+                                <field name="fromDate">
                                     <default-field>
-                                        <text-line input-type="number"/>
+                                        <date-time type="date" size="200" format="MM-dd-yyyy"/>
                                     </default-field>
                                 </field>
-                                <field name="months">
+                                <field name="toDate">
                                     <default-field>
-                                        <text-line input-type="number"/>
+                                        <date-time type="date" size="200" format="MM-dd-yyyy"/>
                                     </default-field>
                                 </field>
                                 <field name="jobTitle">
@@ -536,8 +515,8 @@
                                         <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
                                     </field-col-row>
                                     <field-col-row>
-                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
-                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="fromDate"/></field-col>
+                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="toDate"/></field-col>
                                     </field-col-row>
                                     <field-col-row>
                                         <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="jobTitle"/></field-col>
@@ -572,7 +551,7 @@
                                 <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                                 <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
                                 <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
-                                <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtEmployee"/></default-field></field>
+                                <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtPreviousEmployee"/></default-field></field>
 
                                 <field name="employerName">
                                     <default-field title="Business Name">
@@ -618,14 +597,14 @@
                                         <label text="Duration" style="margin-tb-1"/>
                                     </default-field>
                                 </field>
-                                <field name="years">
+                                <field name="fromDate">
                                     <default-field>
-                                        <text-line input-type="number"/>
+                                        <date-time type="date" size="200" format="MM-dd-yyyy"/>
                                     </default-field>
                                 </field>
-                                <field name="months">
+                                <field name="toDate">
                                     <default-field>
-                                        <text-line input-type="number"/>
+                                        <date-time type="date" size="200" format="MM-dd-yyyy"/>
                                     </default-field>
                                 </field>
                                 <field name="employerAddress1">
@@ -687,8 +666,8 @@
                                         <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
                                     </field-col-row>
                                     <field-col-row>
-                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
-                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="fromDate"/></field-col>
+                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="toDate"/></field-col>
                                     </field-col-row>
 
                                     <field-col-row>
@@ -717,195 +696,14 @@
                     </widgets>
                 </section>
 
-                <label text="Current Non-Employment Income" type="h5" style="margin-t-2 margin-b-1"/>
-                <label text="Add all current non-employment income sources. Alimony, child support, or separate maintenance income need not be provided if applicant does not wish it to be considered as a basis for repaying this obligation." style="margin-b-1"/>
-                <container style="h-separator margin-tb-2"/>
-
-                <section name="currentIncomeSection">
-                    <widgets>
-                        <section name="incomeSection" condition="incomeFinFlowList.size() > 0">
-                            <widgets>
-                                <section-iterate name="incomeIterator" list="incomeFinFlowList" entry="incomeFinFlow">
-                                    <actions>
-                                        <entity-find-related-one value-field="incomeFinFlow" relationship-name="flowType" to-value-field="flowType"/>
-                                        <set field="financialFlowTypeEnumId" from="incomeFinFlow.financialFlowTypeEnumId"/>
-                                        <set field="amount" from="incomeFinFlow.amount"/>
-
-                                        <set field="millis" from="Math.abs(incomeFinFlow.fromDate.getTime() - ec.user.nowTimestamp.getTime())"/>
-                                        <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
-                                        <set field="years" from="Math.floor(days / 365)"/>
-                                        <set field="months" from="Math.floor(days / 30) - (years * 12)"/>
-                                    </actions>
-                                    <widgets>
-                                        <container-row>
-                                            <row-col xs="6" sm="6" md="6" lg="6">
-                                                <container style="margin-tb-05">
-                                                    <label text="${flowType.description}"/>
-                                                </container>
-                                            </row-col>
-                                            <row-col xs="6" sm="6" md="6" lg="6" style="text-right">
-                                                <container-dialog id="EditIncomeSourceDialog" button-text="Edit" width="960">
-                                                    <form-single name="EditIncomeSourceForm" transition="updateIncomeSource">
-                                                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
-                                                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
-                                                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
-                                                        <field name="financialFlowId"><default-field><hidden default-value="${incomeFinFlow.financialFlowId}"/></default-field></field>
-
-                                                        <field name="financialFlowTypeEnumId">
-                                                            <default-field title="Income Source Type">
-                                                                <drop-down required-manual-select="true">
-                                                                    <entity-options text="${enumDescription}" key="${enumId}">
-                                                                        <entity-find entity-name="moqui.basic.EnumGroupEnumAndParent">
-                                                                            <econdition field-name="enumGroupEnumId" value="DefaultDashboardIncomeSourceGroup"/>
-                                                                            <order-by field-name="enumDescription"/>
-                                                                        </entity-find>
-                                                                    </entity-options>
-                                                                </drop-down>
-                                                            </default-field>
-                                                        </field>
-                                                        <field name="amount">
-                                                            <default-field title="Gross Income Monthly">
-                                                                <text-line input-type="number" format="#.##" prefix="$"/>
-                                                            </default-field>
-                                                        </field>
-
-                                                        <field name="durationHeader">
-                                                            <default-field>
-                                                                <label text="Duration" style="margin-tb-1"/>
-                                                            </default-field>
-                                                        </field>
-                                                        <field name="years">
-                                                            <default-field>
-                                                                <text-line input-type="number"/>
-                                                            </default-field>
-                                                        </field>
-                                                        <field name="months">
-                                                            <default-field>
-                                                                <text-line input-type="number"/>
-                                                            </default-field>
-                                                        </field>
-
-                                                        <field name="submit">
-                                                            <default-field>
-                                                                <submit text="Save"/>
-                                                            </default-field>
-                                                        </field>
-
-                                                        <field-layout>
-                                                            <field-col-row>
-                                                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="financialFlowTypeEnumId"/></field-col>
-                                                            </field-col-row>
-                                                            <field-col-row>
-                                                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="amount"/></field-col>
-                                                            </field-col-row>
-
-                                                            <field-col-row>
-                                                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
-                                                            </field-col-row>
-                                                            <field-col-row>
-                                                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
-                                                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
-                                                            </field-col-row>
-
-                                                            <fields-not-referenced/>
-
-                                                            <field-col-row>
-                                                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
-                                                            </field-col-row>
-                                                        </field-layout>
-                                                    </form-single>
-                                                </container-dialog>
-                                                <link text="Remove" btn-type="danger" url="deleteIncomeSource" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, financialFlowId: incomeFinFlow.financialFlowId]"/>
-                                            </row-col>
-                                        </container-row>
-                                        <container style="h-separator margin-tb-05"/>
-                                    </widgets>
-                                </section-iterate>
-                                <container style="margin-tb-2"/>
-                            </widgets>
-                        </section>
-
-                        <container-dialog id="AddIncomeSourceDialog" button-text="Add Income Source" width="960" button-style="block margin-tb-1">
-                            <form-single name="AddIncomeSourceForm" transition="addIncomeSource">
-                                <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
-                                <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
-                                <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
-
-                                <field name="financialFlowTypeEnumId">
-                                    <default-field title="Income Source Type">
-                                        <drop-down required-manual-select="true">
-                                            <entity-options text="${enumDescription}" key="${enumId}">
-                                                <entity-find entity-name="moqui.basic.EnumGroupEnumAndParent">
-                                                    <econdition field-name="enumGroupEnumId" value="DefaultDashboardIncomeSourceGroup"/>
-                                                    <order-by field-name="enumDescription"/>
-                                                </entity-find>
-                                            </entity-options>
-                                        </drop-down>
-                                    </default-field>
-                                </field>
-                                <field name="amount">
-                                    <default-field title="Gross Income Monthly">
-                                        <text-line input-type="number" format="#.##" prefix="$"/>
-                                    </default-field>
-                                </field>
-
-                                <field name="durationHeader">
-                                    <default-field>
-                                        <label text="Duration" style="margin-tb-1"/>
-                                    </default-field>
-                                </field>
-                                <field name="years">
-                                    <default-field>
-                                        <text-line input-type="number"/>
-                                    </default-field>
-                                </field>
-                                <field name="months">
-                                    <default-field>
-                                        <text-line input-type="number"/>
-                                    </default-field>
-                                </field>
-
-                                <field name="submit">
-                                    <default-field>
-                                        <submit text="Save"/>
-                                    </default-field>
-                                </field>
-
-                                <field-layout>
-                                    <field-col-row>
-                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="financialFlowTypeEnumId"/></field-col>
-                                    </field-col-row>
-                                    <field-col-row>
-                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="amount"/></field-col>
-                                    </field-col-row>
-
-                                    <field-col-row>
-                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
-                                    </field-col-row>
-                                    <field-col-row>
-                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
-                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
-                                    </field-col-row>
-
-                                    <fields-not-referenced/>
-
-                                    <field-col-row>
-                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
-                                    </field-col-row>
-                                </field-layout>
-                            </form-single>
-                        </container-dialog>
-                    </widgets>
-                </section>
-
                 <container style="margin-tb-2"/>
 
                 <container-row>
                     <row-col xs="6" sm="6" md="6" lg="6" style="padding-all-0">
-                        <link url="partyIdentity" text="Back" style="text-black"/>
+                        <link url="partyEmployment" text="Back" style="text-black"/>
                     </row-col>
                     <row-col xs="6" sm="6" md="6" lg="6" style="padding-all-0 text-right">
-                        <link url="checkEmployment" text="Finish" btn-type="default" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId]"/>
+                        <link url="orderOverview" text="Finish" btn-type="default" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId]"/>
                     </row-col>
                 </container-row>
             </row-col>
