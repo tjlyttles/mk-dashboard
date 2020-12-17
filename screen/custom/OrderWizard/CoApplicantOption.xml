@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
         default-menu-title="Co-Applicant Option"
         default-menu-include="false"
-        default-menu-index="6">
+        default-menu-index="7">
 
     <parameter name="orderId" required="true"/>
     <parameter name="orderPartSeqId" required="true"/>
