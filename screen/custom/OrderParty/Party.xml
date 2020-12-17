@@ -17,7 +17,7 @@
             <parameter name="partyId"/>
         </default-response>
     </transition>
-    <transition name="viewOrderOverview">
+    <transition name="orderOverview">
         <default-response url="../../OrderProfile/OrderOverview">
             <parameter name="orderId"/>
         </default-response>
@@ -272,7 +272,7 @@
                 </field>
                 <field name="backButton">
                     <default-field container-style="dark-link">
-                        <link url="viewOrderOverview" text="Back" btn-type="default"/>
+                        <link url="orderOverview" text="Back" btn-type="default"/>
                     </default-field>
                 </field>
 

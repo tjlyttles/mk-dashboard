@@ -17,23 +17,14 @@
         <service-call name="mkdecision.dashboard.OrderServices.delete#Identity" in-map="context"/>
         <default-response url="."/>
     </transition>
-    <transition name="viewParty">
+    <transition name="party">
         <default-response url="../Party">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
             <parameter name="partyId"/>
         </default-response>
     </transition>
-    <transition name="viewPartyEmployment">
-        <actions>
-            <entity-find-count entity-name="mantle.party.PartyIdentification" count-field="idCount">
-                <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="partyIdTypeEnumId" operator="not-equals" value="PtidSsn"/>
-            </entity-find-count>
-            <if condition="idCount == 0">
-                <return message="${ec.l10n.localize('DASHBOARD_INVALID_ID_COUNT')}" error="true"/>
-            </if>
-        </actions>
+    <transition name="partyEmployment">
         <default-response url="../PartyEmployment">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
@@ -352,10 +343,10 @@
 
                 <container-row>
                     <row-col xs="6" sm="6" md="6" lg="6" style="padding-all-0">
-                        <link url="viewParty" text="Back" style="text-black"/>
+                        <link url="party" text="Back" style="text-black"/>
                     </row-col>
                     <row-col xs="6" sm="6" md="6" lg="6" style="padding-all-0 text-right">
-                        <link url="viewPartyEmployment" text="Continue" btn-type="default" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId]"/>
+                        <link url="partyEmployment" text="Continue" btn-type="default" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId]"/>
                     </row-col>
                 </container-row>
             </row-col>
