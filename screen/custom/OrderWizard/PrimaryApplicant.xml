@@ -40,6 +40,7 @@
             <set field="middleName" from="party?.middleName ?: ''"/>
             <set field="lastName" from="party?.lastName ?: ''"/>
             <set field="suffix" from="party?.suffix ?: ''"/>
+            <set field="nickname" from="party?.nickname ?: ''"/>
             <set field="birthDate" from="ec.l10n.format(party?.birthDate, 'MM-dd-yyyy') ?: ''"/>
             <set field="maritalStatusEnumId" from="party?.maritalStatusEnumId ?: ''"/>
             <set field="employmentStatusEnumId" from="party?.employmentStatusEnumId ?: ''"/>
@@ -142,6 +143,11 @@
                 </field>
                 <field name="suffix">
                     <default-field title="Suffix (Optional)">
+                        <text-line/>
+                    </default-field>
+                </field>
+                <field name="nickname">
+                    <default-field title="Other Name (AKA) (Optional)">
                         <text-line/>
                     </default-field>
                 </field>
@@ -284,6 +290,11 @@
                         <field-col xs="0" sm="1" md="3" lg="3"/>
                         <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="lastName"/></field-col>
                         <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="suffix"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="nickname"/></field-col>
                         <field-col xs="0" sm="1" md="3" lg="3"/>
                     </field-col-row>
                     <field-col-row>

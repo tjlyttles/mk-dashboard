@@ -23,9 +23,11 @@ class PartyServices {
 
         // prepare party name
         String partyName = null
+        String partyNickname = null
         if (partyDetail != null) {
             if (partyDetail.getString("partyTypeEnumId").equals("PtyPerson")) {
                 partyName = String.format("%s %s", StringUtils.defaultString(partyDetail.getString("firstName")), StringUtils.defaultString(partyDetail.getString("lastName"))).trim()
+                partyNickname = partyDetail.getString("nickname")
             } else if (partyDetail.getString("partyTypeEnumId").equals("PtyOrganization")) {
                 partyName = partyDetail.getString("organizationName")
             }
@@ -35,6 +37,7 @@ class PartyServices {
         HashMap<String, Object> outParams = new HashMap<>()
         outParams.put("partyId", partyId)
         outParams.put("partyName", partyName)
+        outParams.put("partyNickname", partyNickname)
         return outParams
     }
 

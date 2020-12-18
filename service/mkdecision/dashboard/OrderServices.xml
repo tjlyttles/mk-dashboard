@@ -126,6 +126,7 @@
             <parameter name="middleName"/>
             <parameter name="lastName"/>
             <parameter name="suffix"/>
+            <parameter name="nickname"/>
             <parameter name="address1"/>
             <parameter name="unitNumber"/>
             <parameter name="postalCode"/>
@@ -158,6 +159,7 @@
                 <matches regexp="^[- A-Za-z']+$" message="Please enter a last name."/>
             </parameter>
             <parameter name="suffix"/>
+            <parameter name="nickname"/>
             <parameter name="address1" required="true">
                 <matches regexp="^[- #a-zA-Z0-9.',\/]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, commas, and -, /, ', or #."/>
             </parameter>

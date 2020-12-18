@@ -508,6 +508,11 @@
                         <display text="${partyName ?: '-'}"/>
                     </default-field>
                 </field>
+                <field name="nickname">
+                    <default-field title="Other Name (AKA)">
+                        <display text="${nickname ?: '-'}"/>
+                    </default-field>
+                </field>
                 <field name="telecomNumber">
                     <conditional-field condition="telecomNumber == null" title="Phone">
                         <display text="${telecomNumber ?: '-'}"/>
