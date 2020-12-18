@@ -82,13 +82,13 @@
                 <label text="Add all current employment sources" style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>
 
-                <section-include name="employmentSection" location="component://mk-dashboard/screen/custom/OrderParty/PartyEmployment.xml"/>
+                <section-include name="currentEmploymentSection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
 
                 <label text="Current Non-Employment Income" type="h5" style="margin-t-2 margin-b-1"/>
                 <label text="Add all current non-employment income sources. Alimony, child support, or separate maintenance income need not be provided if applicant does not wish it to be considered as a basis for repaying this obligation." style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>
 
-                <section-include name="currentIncomeSection" location="component://mk-dashboard/screen/custom/OrderParty/PartyEmployment.xml"/>
+                <section-include name="incomeSourceSection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
 
                 <container style="margin-tb-2"/>
 

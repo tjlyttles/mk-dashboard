@@ -1,0 +1,1755 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-include="false">
+
+    <parameter name="partyId"/>
+
+    <widgets>
+        <section name="currentEmploymentSection">
+            <widgets>
+                <section name="currentEmploymentRelationSection" condition="employmentRelationList.size() > 0">
+                    <widgets>
+                        <section-iterate name="currentEmploymentIterator" list="employmentRelationList" entry="employmentRelation">
+                            <actions>
+                                <set field="employerName" from="employmentRelation.organizationName"/>
+                                <set field="jobTitle" from="employmentRelation.relationshipName"/>
+
+                                <entity-find entity-name="mantle.party.PartyClassificationAppl" list="partyClassList">
+                                    <econdition field-name="partyId" from="employmentRelation.toPartyId"/>
+                                    <date-filter/>
+                                </entity-find>
+                                <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
+
+                                <entity-find-one entity-name="mantle.party.PartyRelationshipSetting" value-field="employmentStatusSetting">
+                                    <field-map field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
+                                    <field-map field-name="partySettingTypeId" value="EmploymentStatus"/>
+                                </entity-find-one>
+                                <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
+
+                                <entity-find entity-name="mk.close.FinancialFlow" list="monthlyIncomeFinFlowList">
+                                    <econdition field-name="partyId" from="employmentRelation.fromPartyId"/>
+                                    <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                                    <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowTotalMonthlyIncome"/>
+                                    <econdition field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
+                                </entity-find>
+                                <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
+
+                                <set field="millis" from="Math.abs(employmentRelation.fromDate.getTime() - ec.user.nowTimestamp.getTime())"/>
+                                <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
+                                <set field="years" from="Math.floor(days / 365)"/>
+                                <set field="months" from="Math.floor(days / 30) - (years * 12)"/>
+
+                                <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryPostalAddress" in-map="[partyId: employmentRelation.toPartyId]" out-map="postalAddressResp"/>
+                                <log message="${postalAddressResp}" level="warn"/>
+                                <set field="employerAddress1" from="postalAddressResp.postalAddress?.address1"/>
+                                <set field="employerUnitNumber" from="postalAddressResp.postalAddress?.unitNumber"/>
+                                <set field="employerPostalCode" from="postalAddressResp.postalAddress?.postalCode"/>
+                                <set field="employerCity" from="postalAddressResp.postalAddress?.city"/>
+                                <set field="employerStateProvinceGeoId" from="postalAddressResp.postalAddress?.stateProvinceGeoId"/>
+
+                                <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryTelecomNumber" in-map="[partyId: employmentRelation.toPartyId]" out-map="telecomNumberResp"/>
+                                <set field="employerContactNumber" from="telecomNumberResp.telecomNumber"/>
+                            </actions>
+                            <widgets>
+                                <container-row>
+                                    <row-col xs="6" sm="6" md="6" lg="6">
+                                        <container style="margin-tb-05">
+                                            <label text="${employerName}"/>
+                                        </container>
+                                    </row-col>
+                                    <row-col xs="6" sm="6" md="6" lg="6" style="text-right">
+                                        <container-dialog id="EditCurrentRegularEmploymentDialog" button-text="Edit" width="960" condition="employmentStatusEnumId == 'EmpsFullTime' || employmentStatusEnumId == 'EmpsPartTime'">
+                                            <form-single name="EditCurrentRegularEmploymentForm" transition="updateEmployment">
+                                                <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                                <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                                <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                                <field name="partyRelationshipId"><default-field><hidden default-value="${employmentRelation.partyRelationshipId}"/></default-field></field>
+                                                <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtEmployee"/></default-field></field>
+
+                                                <field name="employerName">
+                                                    <default-field>
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employmentStatusEnumId">
+                                                    <default-field title="Employment Status">
+                                                        <drop-down required-manual-select="true">
+                                                            <entity-options text="${description}" key="${enumId}">
+                                                                <entity-find entity-name="moqui.basic.Enumeration">
+                                                                    <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                                                    <econditions combine="or">
+                                                                        <econdition field-name="enumId" value="EmpsFullTime"/>
+                                                                        <econdition field-name="enumId" value="EmpsPartTime"/>
+                                                                    </econditions>
+                                                                    <order-by field-name="description"/>
+                                                                </entity-find>
+                                                            </entity-options>
+                                                        </drop-down>
+                                                    </default-field>
+                                                </field>
+                                                <field name="monthlyIncome">
+                                                    <default-field title="Gross Income Monthly">
+                                                        <text-line input-type="number" format="#.##" prefix="$"/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="durationHeader">
+                                                    <default-field>
+                                                        <label text="Duration" style="margin-tb-1"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="years">
+                                                    <default-field>
+                                                        <text-line input-type="number"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="months">
+                                                    <default-field>
+                                                        <text-line input-type="number"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="jobTitle">
+                                                    <default-field title="Title">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="employerContactNumber">
+                                                    <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
+                                                        <text-line  mask="###-###-####" input-type="tel"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerAddress1">
+                                                    <default-field title="Employer Address (Optional)">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerUnitNumber">
+                                                    <default-field title="Apt / Unit # (Optional)">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerPostalCode">
+                                                    <default-field title="ZIP Code (Optional)">
+                                                        <text-line input-type="number"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerCity">
+                                                    <default-field title="Employer City (Optional)">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerStateProvinceGeoId">
+                                                    <default-field title="State (Optional)">
+                                                        <drop-down allow-empty="true">
+                                                            <entity-options text="${geoName}" key="${toGeoId}">
+                                                                <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                                                    <econdition field-name="geoId" value="USA"/>
+                                                                    <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                                                    <order-by field-name="geoName"/>
+                                                                </entity-find>
+                                                            </entity-options>
+                                                        </drop-down>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="submit">
+                                                    <default-field>
+                                                        <submit text="Save"/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field-layout>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerName"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                                                    </field-col-row>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="jobTitle"/></field-col>
+                                                    </field-col-row>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                                                    </field-col-row>
+
+                                                    <fields-not-referenced/>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                                                    </field-col-row>
+                                                </field-layout>
+                                            </form-single>
+                                        </container-dialog>
+                                        <container-dialog id="EditCurrentSelfEmploymentDialog" button-text="Edit" width="960" condition="employmentStatusEnumId == 'EmpsContractor' || employmentStatusEnumId == 'EmpsSelf'">
+                                            <form-single name="EditCurrentSelfEmploymentForm" transition="updateEmployment">
+                                                <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                                <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                                <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                                <field name="partyRelationshipId"><default-field><hidden default-value="${employmentRelation.partyRelationshipId}"/></default-field></field>
+                                                <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtEmployee"/></default-field></field>
+
+                                                <field name="employerName">
+                                                    <default-field title="Business Name">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerClassificationId">
+                                                    <default-field title="Business Activity">
+                                                        <drop-down required-manual-select="true">
+                                                            <entity-options text="${description}" key="${partyClassificationId}">
+                                                                <entity-find entity-name="mantle.party.PartyClassification">
+                                                                    <econdition field-name="classificationTypeEnumId" value="PcltIndustry"/>
+                                                                    <order-by field-name="description"/>
+                                                                </entity-find>
+                                                            </entity-options>
+                                                        </drop-down>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employmentStatusEnumId">
+                                                    <default-field title="Employment Status">
+                                                        <drop-down required-manual-select="true">
+                                                            <entity-options text="${description}" key="${enumId}">
+                                                                <entity-find entity-name="moqui.basic.Enumeration">
+                                                                    <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                                                    <econditions combine="or">
+                                                                        <econdition field-name="enumId" value="EmpsContractor"/>
+                                                                        <econdition field-name="enumId" value="EmpsSelf"/>
+                                                                    </econditions>
+                                                                    <order-by field-name="description"/>
+                                                                </entity-find>
+                                                            </entity-options>
+                                                        </drop-down>
+                                                    </default-field>
+                                                </field>
+                                                <field name="monthlyIncome">
+                                                    <default-field title="Gross Income Monthly">
+                                                        <text-line input-type="number" format="#.##" prefix="$"/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="durationHeader">
+                                                    <default-field>
+                                                        <label text="Duration" style="margin-tb-1"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="years">
+                                                    <default-field>
+                                                        <text-line input-type="number"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="months">
+                                                    <default-field>
+                                                        <text-line input-type="number"/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="employerContactNumber">
+                                                    <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
+                                                        <text-line  mask="###-###-####" input-type="tel"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerAddress1">
+                                                    <default-field title="Employer Address (Optional)">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerUnitNumber">
+                                                    <default-field title="Apt / Unit # (Optional)">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerPostalCode">
+                                                    <default-field title="ZIP Code (Optional)">
+                                                        <text-line input-type="number"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerCity">
+                                                    <default-field title="Employer City (Optional)">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerStateProvinceGeoId">
+                                                    <default-field title="State (Optional)">
+                                                        <drop-down allow-empty="true">
+                                                            <entity-options text="${geoName}" key="${toGeoId}">
+                                                                <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                                                    <econdition field-name="geoId" value="USA"/>
+                                                                    <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                                                    <order-by field-name="geoName"/>
+                                                                </entity-find>
+                                                            </entity-options>
+                                                        </drop-down>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="submit">
+                                                    <default-field>
+                                                        <submit text="Save"/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field-layout>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerClassificationId"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerName"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                                                    </field-col-row>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                                                    </field-col-row>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                                                    </field-col-row>
+
+                                                    <fields-not-referenced/>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                                                    </field-col-row>
+                                                </field-layout>
+                                            </form-single>
+                                        </container-dialog>
+                                        <link text="Remove" btn-type="danger" url="deleteEmployment" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, partyRelationshipId: employmentRelation.partyRelationshipId]"/>
+                                    </row-col>
+                                </container-row>
+                                <container style="h-separator margin-tb-05"/>
+                            </widgets>
+                        </section-iterate>
+                        <container style="margin-tb-2"/>
+                    </widgets>
+                </section>
+
+                <container-dialog id="AddCurrentRegularEmploymentDialog" button-text="Add Full or Part-time Employment" width="960" button-style="block margin-tb-1">
+                    <form-single name="AddCurrentRegularEmploymentForm" transition="addEmployment">
+                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                        <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtEmployee"/></default-field></field>
+
+                        <field name="employerName">
+                            <default-field>
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employmentStatusEnumId">
+                            <default-field title="Employment Status">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${enumId}">
+                                        <entity-find entity-name="moqui.basic.Enumeration">
+                                            <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                            <econditions combine="or">
+                                                <econdition field-name="enumId" value="EmpsFullTime"/>
+                                                <econdition field-name="enumId" value="EmpsPartTime"/>
+                                            </econditions>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="monthlyIncome">
+                            <default-field title="Gross Income Monthly">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+
+                        <field name="durationHeader">
+                            <default-field>
+                                <label text="Duration" style="margin-tb-1"/>
+                            </default-field>
+                        </field>
+                        <field name="years">
+                            <default-field>
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="months">
+                            <default-field>
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="jobTitle">
+                            <default-field title="Title">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerAddress1">
+                            <default-field title="Employer Address (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerUnitNumber">
+                            <default-field title="Apt / Unit # (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerPostalCode">
+                            <default-field title="ZIP Code (Optional)">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="employerCity">
+                            <default-field title="Employer City (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerStateProvinceGeoId">
+                            <default-field title="State (Optional)">
+                                <drop-down allow-empty="true">
+                                    <entity-options text="${geoName}" key="${toGeoId}">
+                                        <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                            <econdition field-name="geoId" value="USA"/>
+                                            <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                            <order-by field-name="geoName"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="employerContactNumber">
+                            <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
+                                <text-line  mask="###-###-####" input-type="tel"/>
+                            </default-field>
+                        </field>
+
+                        <field name="submit">
+                            <default-field>
+                                <submit text="Save"/>
+                            </default-field>
+                        </field>
+
+                        <field-layout>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerName"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="jobTitle"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                            </field-col-row>
+
+                            <fields-not-referenced/>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                            </field-col-row>
+                        </field-layout>
+                    </form-single>
+                </container-dialog>
+
+                <container-dialog id="AddCurrentSelfEmploymentDialog" button-text="Add Contractor or Self-Employment" width="960" button-style="block margin-tb-1">
+                    <form-single name="AddCurrentSelfEmploymentForm" transition="addEmployment">
+                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                        <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtEmployee"/></default-field></field>
+
+                        <field name="employerName">
+                            <default-field title="Business Name">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerClassificationId">
+                            <default-field title="Business Activity">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${partyClassificationId}">
+                                        <entity-find entity-name="mantle.party.PartyClassification">
+                                            <econdition field-name="classificationTypeEnumId" value="PcltIndustry"/>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="employmentStatusEnumId">
+                            <default-field title="Employment Status">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${enumId}">
+                                        <entity-find entity-name="moqui.basic.Enumeration">
+                                            <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                            <econditions combine="or">
+                                                <econdition field-name="enumId" value="EmpsContractor"/>
+                                                <econdition field-name="enumId" value="EmpsSelf"/>
+                                            </econditions>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="monthlyIncome">
+                            <default-field title="Gross Income Monthly">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+
+                        <field name="durationHeader">
+                            <default-field>
+                                <label text="Duration" style="margin-tb-1"/>
+                            </default-field>
+                        </field>
+                        <field name="years">
+                            <default-field>
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="months">
+                            <default-field>
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+
+                        <field name="employerContactNumber">
+                            <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
+                                <text-line  mask="###-###-####" input-type="tel"/>
+                            </default-field>
+                        </field>
+                        <field name="employerAddress1">
+                            <default-field title="Employer Address (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerUnitNumber">
+                            <default-field title="Apt / Unit # (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerPostalCode">
+                            <default-field title="ZIP Code (Optional)">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="employerCity">
+                            <default-field title="Employer City (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerStateProvinceGeoId">
+                            <default-field title="State (Optional)">
+                                <drop-down allow-empty="true">
+                                    <entity-options text="${geoName}" key="${toGeoId}">
+                                        <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                            <econdition field-name="geoId" value="USA"/>
+                                            <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                            <order-by field-name="geoName"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+
+                        <field name="submit">
+                            <default-field>
+                                <submit text="Save"/>
+                            </default-field>
+                        </field>
+
+                        <field-layout>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerClassificationId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerName"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                            </field-col-row>
+
+                            <fields-not-referenced/>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                            </field-col-row>
+                        </field-layout>
+                    </form-single>
+                </container-dialog>
+            </widgets>
+        </section>
+
+        <section name="previousEmploymentSection">
+            <widgets>
+                <section name="previousEmploymentRelationSection" condition="employmentRelationList.size() > 0">
+                    <widgets>
+                        <section-iterate name="previousEmploymentIterator" list="employmentRelationList" entry="employmentRelation">
+                            <actions>
+                                <set field="employerName" from="employmentRelation.organizationName"/>
+                                <set field="jobTitle" from="employmentRelation.relationshipName"/>
+                                <set field="fromDate" from="ec.l10n.format(employmentRelation.fromDate, 'MM-dd-yyyy') ?: ''"/>
+                                <set field="toDate" from="ec.l10n.format(employmentRelation.thruDate, 'MM-dd-yyyy') ?: ''"/>
+
+                                <entity-find entity-name="mantle.party.PartyClassificationAppl" list="partyClassList">
+                                    <econdition field-name="partyId" from="employmentRelation.toPartyId"/>
+                                    <date-filter/>
+                                </entity-find>
+                                <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
+
+                                <entity-find-one entity-name="mantle.party.PartyRelationshipSetting" value-field="employmentStatusSetting">
+                                    <field-map field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
+                                    <field-map field-name="partySettingTypeId" value="EmploymentStatus"/>
+                                </entity-find-one>
+                                <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
+
+                                <entity-find entity-name="mk.close.FinancialFlow" list="monthlyIncomeFinFlowList">
+                                    <econdition field-name="partyId" from="employmentRelation.fromPartyId"/>
+                                    <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                                    <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowTotalMonthlyIncome"/>
+                                    <econdition field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
+                                </entity-find>
+                                <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
+
+                                <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryPostalAddress" in-map="[partyId: employmentRelation.toPartyId]" out-map="postalAddressResp"/>
+                                <log message="${postalAddressResp}" level="warn"/>
+                                <set field="employerAddress1" from="postalAddressResp.postalAddress?.address1"/>
+                                <set field="employerUnitNumber" from="postalAddressResp.postalAddress?.unitNumber"/>
+                                <set field="employerPostalCode" from="postalAddressResp.postalAddress?.postalCode"/>
+                                <set field="employerCity" from="postalAddressResp.postalAddress?.city"/>
+                                <set field="employerStateProvinceGeoId" from="postalAddressResp.postalAddress?.stateProvinceGeoId"/>
+
+                                <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryTelecomNumber" in-map="[partyId: employmentRelation.toPartyId]" out-map="telecomNumberResp"/>
+                                <set field="employerContactNumber" from="telecomNumberResp.telecomNumber"/>
+                            </actions>
+                            <widgets>
+                                <container-row>
+                                    <row-col xs="6" sm="6" md="6" lg="6">
+                                        <container style="margin-tb-05">
+                                            <label text="${employerName}"/>
+                                        </container>
+                                    </row-col>
+                                    <row-col xs="6" sm="6" md="6" lg="6" style="text-right">
+                                        <container-dialog id="EditPreviousRegularEmploymentDialog" button-text="Edit" width="960" condition="employmentStatusEnumId == 'EmpsFullTime' || employmentStatusEnumId == 'EmpsPartTime'">
+                                            <form-single name="EditPreviousRegularEmploymentForm" transition="updateEmployment">
+                                                <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                                <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                                <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                                <field name="partyRelationshipId"><default-field><hidden default-value="${employmentRelation.partyRelationshipId}"/></default-field></field>
+                                                <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtPreviousEmployee"/></default-field></field>
+
+                                                <field name="employerName">
+                                                    <default-field>
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employmentStatusEnumId">
+                                                    <default-field title="Employment Status">
+                                                        <drop-down required-manual-select="true">
+                                                            <entity-options text="${description}" key="${enumId}">
+                                                                <entity-find entity-name="moqui.basic.Enumeration">
+                                                                    <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                                                    <econditions combine="or">
+                                                                        <econdition field-name="enumId" value="EmpsFullTime"/>
+                                                                        <econdition field-name="enumId" value="EmpsPartTime"/>
+                                                                    </econditions>
+                                                                    <order-by field-name="description"/>
+                                                                </entity-find>
+                                                            </entity-options>
+                                                        </drop-down>
+                                                    </default-field>
+                                                </field>
+                                                <field name="monthlyIncome">
+                                                    <default-field title="Gross Income Monthly">
+                                                        <text-line input-type="number" format="#.##" prefix="$"/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="durationHeader">
+                                                    <default-field>
+                                                        <label text="Duration" style="margin-tb-1"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="fromDate">
+                                                    <default-field>
+                                                        <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="toDate">
+                                                    <default-field>
+                                                        <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="jobTitle">
+                                                    <default-field title="Title">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="employerContactNumber">
+                                                    <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
+                                                        <text-line  mask="###-###-####" input-type="tel"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerAddress1">
+                                                    <default-field title="Employer Address (Optional)">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerUnitNumber">
+                                                    <default-field title="Apt / Unit # (Optional)">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerPostalCode">
+                                                    <default-field title="ZIP Code (Optional)">
+                                                        <text-line input-type="number"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerCity">
+                                                    <default-field title="Employer City (Optional)">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerStateProvinceGeoId">
+                                                    <default-field title="State (Optional)">
+                                                        <drop-down allow-empty="true">
+                                                            <entity-options text="${geoName}" key="${toGeoId}">
+                                                                <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                                                    <econdition field-name="geoId" value="USA"/>
+                                                                    <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                                                    <order-by field-name="geoName"/>
+                                                                </entity-find>
+                                                            </entity-options>
+                                                        </drop-down>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="submit">
+                                                    <default-field>
+                                                        <submit text="Save"/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field-layout>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerName"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                                                    </field-col-row>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="fromDate"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="toDate"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="jobTitle"/></field-col>
+                                                    </field-col-row>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                                                    </field-col-row>
+
+                                                    <fields-not-referenced/>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                                                    </field-col-row>
+                                                </field-layout>
+                                            </form-single>
+                                        </container-dialog>
+                                        <container-dialog id="EditPreviousSelfEmploymentDialog" button-text="Edit" width="960" condition="employmentStatusEnumId == 'EmpsContractor' || employmentStatusEnumId == 'EmpsSelf'">
+                                            <form-single name="EditPreviousSelfEmploymentForm" transition="updateEmployment">
+                                                <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                                <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                                <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                                <field name="partyRelationshipId"><default-field><hidden default-value="${employmentRelation.partyRelationshipId}"/></default-field></field>
+                                                <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtPreviousEmployee"/></default-field></field>
+
+                                                <field name="employerName">
+                                                    <default-field title="Business Name">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerClassificationId">
+                                                    <default-field title="Business Activity">
+                                                        <drop-down required-manual-select="true">
+                                                            <entity-options text="${description}" key="${partyClassificationId}">
+                                                                <entity-find entity-name="mantle.party.PartyClassification">
+                                                                    <econdition field-name="classificationTypeEnumId" value="PcltIndustry"/>
+                                                                    <order-by field-name="description"/>
+                                                                </entity-find>
+                                                            </entity-options>
+                                                        </drop-down>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employmentStatusEnumId">
+                                                    <default-field title="Employment Status">
+                                                        <drop-down required-manual-select="true">
+                                                            <entity-options text="${description}" key="${enumId}">
+                                                                <entity-find entity-name="moqui.basic.Enumeration">
+                                                                    <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                                                    <econditions combine="or">
+                                                                        <econdition field-name="enumId" value="EmpsContractor"/>
+                                                                        <econdition field-name="enumId" value="EmpsSelf"/>
+                                                                    </econditions>
+                                                                    <order-by field-name="description"/>
+                                                                </entity-find>
+                                                            </entity-options>
+                                                        </drop-down>
+                                                    </default-field>
+                                                </field>
+                                                <field name="monthlyIncome">
+                                                    <default-field title="Gross Income Monthly">
+                                                        <text-line input-type="number" format="#.##" prefix="$"/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="durationHeader">
+                                                    <default-field>
+                                                        <label text="Duration" style="margin-tb-1"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="fromDate">
+                                                    <default-field>
+                                                        <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="toDate">
+                                                    <default-field>
+                                                        <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="employerContactNumber">
+                                                    <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
+                                                        <text-line  mask="###-###-####" input-type="tel"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerAddress1">
+                                                    <default-field title="Employer Address (Optional)">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerUnitNumber">
+                                                    <default-field title="Apt / Unit # (Optional)">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerPostalCode">
+                                                    <default-field title="ZIP Code (Optional)">
+                                                        <text-line input-type="number"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerCity">
+                                                    <default-field title="Employer City (Optional)">
+                                                        <text-line/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="employerStateProvinceGeoId">
+                                                    <default-field title="State (Optional)">
+                                                        <drop-down allow-empty="true">
+                                                            <entity-options text="${geoName}" key="${toGeoId}">
+                                                                <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                                                    <econdition field-name="geoId" value="USA"/>
+                                                                    <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                                                    <order-by field-name="geoName"/>
+                                                                </entity-find>
+                                                            </entity-options>
+                                                        </drop-down>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="submit">
+                                                    <default-field>
+                                                        <submit text="Save"/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field-layout>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerClassificationId"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerName"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                                                    </field-col-row>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="fromDate"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="toDate"/></field-col>
+                                                    </field-col-row>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                                                    </field-col-row>
+
+                                                    <fields-not-referenced/>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                                                    </field-col-row>
+                                                </field-layout>
+                                            </form-single>
+                                        </container-dialog>
+                                        <link text="Remove" btn-type="danger" url="deleteEmployment" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, partyRelationshipId: employmentRelation.partyRelationshipId]"/>
+                                    </row-col>
+                                </container-row>
+                                <container style="h-separator margin-tb-05"/>
+                            </widgets>
+                        </section-iterate>
+                        <container style="margin-tb-2"/>
+                    </widgets>
+                </section>
+
+                <container-dialog id="AddPreviousRegularEmploymentDialog" button-text="Add Full or Part-time Employment" width="960" button-style="block margin-tb-1">
+                    <form-single name="AddPreviousRegularEmploymentForm" transition="addEmployment">
+                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                        <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtPreviousEmployee"/></default-field></field>
+
+                        <field name="employerName">
+                            <default-field>
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employmentStatusEnumId">
+                            <default-field title="Employment Status">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${enumId}">
+                                        <entity-find entity-name="moqui.basic.Enumeration">
+                                            <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                            <econditions combine="or">
+                                                <econdition field-name="enumId" value="EmpsFullTime"/>
+                                                <econdition field-name="enumId" value="EmpsPartTime"/>
+                                            </econditions>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="monthlyIncome">
+                            <default-field title="Gross Income Monthly">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+
+                        <field name="durationHeader">
+                            <default-field>
+                                <label text="Duration" style="margin-tb-1"/>
+                            </default-field>
+                        </field>
+                        <field name="fromDate">
+                            <default-field>
+                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                            </default-field>
+                        </field>
+                        <field name="toDate">
+                            <default-field>
+                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                            </default-field>
+                        </field>
+                        <field name="jobTitle">
+                            <default-field title="Title">
+                                <text-line/>
+                            </default-field>
+                        </field>
+
+                        <field name="employerContactNumber">
+                            <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
+                                <text-line  mask="###-###-####" input-type="tel"/>
+                            </default-field>
+                        </field>
+                        <field name="employerAddress1">
+                            <default-field title="Employer Address (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerUnitNumber">
+                            <default-field title="Apt / Unit # (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerPostalCode">
+                            <default-field title="ZIP Code (Optional)">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="employerCity">
+                            <default-field title="Employer City (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerStateProvinceGeoId">
+                            <default-field title="State (Optional)">
+                                <drop-down allow-empty="true">
+                                    <entity-options text="${geoName}" key="${toGeoId}">
+                                        <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                            <econdition field-name="geoId" value="USA"/>
+                                            <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                            <order-by field-name="geoName"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+
+                        <field name="submit">
+                            <default-field>
+                                <submit text="Save"/>
+                            </default-field>
+                        </field>
+
+                        <field-layout>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerName"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="fromDate"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="toDate"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="jobTitle"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                            </field-col-row>
+
+                            <fields-not-referenced/>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                            </field-col-row>
+                        </field-layout>
+                    </form-single>
+                </container-dialog>
+
+                <container-dialog id="AddPreviousSelfEmploymentDialog" button-text="Add Contractor or Self-Employment" width="960" button-style="block margin-tb-1">
+                    <form-single name="AddPreviousSelfEmploymentForm" transition="addEmployment">
+                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                        <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtPreviousEmployee"/></default-field></field>
+
+                        <field name="employerName">
+                            <default-field title="Business Name">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerClassificationId">
+                            <default-field title="Business Activity">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${partyClassificationId}">
+                                        <entity-find entity-name="mantle.party.PartyClassification">
+                                            <econdition field-name="classificationTypeEnumId" value="PcltIndustry"/>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="employmentStatusEnumId">
+                            <default-field title="Employment Status">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${enumId}">
+                                        <entity-find entity-name="moqui.basic.Enumeration">
+                                            <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                            <econditions combine="or">
+                                                <econdition field-name="enumId" value="EmpsContractor"/>
+                                                <econdition field-name="enumId" value="EmpsSelf"/>
+                                            </econditions>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="monthlyIncome">
+                            <default-field title="Gross Income Monthly">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+
+                        <field name="durationHeader">
+                            <default-field>
+                                <label text="Duration" style="margin-tb-1"/>
+                            </default-field>
+                        </field>
+                        <field name="fromDate">
+                            <default-field>
+                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                            </default-field>
+                        </field>
+                        <field name="toDate">
+                            <default-field>
+                                <date-time type="date" size="200" format="MM-dd-yyyy"/>
+                            </default-field>
+                        </field>
+
+                        <field name="employerContactNumber">
+                            <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
+                                <text-line  mask="###-###-####" input-type="tel"/>
+                            </default-field>
+                        </field>
+                        <field name="employerAddress1">
+                            <default-field title="Employer Address (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerUnitNumber">
+                            <default-field title="Apt / Unit # (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerPostalCode">
+                            <default-field title="ZIP Code (Optional)">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="employerCity">
+                            <default-field title="Employer City (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerStateProvinceGeoId">
+                            <default-field title="State (Optional)">
+                                <drop-down allow-empty="true">
+                                    <entity-options text="${geoName}" key="${toGeoId}">
+                                        <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                            <econdition field-name="geoId" value="USA"/>
+                                            <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                            <order-by field-name="geoName"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+
+                        <field name="submit">
+                            <default-field>
+                                <submit text="Save"/>
+                            </default-field>
+                        </field>
+
+                        <field-layout>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerClassificationId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerName"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="fromDate"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="toDate"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                            </field-col-row>
+
+                            <fields-not-referenced/>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                            </field-col-row>
+                        </field-layout>
+                    </form-single>
+                </container-dialog>
+            </widgets>
+        </section>
+
+        <section name="incomeSourceSection">
+            <widgets>
+                <section name="incomeSourceFinFlowSection" condition="incomeFinFlowList.size() > 0">
+                    <widgets>
+                        <section-iterate name="incomeSourceFinFlowIterator" list="incomeFinFlowList" entry="incomeFinFlow">
+                            <actions>
+                                <entity-find-related-one value-field="incomeFinFlow" relationship-name="flowType" to-value-field="flowType"/>
+                                <set field="financialFlowTypeEnumId" from="incomeFinFlow.financialFlowTypeEnumId"/>
+                                <set field="amount" from="incomeFinFlow.amount"/>
+
+                                <set field="millis" from="Math.abs(incomeFinFlow.fromDate.getTime() - ec.user.nowTimestamp.getTime())"/>
+                                <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
+                                <set field="years" from="Math.floor(days / 365)"/>
+                                <set field="months" from="Math.floor(days / 30) - (years * 12)"/>
+                            </actions>
+                            <widgets>
+                                <container-row>
+                                    <row-col xs="6" sm="6" md="6" lg="6">
+                                        <container style="margin-tb-05">
+                                            <label text="${flowType.description}"/>
+                                        </container>
+                                    </row-col>
+                                    <row-col xs="6" sm="6" md="6" lg="6" style="text-right">
+                                        <container-dialog id="EditIncomeSourceDialog" button-text="Edit" width="960">
+                                            <form-single name="EditIncomeSourceForm" transition="updateIncomeSource">
+                                                <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                                <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                                <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                                <field name="financialFlowId"><default-field><hidden default-value="${incomeFinFlow.financialFlowId}"/></default-field></field>
+
+                                                <field name="financialFlowTypeEnumId">
+                                                    <default-field title="Income Source Type">
+                                                        <drop-down required-manual-select="true">
+                                                            <entity-options text="${enumDescription}" key="${enumId}">
+                                                                <entity-find entity-name="moqui.basic.EnumGroupEnumAndParent">
+                                                                    <econdition field-name="enumGroupEnumId" value="DefaultDashboardIncomeSourceGroup"/>
+                                                                    <order-by field-name="enumDescription"/>
+                                                                </entity-find>
+                                                            </entity-options>
+                                                        </drop-down>
+                                                    </default-field>
+                                                </field>
+                                                <field name="amount">
+                                                    <default-field title="Gross Income Monthly">
+                                                        <text-line input-type="number" format="#.##" prefix="$"/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="durationHeader">
+                                                    <default-field>
+                                                        <label text="Duration" style="margin-tb-1"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="years">
+                                                    <default-field>
+                                                        <text-line input-type="number"/>
+                                                    </default-field>
+                                                </field>
+                                                <field name="months">
+                                                    <default-field>
+                                                        <text-line input-type="number"/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field name="submit">
+                                                    <default-field>
+                                                        <submit text="Save"/>
+                                                    </default-field>
+                                                </field>
+
+                                                <field-layout>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="financialFlowTypeEnumId"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="amount"/></field-col>
+                                                    </field-col-row>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                                                    </field-col-row>
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
+                                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                                                    </field-col-row>
+
+                                                    <fields-not-referenced/>
+
+                                                    <field-col-row>
+                                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                                                    </field-col-row>
+                                                </field-layout>
+                                            </form-single>
+                                        </container-dialog>
+                                        <link text="Remove" btn-type="danger" url="deleteIncomeSource" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, financialFlowId: incomeFinFlow.financialFlowId]"/>
+                                    </row-col>
+                                </container-row>
+                                <container style="h-separator margin-tb-05"/>
+                            </widgets>
+                        </section-iterate>
+                        <container style="margin-tb-2"/>
+                    </widgets>
+                </section>
+
+                <container-dialog id="AddIncomeSourceDialog" button-text="Add Income Source" width="960" button-style="block margin-tb-1">
+                    <form-single name="AddIncomeSourceForm" transition="addIncomeSource">
+                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+
+                        <field name="financialFlowTypeEnumId">
+                            <default-field title="Income Source Type">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${enumDescription}" key="${enumId}">
+                                        <entity-find entity-name="moqui.basic.EnumGroupEnumAndParent">
+                                            <econdition field-name="enumGroupEnumId" value="DefaultDashboardIncomeSourceGroup"/>
+                                            <order-by field-name="enumDescription"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="amount">
+                            <default-field title="Gross Income Monthly">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+
+                        <field name="durationHeader">
+                            <default-field>
+                                <label text="Duration" style="margin-tb-1"/>
+                            </default-field>
+                        </field>
+                        <field name="years">
+                            <default-field>
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="months">
+                            <default-field>
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+
+                        <field name="submit">
+                            <default-field>
+                                <submit text="Save"/>
+                            </default-field>
+                        </field>
+
+                        <field-layout>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="financialFlowTypeEnumId"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="amount"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                            </field-col-row>
+
+                            <fields-not-referenced/>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                            </field-col-row>
+                        </field-layout>
+                    </form-single>
+                </container-dialog>
+            </widgets>
+        </section>
+
+        <section name="idSection" condition="idList.size() > 0">
+            <widgets>
+                <section-iterate name="idIterator" list="idList" entry="id">
+                    <actions>
+                        <entity-find-related-one value-field="id" relationship-name="type" to-value-field="idType"/>
+                    </actions>
+                    <widgets>
+                        <container-row>
+                            <row-col xs="6" sm="6" md="6" lg="6">
+                                <container style="margin-b-1">
+                                    <label text="${idType.description}" style="text-weight-medium block"/>
+                                    <label text="${id.idValue}" style="text-weight-light"/>
+                                </container>
+                                <container style="margin-b-1">
+                                    <label text="${idType.enumId == 'PtidPassport' || idType.enumId == 'PtidArn' || idType.enumId == 'PtidMilitaryId' ? 'Country Issued' : 'State Issued'}" style="text-weight-medium block"/>
+                                    <label text="${id.issuedBy}" style="text-weight-light"/>
+                                </container>
+                                <section name="idIssueDate" condition="idType.enumId != 'PtidArn'">
+                                    <widgets>
+                                        <container style="margin-b-1">
+                                            <label text="Issue Date" style="text-weight-medium block"/>
+                                            <label text="${ec.l10n.format(id.issueDate, 'MM-dd-yyyy')}" style="text-weight-light"/>
+                                        </container>
+                                    </widgets>
+                                </section>
+                                <container>
+                                    <label text="Expiration Date" style="text-weight-medium block"/>
+                                    <label text="${ec.l10n.format(id.expireDate, 'MM-dd-yyyy')}" style="text-weight-light"/>
+                                </container>
+                            </row-col>
+                            <row-col xs="6" sm="6" md="6" lg="6" style="text-right">
+                                <link text="Remove" btn-type="danger" url="deleteIdentity" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, partyIdTypeEnumId: id.partyIdTypeEnumId]"/>
+                            </row-col>
+                        </container-row>
+                    </widgets>
+                </section-iterate>
+            </widgets>
+            <fail-widgets>
+                <section name="AddDriversLicense">
+                    <widgets>
+                        <container-dialog id="AddDriversLicenseDialog" button-text="Add Driver's License" width="960" button-style="block margin-tb-1">
+                            <form-single name="AddDriversLicenseForm" transition="addIdentity">
+                                <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidDriverLicense"/></default-field></field>
+
+                                <field name="idValue">
+                                    <default-field title="ID Number">
+                                        <text-line/>
+                                    </default-field>
+                                </field>
+                                <field name="idIssuedBy">
+                                    <default-field title="State Issued">
+                                        <drop-down required-manual-select="true">
+                                            <entity-options text="${geoName}" key="${geoName}">
+                                                <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                                    <econdition field-name="geoId" value="USA"/>
+                                                    <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                                    <order-by field-name="geoName"/>
+                                                </entity-find>
+                                            </entity-options>
+                                        </drop-down>
+                                    </default-field>
+                                </field>
+                                <field name="idIssueDate">
+                                    <default-field title="Issue Date">
+                                        <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &lt; Date.now() || 'Please enter a valid date.'"/>
+                                    </default-field>
+                                </field>
+                                <field name="idExpiryDate">
+                                    <default-field title="Expiration Date">
+                                        <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
+                                    </default-field>
+                                </field>
+
+                                <field name="submit">
+                                    <default-field>
+                                        <submit text="Save"/>
+                                    </default-field>
+                                </field>
+                            </form-single>
+                        </container-dialog>
+                    </widgets>
+                </section>
+
+                <section name="AddStateIssued">
+                    <widgets>
+                        <container-dialog id="AddStateIssuedDialog" button-text="Add State Issued ID" width="960" button-style="block margin-tb-1">
+                            <form-single name="AddStateIssuedForm" transition="addIdentity">
+                                <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidStateId"/></default-field></field>
+
+                                <field name="idValue">
+                                    <default-field title="ID Number">
+                                        <text-line/>
+                                    </default-field>
+                                </field>
+                                <field name="idIssuedBy">
+                                    <default-field title="State Issued">
+                                        <drop-down required-manual-select="true">
+                                            <entity-options text="${geoName}" key="${geoName}">
+                                                <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                                    <econdition field-name="geoId" value="USA"/>
+                                                    <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                                    <order-by field-name="geoName"/>
+                                                </entity-find>
+                                            </entity-options>
+                                        </drop-down>
+                                    </default-field>
+                                </field>
+                                <field name="idIssueDate">
+                                    <default-field title="Issue Date">
+                                        <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &lt; Date.now() || 'Please enter a valid date.'"/>
+                                    </default-field>
+                                </field>
+                                <field name="idExpiryDate">
+                                    <default-field title="Expiration Date">
+                                        <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
+                                    </default-field>
+                                </field>
+
+                                <field name="submit">
+                                    <default-field>
+                                        <submit text="Save"/>
+                                    </default-field>
+                                </field>
+                            </form-single>
+                        </container-dialog>
+                    </widgets>
+                </section>
+
+                <section name="AddMilitaryId">
+                    <widgets>
+                        <container-dialog id="AddMilitaryIdDialog" button-text="Add Military ID" width="960" button-style="block margin-tb-1">
+                            <form-single name="AddMilitaryIdForm" transition="addIdentity">
+                                <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidMilitaryId"/></default-field></field>
+
+                                <field name="idValue">
+                                    <default-field title="ID Number">
+                                        <text-line/>
+                                    </default-field>
+                                </field>
+                                <field name="idIssuedBy">
+                                    <default-field title="Country Issued">
+                                        <drop-down required-manual-select="true">
+                                            <entity-options text="${geoName}" key="${geoName}">
+                                                <entity-find entity-name="moqui.basic.Geo">
+                                                    <econdition field-name="geoId" value="USA"/>
+                                                    <order-by field-name="geoName"/>
+                                                </entity-find>
+                                            </entity-options>
+                                        </drop-down>
+                                    </default-field>
+                                </field>
+                                <field name="idIssueDate">
+                                    <default-field title="Issue Date">
+                                        <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &lt; Date.now() || 'Please enter a valid date.'"/>
+                                    </default-field>
+                                </field>
+                                <field name="idExpiryDate">
+                                    <default-field title="Expiration Date">
+                                        <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
+                                    </default-field>
+                                </field>
+
+                                <field name="submit">
+                                    <default-field>
+                                        <submit text="Save"/>
+                                    </default-field>
+                                </field>
+                            </form-single>
+                        </container-dialog>
+                    </widgets>
+                </section>
+                <section name="AddPassport">
+                    <widgets>
+                        <container-dialog id="AddPassportDialog" button-text="Add Passport" width="960" button-style="block margin-tb-1">
+                            <form-single name="AddPassportForm" transition="addIdentity">
+                                <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidPassport"/></default-field></field>
+
+                                <field name="idValue">
+                                    <default-field title="Passport Number">
+                                        <text-line/>
+                                    </default-field>
+                                </field>
+                                <field name="idIssuedBy">
+                                    <default-field title="Country Issued">
+                                        <drop-down required-manual-select="true">
+                                            <entity-options text="${geoName}" key="${geoName}">
+                                                <entity-find entity-name="moqui.basic.Geo">
+                                                    <econdition field-name="geoId" value="USA"/>
+                                                    <order-by field-name="geoName"/>
+                                                </entity-find>
+                                            </entity-options>
+                                        </drop-down>
+                                    </default-field>
+                                </field>
+                                <field name="idIssueDate">
+                                    <default-field title="Issue Date">
+                                        <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &lt; Date.now() || 'Please enter a valid date.'"/>
+                                    </default-field>
+                                </field>
+                                <field name="idExpiryDate">
+                                    <default-field title="Expiration Date">
+                                        <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
+                                    </default-field>
+                                </field>
+
+                                <field name="submit">
+                                    <default-field>
+                                        <submit text="Save"/>
+                                    </default-field>
+                                </field>
+                            </form-single>
+                        </container-dialog>
+                    </widgets>
+                </section>
+
+                <section name="AddPermRegId">
+                    <widgets>
+                        <container-dialog id="AddPermRegIdDialog" button-text="Add Permanent Resident Card" width="960" button-style="block margin-tb-1">
+                            <form-single name="AddPermRegIdForm" transition="addIdentity">
+                                <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                <field name="partyIdTypeEnumId"><default-field><hidden default-value="PtidArn"/></default-field></field>
+
+                                <field name="idValue">
+                                    <default-field title="ID Number">
+                                        <text-line/>
+                                    </default-field>
+                                </field>
+                                <field name="idIssuedBy">
+                                    <default-field title="Country Issued">
+                                        <drop-down required-manual-select="true">
+                                            <entity-options text="${geoName}" key="${geoName}">
+                                                <entity-find entity-name="moqui.basic.Geo">
+                                                    <econdition field-name="geoId" value="USA"/>
+                                                    <order-by field-name="geoName"/>
+                                                </entity-find>
+                                            </entity-options>
+                                        </drop-down>
+                                    </default-field>
+                                </field>
+                                <field name="idExpiryDate">
+                                    <default-field title="Expiration Date">
+                                        <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; moment(value,'MM-DD-YYYY') &gt; Date.now() || 'Please enter a valid date.'"/>
+                                    </default-field>
+                                </field>
+
+                                <field name="submit">
+                                    <default-field>
+                                        <submit text="Save"/>
+                                    </default-field>
+                                </field>
+                            </form-single>
+                        </container-dialog>
+                    </widgets>
+                </section>
+            </fail-widgets>
+        </section>
+    </widgets>
+</screen>

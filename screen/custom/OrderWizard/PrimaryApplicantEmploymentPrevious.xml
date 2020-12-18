@@ -84,7 +84,7 @@
                 <label text="Add all previous employment sources for the past 2 years" style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>
 
-                <section-include name="employmentSection" location="component://mk-dashboard/screen/custom/OrderParty/PartyEmploymentPrevious.xml"/>
+                <section-include name="previousEmploymentSection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
 
                 <container style="margin-tb-2"/>
 

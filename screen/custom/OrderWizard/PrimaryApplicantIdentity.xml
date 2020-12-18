@@ -83,7 +83,7 @@
                 <label text="Add a United States of America Government or State issued identification." style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>
 
-                <section-include name="idSection" location="component://mk-dashboard/screen/custom/OrderParty/PartyIdentity.xml"/>
+                <section-include name="idSection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
 
                 <container style="margin-tb-2"/>
 
