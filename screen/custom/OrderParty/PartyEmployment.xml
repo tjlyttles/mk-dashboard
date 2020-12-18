@@ -195,6 +195,7 @@
                                                                 <text-line/>
                                                             </default-field>
                                                         </field>
+
                                                         <field name="employerContactNumber">
                                                             <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.OrderServices.add#Employment">
                                                                 <text-line  mask="###-###-####" input-type="tel"/>
@@ -723,6 +724,193 @@
                                     <field-col-row>
                                         <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
                                         <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                                    </field-col-row>
+
+                                    <fields-not-referenced/>
+
+                                    <field-col-row>
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                                    </field-col-row>
+                                </field-layout>
+                            </form-single>
+                        </container-dialog>
+                    </widgets>
+                </section>
+
+                <label text="Current Non-Employment Income" type="h5" style="margin-t-2 margin-b-1"/>
+                <label text="Add all current non-employment income sources. Alimony, child support, or separate maintenance income need not be provided if applicant does not wish it to be considered as a basis for repaying this obligation." style="margin-b-1"/>
+                <container style="h-separator margin-tb-2"/>
+
+                <section name="currentIncomeSection">
+                    <widgets>
+                        <section name="incomeSection" condition="incomeFinFlowList.size() > 0">
+                            <widgets>
+                                <section-iterate name="incomeIterator" list="incomeFinFlowList" entry="incomeFinFlow">
+                                    <actions>
+                                        <entity-find-related-one value-field="incomeFinFlow" relationship-name="flowType" to-value-field="flowType"/>
+                                        <set field="financialFlowTypeEnumId" from="incomeFinFlow.financialFlowTypeEnumId"/>
+                                        <set field="amount" from="incomeFinFlow.amount"/>
+
+                                        <set field="millis" from="Math.abs(incomeFinFlow.fromDate.getTime() - ec.user.nowTimestamp.getTime())"/>
+                                        <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
+                                        <set field="years" from="Math.floor(days / 365)"/>
+                                        <set field="months" from="Math.floor(days / 30) - (years * 12)"/>
+                                    </actions>
+                                    <widgets>
+                                        <container-row>
+                                            <row-col xs="6" sm="6" md="6" lg="6">
+                                                <container style="margin-tb-05">
+                                                    <label text="${flowType.description}"/>
+                                                </container>
+                                            </row-col>
+                                            <row-col xs="6" sm="6" md="6" lg="6" style="text-right">
+                                                <container-dialog id="EditIncomeSourceDialog" button-text="Edit" width="960">
+                                                    <form-single name="EditIncomeSourceForm" transition="updateIncomeSource">
+                                                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                                                        <field name="financialFlowId"><default-field><hidden default-value="${incomeFinFlow.financialFlowId}"/></default-field></field>
+
+                                                        <field name="financialFlowTypeEnumId">
+                                                            <default-field title="Income Source Type">
+                                                                <drop-down required-manual-select="true">
+                                                                    <entity-options text="${enumDescription}" key="${enumId}">
+                                                                        <entity-find entity-name="moqui.basic.EnumGroupEnumAndParent">
+                                                                            <econdition field-name="enumGroupEnumId" value="DefaultDashboardIncomeSourceGroup"/>
+                                                                            <order-by field-name="enumDescription"/>
+                                                                        </entity-find>
+                                                                    </entity-options>
+                                                                </drop-down>
+                                                            </default-field>
+                                                        </field>
+                                                        <field name="amount">
+                                                            <default-field title="Gross Income Monthly">
+                                                                <text-line input-type="number" format="#.##" prefix="$"/>
+                                                            </default-field>
+                                                        </field>
+
+                                                        <field name="durationHeader">
+                                                            <default-field>
+                                                                <label text="Duration" style="margin-tb-1"/>
+                                                            </default-field>
+                                                        </field>
+                                                        <field name="years">
+                                                            <default-field>
+                                                                <text-line input-type="number"/>
+                                                            </default-field>
+                                                        </field>
+                                                        <field name="months">
+                                                            <default-field>
+                                                                <text-line input-type="number"/>
+                                                            </default-field>
+                                                        </field>
+
+                                                        <field name="submit">
+                                                            <default-field>
+                                                                <submit text="Save"/>
+                                                            </default-field>
+                                                        </field>
+
+                                                        <field-layout>
+                                                            <field-col-row>
+                                                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="financialFlowTypeEnumId"/></field-col>
+                                                            </field-col-row>
+                                                            <field-col-row>
+                                                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="amount"/></field-col>
+                                                            </field-col-row>
+
+                                                            <field-col-row>
+                                                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                                                            </field-col-row>
+                                                            <field-col-row>
+                                                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
+                                                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                                                            </field-col-row>
+
+                                                            <fields-not-referenced/>
+
+                                                            <field-col-row>
+                                                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                                                            </field-col-row>
+                                                        </field-layout>
+                                                    </form-single>
+                                                </container-dialog>
+                                                <link text="Remove" btn-type="danger" url="deleteIncomeSource" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, financialFlowId: incomeFinFlow.financialFlowId]"/>
+                                            </row-col>
+                                        </container-row>
+                                        <container style="h-separator margin-tb-05"/>
+                                    </widgets>
+                                </section-iterate>
+                                <container style="margin-tb-2"/>
+                            </widgets>
+                        </section>
+
+                        <container-dialog id="AddIncomeSourceDialog" button-text="Add Income Source" width="960" button-style="block margin-tb-1">
+                            <form-single name="AddIncomeSourceForm" transition="addIncomeSource">
+                                <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                                <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                                <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+
+                                <field name="financialFlowTypeEnumId">
+                                    <default-field title="Income Source Type">
+                                        <drop-down required-manual-select="true">
+                                            <entity-options text="${enumDescription}" key="${enumId}">
+                                                <entity-find entity-name="moqui.basic.EnumGroupEnumAndParent">
+                                                    <econdition field-name="enumGroupEnumId" value="DefaultDashboardIncomeSourceGroup"/>
+                                                    <order-by field-name="enumDescription"/>
+                                                </entity-find>
+                                            </entity-options>
+                                        </drop-down>
+                                    </default-field>
+                                </field>
+                                <field name="amount">
+                                    <default-field title="Gross Income Monthly">
+                                        <text-line input-type="number" format="#.##" prefix="$"/>
+                                    </default-field>
+                                </field>
+
+                                <field name="durationHeader">
+                                    <default-field>
+                                        <label text="Duration" style="margin-tb-1"/>
+                                    </default-field>
+                                </field>
+                                <field name="years">
+                                    <default-field>
+                                        <text-line input-type="number"/>
+                                    </default-field>
+                                </field>
+                                <field name="months">
+                                    <default-field>
+                                        <text-line input-type="number"/>
+                                    </default-field>
+                                </field>
+
+                                <field name="submit">
+                                    <default-field>
+                                        <submit text="Save"/>
+                                    </default-field>
+                                </field>
+
+                                <field-layout>
+                                    <field-col-row>
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="financialFlowTypeEnumId"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row>
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="amount"/></field-col>
+                                    </field-col-row>
+
+                                    <field-col-row>
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                                    </field-col-row>
+                                    <field-col-row>
+                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
+                                        <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                                    </field-col-row>
+
+                                    <fields-not-referenced/>
+
+                                    <field-col-row>
+                                        <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
                                     </field-col-row>
 
                                     <fields-not-referenced/>
