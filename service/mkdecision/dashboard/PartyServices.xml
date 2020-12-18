@@ -9,6 +9,7 @@
         <out-parameters>
             <parameter name="partyId"/>
             <parameter name="partyName"/>
+            <parameter name="partyNickname"/>
         </out-parameters>
     </service>
     <service verb="get" noun="PartyPrimaryTelecomNumber" type="java" location="com.mkdecision.dashboard.PartyServices" method="getPartyPrimaryTelecomNumber">

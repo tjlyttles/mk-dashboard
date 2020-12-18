@@ -47,58 +47,11 @@
         </actions>
         <default-response type="none"/>
     </transition>
-    <transition name="calculateNetPurchaseAmount">
-        <actions>
-            <if condition="totalPurchaseAmount == null || downPayment == null">
-                <script>ec.web.sendTextResponse('"Enter all amounts above"')</script>
-                <else>
-                    <set field="netPurchaseAmount" from="(ec.l10n.parseNumber(totalPurchaseAmount, null)).subtract(ec.l10n.parseNumber(downPayment,null))" type="BigDecimal"/>
-                    <script>ec.web.sendTextResponse(String.format("%f", netPurchaseAmount))</script>
-                </else>
-            </if>
-        </actions>
-        <default-response type="none"/>
-    </transition>
-    <transition name="calculateLoanFee">
-        <actions>
-            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
-            <service-call name="mkdecision.dashboard.ProductServices.get#ProductParameterValue" out-map="loanFee">
-                <field-map field-name="productId"/>
-                <field-map field-name="productStoreId" from="orderHeader.productStoreId"/>
-                <field-map field-name="productParameterId" value="LoanFee"/>
-            </service-call>
-            <script>ec.web.sendTextResponse(loanFee?.parameterValue ?: '0')</script>
-        </actions>
-        <default-response type="none"/>
-    </transition>
-    <transition name="calculateFinancedAmount">
-        <actions>
-            <if condition="totalPurchaseAmount == null || loanFee == null || downPayment == null">
-                <script>ec.web.sendTextResponse('"Enter all amounts above"')</script>
-                <else>
-                    <set field="financedAmount" from="(new BigDecimal(totalPurchaseAmount)).add(new BigDecimal(loanFee)).subtract(new BigDecimal(downPayment))" type="BigDecimal"/>
-                    <script>ec.web.sendTextResponse(String.format("%f", financedAmount))</script>
-                </else>
-            </if>
-        </actions>
-        <default-response type="none"/>
-    </transition>
-    <transition name="calculateEstimatedPayment">
-        <actions>
-            <if condition="totalPurchaseAmount == null || loanFee == null || downPayment == null">
-                <script>ec.web.sendTextResponse('"Enter all amounts above"')</script>
-                <else>
-                    <set field="orderAmount" from="(new BigDecimal(totalPurchaseAmount)).add(new BigDecimal(loanFee)).subtract(new BigDecimal(downPayment))" type="BigDecimal"/>
-                    <service-call name="close.ProductServices.calculate#EstimatedPayment" out-map="estimatedPayment">
-                        <field-map field-name="productId"/>
-                        <field-map field-name="creditLine" from="orderAmount"/>
-                    </service-call>
-                    <script>ec.web.sendTextResponse(String.format("%f", estimatedPayment?.estimatedPayment ?: 0.0))</script>
-                </else>
-            </if>
-        </actions>
-        <default-response type="none"/>
-    </transition>
+    <transition-include name="calculateNetPurchaseAmount" location="component://mk-dashboard/screen/custom/OrderWizard/OrderHeader.xml"/>
+    <transition-include name="calculateLoanFee" location="component://mk-dashboard/screen/custom/OrderWizard/OrderHeader.xml"/>
+    <transition-include name="calculateFinancedAmount" location="component://mk-dashboard/screen/custom/OrderWizard/OrderHeader.xml"/>
+    <transition-include name="calculateEstimatedPayment" location="component://mk-dashboard/screen/custom/OrderWizard/OrderHeader.xml"/>
+
     <transition name="addParty">
         <default-response url="../../OrderParty/Party">
             <parameter name="orderId" from="orderId"/>
@@ -337,36 +290,37 @@
                                 </field>
                                 <field name="netPurchaseAmount">
                                     <default-field>
-                                        <display dynamic-transition="calculateNetPurchaseAmount" depends-optional="true" style="bg-grey-1">
+                                        <text-line format="#.##" prefix="$" default-transition="calculateNetPurchaseAmount" disabled="true">
                                             <depends-on field="totalPurchaseAmount"/>
                                             <depends-on field="downPayment"/>
-                                        </display>
+                                        </text-line>
                                     </default-field>
                                 </field>
                                 <field name="loanFee">
                                     <default-field>
-                                        <display dynamic-transition="calculateLoanFee" depends-optional="true" style="bg-grey-1">
+                                        <text-line format="#.##" prefix="$" default-transition="calculateLoanFee" disabled="true">
+                                            <depends-on field="productStoreId"/>
                                             <depends-on field="productId"/>
-                                        </display>
+                                        </text-line>
                                     </default-field>
                                 </field>
                                 <field name="financedAmount">
-                                    <default-field>
-                                        <display dynamic-transition="calculateFinancedAmount" depends-optional="true" style="bg-grey-1">
+                                    <default-field title="Amount Financed">
+                                        <text-line format="#.##" prefix="$" default-transition="calculateFinancedAmount" disabled="true">
                                             <depends-on field="totalPurchaseAmount"/>
                                             <depends-on field="downPayment"/>
                                             <depends-on field="loanFee"/>
-                                        </display>
+                                        </text-line>
                                     </default-field>
                                 </field>
                                 <field name="estimatedPayment">
                                     <default-field>
-                                        <display dynamic-transition="calculateEstimatedPayment" depends-optional="true" style="bg-grey-1">
+                                        <text-line format="#.##" prefix="$" default-transition="calculateEstimatedPayment" disabled="true">
                                             <depends-on field="productId"/>
                                             <depends-on field="totalPurchaseAmount"/>
                                             <depends-on field="downPayment"/>
                                             <depends-on field="loanFee"/>
-                                        </display>
+                                        </text-line>
                                     </default-field>
                                 </field>
                                 <field name="submit">
@@ -552,6 +506,11 @@
                 <field name="partyName">
                     <default-field title="Name">
                         <display text="${partyName ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="nickname">
+                    <default-field title="Other Name (AKA)">
+                        <display text="${nickname ?: '-'}"/>
                     </default-field>
                 </field>
                 <field name="telecomNumber">
