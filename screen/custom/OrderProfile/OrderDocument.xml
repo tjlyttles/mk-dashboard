@@ -44,12 +44,111 @@
             <econdition field-name="agreementId" operator="in" from="agreementIdList"/>
         </entity-find>
 
-        <entity-find entity-name="mantle.party.PartyContent" list="partyContentList">
-            <econdition field-name="partyId" operator="in" from="partyIdList"/>
-        </entity-find>
-        <entity-find entity-name="mantle.order.OrderContent" list="orderContentList">
-            <econdition field-name="orderId" from="orderId"/>
-        </entity-find>
+        <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
+            <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+            <econdition field-name="partyId" from="ec.user.userAccount.partyId"/>
+            <econdition field-name="roleTypeId" value="FinanceManager"/>
+            <date-filter/>
+        </entity-find-count>
+        <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="underwriterCount">
+            <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+            <econdition field-name="partyId" from="ec.user.userAccount.partyId"/>
+            <econdition field-name="roleTypeId" value="Underwriter"/>
+            <date-filter/>
+        </entity-find-count>
+        <set field="isFinanceManager" from="financeManagerCount > 0"/>
+        <set field="isUnderwriter" from="underwriterCount > 0"/>
+
+        <if condition="isUnderwriter">
+            <entity-find entity-name="mkdecision.dashboard.PartyContentDetail" list="partyContentList" distinct="true">
+                <econdition field-name="partyId" operator="in" from="partyIdList"/>
+                <select-field field-name="partyContentId"/>
+                <select-field field-name="partyId"/>
+                <select-field field-name="contentLocation"/>
+                <select-field field-name="partyContentTypeEnumId"/>
+                <select-field field-name="description"/>
+                <select-field field-name="contentDate"/>
+                <select-field field-name="userId"/>
+            </entity-find>
+            <else-if condition="isFinanceManager">
+                <entity-find entity-name="mkdecision.dashboard.PartyContentDetail" list="partyContentList" distinct="true">
+                    <econdition field-name="partyId" operator="in" from="partyIdList"/>
+                    <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+                    <econditions combine="or">
+                        <econdition field-name="storePartyRoleTypeId" value="FinanceManager"/>
+                        <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
+                    </econditions>
+                    <select-field field-name="partyContentId"/>
+                    <select-field field-name="partyId"/>
+                    <select-field field-name="contentLocation"/>
+                    <select-field field-name="partyContentTypeEnumId"/>
+                    <select-field field-name="description"/>
+                    <select-field field-name="contentDate"/>
+                    <select-field field-name="userId"/>
+                </entity-find>
+                <else>
+                    <entity-find entity-name="mkdecision.dashboard.PartyContentDetail" list="partyContentList" distinct="true">
+                        <econdition field-name="partyId" operator="in" from="partyIdList"/>
+                        <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+                        <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
+                        <econdition field-name="userId" from="ec.user.userId"/>
+                        <select-field field-name="partyContentId"/>
+                        <select-field field-name="partyId"/>
+                        <select-field field-name="contentLocation"/>
+                        <select-field field-name="partyContentTypeEnumId"/>
+                        <select-field field-name="description"/>
+                        <select-field field-name="contentDate"/>
+                        <select-field field-name="userId"/>
+                    </entity-find>
+                </else>
+            </else-if>
+        </if>
+
+        <if condition="isUnderwriter">
+            <entity-find entity-name="mkdecision.dashboard.OrderContentDetail" list="orderContentList" distinct="true">
+                <econdition field-name="orderId" from="orderId"/>
+                <select-field field-name="orderContentId"/>
+                <select-field field-name="orderContentTypeEnumId"/>
+                <select-field field-name="orderId"/>
+                <select-field field-name="contentLocation"/>
+                <select-field field-name="description"/>
+                <select-field field-name="contentDate"/>
+                <select-field field-name="userId"/>
+            </entity-find>
+            <else-if condition="isFinanceManager">
+                <entity-find entity-name="mkdecision.dashboard.OrderContentDetail" list="orderContentList" distinct="true">
+                    <econdition field-name="orderId" from="orderId"/>
+                    <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+                    <econditions combine="or">
+                        <econdition field-name="storePartyRoleTypeId" value="FinanceManager"/>
+                        <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
+                    </econditions>
+                    <select-field field-name="orderContentId"/>
+                    <select-field field-name="orderContentTypeEnumId"/>
+                    <select-field field-name="orderId"/>
+                    <select-field field-name="contentLocation"/>
+                    <select-field field-name="description"/>
+                    <select-field field-name="contentDate"/>
+                    <select-field field-name="userId"/>
+                </entity-find>
+                <else>
+                    <entity-find entity-name="mkdecision.dashboard.OrderContentDetail" list="orderContentList" distinct="true">
+                        <econdition field-name="orderId" from="orderId"/>
+                        <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+                        <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
+                        <econdition field-name="userId" from="ec.user.userId"/>
+                        <select-field field-name="orderContentId"/>
+                        <select-field field-name="orderContentTypeEnumId"/>
+                        <select-field field-name="orderId"/>
+                        <select-field field-name="contentLocation"/>
+                        <select-field field-name="description"/>
+                        <select-field field-name="contentDate"/>
+                        <select-field field-name="userId"/>
+                    </entity-find>
+                </else>
+            </else-if>
+        </if>
+
         <set field="fileList" from="[]"/>
         <iterate list="partyContentList" entry="partyContent">
             <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
@@ -62,7 +161,7 @@
                 <field-map field-name="partyId" from="partyContent.partyId"/>
             </service-call>
             <set field="resourceRef" from="ec.resource.getLocationReference(partyContent.contentLocation)"/>
-            <script>fileList.add([contentId: partyContent.partyContentId, contentOrigin: 'Party', contentType:contentType.description, partyName: party.partyName ?: '-', source: resourceRef?.getFileName() ?: '-', performedBy: userAccount?.userFullName ?: '-', contentDate: partyContent.contentDate])</script>
+            <script>fileList.add([contentId: partyContent.partyContentId, contentOrigin: 'Party', contentType:contentType?.description ?: '-', partyName: party.partyName ?: '-', source: resourceRef?.getFileName() ?: '-', performedBy: userAccount?.userFullName ?: '-', contentDate: partyContent.contentDate])</script>
         </iterate>
         <iterate list="orderContentList" entry="orderContent">
             <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
@@ -72,7 +171,7 @@
                 <field-map field-name="userId" from="orderContent.userId"/>
             </entity-find-one>
             <set field="resourceRef" from="ec.resource.getLocationReference(orderContent.contentLocation)"/>
-            <script>fileList.add([contentId: orderContent.orderContentId, contentOrigin: 'Order', contentType:contentType.description, partyName: '-', source: resourceRef?.getFileName() ?: '-', performedBy: userAccount?.userFullName ?: '-', contentDate: orderContent.contentDate])</script>
+            <script>fileList.add([contentId: orderContent.orderContentId, contentOrigin: 'Order', contentType:contentType?.description ?: '-', partyName: '-', source: resourceRef?.getFileName() ?: '-', performedBy: userAccount?.userFullName ?: '-', contentDate: orderContent.contentDate])</script>
         </iterate>
 
         <entity-find entity-name="mantle.order.OrderEmailMessageDetail" list="emailList">
