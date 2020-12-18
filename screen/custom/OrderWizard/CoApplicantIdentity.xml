@@ -61,13 +61,12 @@
                 <container style="stepper margin-b-1">
                     <render-mode>
                         <text type="qvt"><![CDATA[
-                            <q-stepper ref="stepper" value="s4" color="primary" :flat="true">
+                            <q-stepper ref="stepper" value="s3" color="primary" :flat="true">
                                 <q-step name="s1" title="Order Items" icon="shopping_cart"/>
                                 <q-step name="s2" title="Eligibility" icon="policy"/>
-                                <q-step name="s3" title="Primary Applicant" icon="person"/>
-                                <q-step name="s4" title="Co-Applicant" icon="person_add"/>
-                                <q-step name="s5" title="Property" icon="home"/>
-                                <q-step name="s6" title="Agreements" icon="done"/>
+                                <q-step name="s3" title="Applicants" icon="person"/>
+                                <q-step name="s4" title="Property" icon="home"/>
+                                <q-step name="s5" title="Agreements" icon="done"/>
                             </q-stepper>
                         ]]></text>
                     </render-mode>
@@ -81,7 +80,7 @@
             <row-col xs="12" sm="10" md="6" lg="6">
                 <label text="New Application" type="h4" style="margin-b-1"/>
                 <label text="Co-Applicant Identity" type="h5" style="margin-b-1"/>
-                <label text="Please add all parties associated with the new application." style="margin-b-1"/>
+                <label text="Add a United States of America Government or State issued identification." style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>
 
                 <section-include name="idSection" location="component://mk-dashboard/screen/custom/OrderParty/PartyIdentity.xml"/>
