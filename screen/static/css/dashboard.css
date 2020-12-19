@@ -30,10 +30,15 @@
 .h-separator { border-bottom: 1px solid rgb(211, 212, 216); }
 .v-separator { border-right: 1px solid rgb(211, 212, 216); }
 
-@media screen and (max-width: 800px) {
-    .stepper {
+@media screen and (max-width: 1500px) {
+    .stepper .q-stepper__title {
         visibility: hidden;
         display: none;
+    }
+}
+@media screen and (max-width: 420px) {
+    .stepper .q-stepper__tab {
+        padding: 8px 16px !important;
     }
 }
 
