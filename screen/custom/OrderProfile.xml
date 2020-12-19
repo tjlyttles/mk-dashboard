@@ -180,10 +180,6 @@
                         </form-single>
                     </container-dialog>
                     <link url="${customerPortalUrl}" text="Customer Portal" condition="customerPortalUrl != null" icon="fa fa-handshake-o" url-type="plain" target-window="_blank"/>
-                    <button-menu text="More" icon="fa fa-ellipsis-v">
-                        <link url="addParty" text="Add Party" condition="editableOrderState.contains(orderHeader.statusId)"/>
-                        <link url="cancelOrder" text="Cancel" btn-type="danger"/>
-                    </button-menu>
                 </container>
             </row-col>
             <row-col lg="6" style="text-right">
@@ -287,6 +283,7 @@
                         </section>
                     </widgets>
                 </section-iterate>
+                <link url="cancelOrder" text="Cancel" btn-type="danger"/>
             </row-col>
         </container-row>
 
