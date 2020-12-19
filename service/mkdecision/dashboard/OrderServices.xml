@@ -58,7 +58,7 @@
             <parameter name="productId"/>
             <parameter name="totalPurchaseAmount" type="BigDecimal"/>
             <parameter name="downPayment" type="BigDecimal"/>
-            <parameter name="downPayment" type="BigDecimal"/>
+            <parameter name="loanFee" type="BigDecimal"/>
             <parameter name="netPurchaseAmount" type="BigDecimal"/>
             <parameter name="financedAmount" type="BigDecimal"/>
             <parameter name="estimatedPayment" type="BigDecimal"/>

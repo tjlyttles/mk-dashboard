@@ -1873,7 +1873,7 @@ class OrderServices {
         BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
         BigDecimal netPurchaseAmount = (BigDecimal) cs.getOrDefault("netPurchaseAmount", null)
         BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
-        String financedAmount = (String) cs.getOrDefault("financedAmount", null)
+        BigDecimal financedAmount = (BigDecimal) cs.getOrDefault("financedAmount", null)
         BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
 
         // validate order header
