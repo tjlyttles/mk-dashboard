@@ -62,6 +62,17 @@
             <econdition field-name="orderId" from="orderId"/>
             <econdition field-name="orderItemSeqId" from="orderItem.orderItemSeqId"/>
         </entity-find>
+        <entity-find entity-name="mantle.order.OrderPartParty" list="partyList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
+            <econditions combine="or">
+                <econdition field-name="roleTypeId" value="PrimaryApplicant"/>
+                <econdition field-name="roleTypeId" value="CoApplicant"/>
+            </econditions>
+        </entity-find>
+        <entity-find entity-name="mantle.product.asset.Asset" list="assetList">
+            <econdition field-name="ownerPartyId" operator="in" from="partyList?.partyId?.toSet()"/>
+        </entity-find>
 
         <set field="formId" from="formList.isEmpty() ? null : formList.getFirst().get('formId')"/>
         <set field="formResponseId" from="responseList?.getFirst()?.formResponseId ?: null"/>
@@ -74,26 +85,13 @@
             </service-call>
             <set field="responseMap" from="formResponse?.responseMap"/>
         </if>
-
-        <entity-find entity-name="mantle.order.OrderPartParty" list="partyList">
-            <econdition field-name="orderId" from="orderId"/>
-            <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
-            <econditions combine="or">
-                <econdition field-name="roleTypeId" value="PrimaryApplicant"/>
-                <econdition field-name="roleTypeId" value="CoApplicant"/>
-            </econditions>
-        </entity-find>
-
-        <entity-find entity-name="mantle.product.asset.Asset" list="assetList">
-            <econdition field-name="ownerPartyId" operator="in" from="partyList?.partyId?.toSet()"/>
-        </entity-find>
     </actions>
 
     <widgets>
-        <container style="row">
+        <container style="full-width row wrap items-stretch">
             <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                <container style="padding-all-05">
-                    <container style="padding-all-1 border-all-1 rounded-borders">
+                <container style="padding-all-05 full-height">
+                    <container style="padding-all-1 border-all-1 rounded-borders full-height">
                         <section-include name="EligibilitySection" location="component://mk-dashboard/template/order/OrderWidgets.xml"/>
                     </container>
                 </container>
@@ -141,8 +139,8 @@
                 </actions>
                 <widgets>
                     <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                        <container style="padding-all-05">
-                            <container style="padding-all-1 border-all-1 rounded-borders">
+                        <container style="padding-all-05 full-height">
+                            <container style="padding-all-1 border-all-1 rounded-borders full-height">
                                 <section-include name="PropertySection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
                             </container>
                         </container>
@@ -220,8 +218,8 @@
                 </actions>
                 <widgets>
                     <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                        <container style="padding-all-05">
-                            <container style="padding-all-1 border-all-1 rounded-borders">
+                        <container style="padding-all-05 full-height">
+                            <container style="padding-all-1 border-all-1 rounded-borders full-height">
                                 <section-include name="PersonSection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
                             </container>
                         </container>
