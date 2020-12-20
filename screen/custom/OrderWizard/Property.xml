@@ -20,7 +20,7 @@
         <default-response url="."/>
     </transition>
     <transition name="deleteMortgage">
-        <service-call name="mkdecision.dashboard.OrderServices.delete#Mortgage" in-map="context"/>
+        <service-call name="mkdecision.dashboard.PartyServices.delete#Mortgage" in-map="context"/>
         <default-response url="."/>
     </transition>
     <transition name="coApplicant">
@@ -195,7 +195,7 @@
                                     </field>
                                     <field name="relationshipAction">
                                         <default-field>
-                                            <link text="Remove Mortgage" btn-type="danger" url="deleteMortgage" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, assetId: assetId, partyRelationshipId: mortgageRelation.partyRelationshipId]"/>
+                                            <link text="Remove Mortgage" btn-type="danger" url="deleteMortgage" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, partyRelationshipId: mortgageRelation.partyRelationshipId]"/>
                                         </default-field>
                                     </field>
                                     <field name="lenderName">

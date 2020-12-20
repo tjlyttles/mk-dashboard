@@ -1141,43 +1141,6 @@ class OrderServices {
         return outParams
     }
 
-    static Map<String, Object> deleteMortgage(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
-
-        // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String partyRelationshipId = (String) cs.getOrDefault("partyRelationshipId", null)
-
-        // find relationship
-        EntityValue relationship = ef.find("mantle.party.PartyRelationship")
-                .condition("partyRelationshipId", partyRelationshipId)
-                .one()
-
-        // validate relationship
-        if (relationship == null || !StringUtils.equals(partyId, relationship.getString("fromPartyId")) || !StringUtils.equals(relationship.getString("relationshipTypeEnumId"), "PrtMortgage")) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE"))
-            return new HashMap<String, Object>()
-        }
-
-        // TODO: Cleanup mortgage?
-
-        // delete relationship
-        sf.sync().name("delete#mantle.party.PartyRelationship")
-                .parameter("partyRelationshipId", partyRelationshipId)
-                .call()
-
-        // return the output parameters
-        return new HashMap<>()
-    }
-
     static void validateOrderItemFields(ExecutionContext ec) {
 
         // shortcuts for convenience

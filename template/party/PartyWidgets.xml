@@ -254,15 +254,15 @@
                     <container style="q-pt-sm">
                         <container-row>
                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="First name" style="text-light-grey"/></row-col>
-                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${partyDetail.firstName ?: '-'}"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${firstName ?: '-'}"/></row-col>
                         </container-row>
                         <container-row>
                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Last name" style="text-light-grey"/></row-col>
-                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${partyDetail.lastName ?: '-'}"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${lastName ?: '-'}"/></row-col>
                         </container-row>
                         <container-row>
                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Other Name (AKA)" style="text-light-grey"/></row-col>
-                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${partyDetail.nickname ?: '-'}"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${nickname ?: '-'}"/></row-col>
                         </container-row>
                         <container-row>
                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Social Security Number" style="text-light-grey"/></row-col>
@@ -270,7 +270,11 @@
                         </container-row>
                         <container-row>
                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Date of Birth" style="text-light-grey"/></row-col>
-                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.format(partyDetail.birthDate, 'MM/dd/yyyy')}"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${birthDate}"/></row-col>
+                        </container-row>
+                        <container-row>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Marital Status" style="text-light-grey"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${maritalStatus.description ?: '-'}"/></row-col>
                         </container-row>
                         <container-row>
                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Employment Status" style="text-light-grey"/></row-col>
@@ -278,11 +282,7 @@
                         </container-row>
                         <container-row>
                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Occupation" style="text-light-grey"/></row-col>
-                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${partyDetail.occupation ?: '-'}"/></row-col>
-                        </container-row>
-                        <container-row>
-                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Marital Status" style="text-light-grey"/></row-col>
-                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${maritalStatus.description ?: '-'}"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${occupation ?: '-'}"/></row-col>
                         </container-row>
                     </container>
                 </container>
@@ -371,44 +371,39 @@
 
                 <section-iterate name="PersonCurrentEmploymentIterator" list="currentEmploymentRelationList" entry="employmentRelation">
                     <actions>
-                        <set field="employerName" from="employmentRelation.organizationName"/>
-                        <set field="jobTitle" from="employmentRelation.relationshipName"/>
-
                         <entity-find entity-name="mantle.party.PartyClassificationAppl" list="partyClassList">
                             <econdition field-name="partyId" from="employmentRelation.toPartyId"/>
                             <date-filter/>
                         </entity-find>
-                        <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
-
                         <entity-find-one entity-name="mantle.party.PartyRelationshipSetting" value-field="employmentStatusSetting">
                             <field-map field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
                             <field-map field-name="partySettingTypeId" value="EmploymentStatus"/>
                         </entity-find-one>
-                        <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
-
                         <entity-find entity-name="mk.close.FinancialFlow" list="monthlyIncomeFinFlowList">
                             <econdition field-name="partyId" from="employmentRelation.fromPartyId"/>
                             <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
                             <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowTotalMonthlyIncome"/>
                             <econdition field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
                         </entity-find>
-                        <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
+                        <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" in-map="[partyId: employmentRelation.toPartyId]" out-map="telecomNumberResp"/>
+                        <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" in-map="[partyId: employmentRelation.toPartyId]" out-map="postalAddressResp"/>
 
+                        <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
+                        <set field="employerName" from="employmentRelation.organizationName"/>
+                        <set field="jobTitle" from="employmentRelation.relationshipName"/>
+                        <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
+                        <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
                         <set field="millis" from="Math.abs(employmentRelation.fromDate.getTime() - ec.user.nowTimestamp.getTime())"/>
                         <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
                         <set field="years" from="Math.floor(days / 365)" type="Integer"/>
                         <set field="months" from="Math.floor(days / 30) - (years * 12)" type="Integer"/>
-
-                        <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" in-map="[partyId: employmentRelation.toPartyId]" out-map="postalAddressResp"/>
+                        <set field="employerContactNumber" from="telecomNumberResp.contactNumber"/>
                         <set field="employerPostalAddress" from="postalAddressResp.postalAddressString"/>
                         <set field="employerAddress1" from="postalAddressResp.postalAddress?.address1"/>
                         <set field="employerUnitNumber" from="postalAddressResp.postalAddress?.unitNumber"/>
                         <set field="employerPostalCode" from="postalAddressResp.postalAddress?.postalCode"/>
                         <set field="employerCity" from="postalAddressResp.postalAddress?.city"/>
                         <set field="employerStateProvinceGeoId" from="postalAddressResp.postalAddress?.stateProvinceGeoId"/>
-
-                        <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" in-map="[partyId: employmentRelation.toPartyId]" out-map="telecomNumberResp"/>
-                        <set field="employerContactNumber" from="telecomNumberResp.contactNumber"/>
                     </actions>
                     <widgets>
                         <container style="q-pt-md">
@@ -454,9 +449,9 @@
                 <section-iterate name="PersonIncomeSourceIterator" list="incomeFinFlowList" entry="incomeFinFlow">
                     <actions>
                         <entity-find-related-one value-field="incomeFinFlow" relationship-name="flowType" to-value-field="flowType"/>
+
                         <set field="financialFlowTypeEnumId" from="incomeFinFlow.financialFlowTypeEnumId"/>
                         <set field="amount" from="incomeFinFlow.amount"/>
-
                         <set field="millis" from="Math.abs(incomeFinFlow.fromDate.getTime() - ec.user.nowTimestamp.getTime())"/>
                         <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
                         <set field="years" from="Math.floor(days / 365)" type="Integer"/>
@@ -492,41 +487,37 @@
 
                 <section-iterate name="PersonPreviousEmploymentIterator" list="previousEmploymentRelationList" entry="employmentRelation">
                     <actions>
-                        <set field="employerName" from="employmentRelation.organizationName"/>
-                        <set field="jobTitle" from="employmentRelation.relationshipName"/>
-                        <set field="fromDate" from="ec.l10n.format(employmentRelation.fromDate, 'MM-dd-yyyy')"/>
-                        <set field="toDate" from="ec.l10n.format(employmentRelation.thruDate, 'MM-dd-yyyy')"/>
-
                         <entity-find entity-name="mantle.party.PartyClassificationAppl" list="partyClassList">
                             <econdition field-name="partyId" from="employmentRelation.toPartyId"/>
                             <date-filter/>
                         </entity-find>
-                        <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
-
                         <entity-find-one entity-name="mantle.party.PartyRelationshipSetting" value-field="employmentStatusSetting">
                             <field-map field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
                             <field-map field-name="partySettingTypeId" value="EmploymentStatus"/>
                         </entity-find-one>
-                        <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
-
                         <entity-find entity-name="mk.close.FinancialFlow" list="monthlyIncomeFinFlowList">
                             <econdition field-name="partyId" from="employmentRelation.fromPartyId"/>
                             <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
                             <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowTotalMonthlyIncome"/>
                             <econdition field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
                         </entity-find>
-                        <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
-
+                        <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" in-map="[partyId: employmentRelation.toPartyId]" out-map="telecomNumberResp"/>
                         <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" in-map="[partyId: employmentRelation.toPartyId]" out-map="postalAddressResp"/>
+
+                        <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
+                        <set field="employerName" from="employmentRelation.organizationName"/>
+                        <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
+                        <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
+                        <set field="jobTitle" from="employmentRelation.relationshipName"/>
+                        <set field="fromDate" from="ec.l10n.format(employmentRelation.fromDate, 'MM-dd-yyyy')"/>
+                        <set field="toDate" from="ec.l10n.format(employmentRelation.thruDate, 'MM-dd-yyyy')"/>
+                        <set field="employerContactNumber" from="telecomNumberResp.contactNumber"/>
                         <set field="employerPostalAddress" from="postalAddressResp.postalAddressString"/>
                         <set field="employerAddress1" from="postalAddressResp.postalAddress?.address1"/>
                         <set field="employerUnitNumber" from="postalAddressResp.postalAddress?.unitNumber"/>
                         <set field="employerPostalCode" from="postalAddressResp.postalAddress?.postalCode"/>
                         <set field="employerCity" from="postalAddressResp.postalAddress?.city"/>
                         <set field="employerStateProvinceGeoId" from="postalAddressResp.postalAddress?.stateProvinceGeoId"/>
-
-                        <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" in-map="[partyId: employmentRelation.toPartyId]" out-map="telecomNumberResp"/>
-                        <set field="employerContactNumber" from="telecomNumberResp.contactNumber"/>
                     </actions>
                     <widgets>
                         <container style="q-pt-md">
@@ -567,6 +558,100 @@
                                 <container-row>
                                     <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Employer Phone Number" style="text-light-grey"/></row-col>
                                     <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><link link-type="anchor" url="tel:${employerContactNumber ?: '-'}" text="${employerContactNumber ?: '-'}" url-type="plain"/></row-col>
+                                </container-row>
+                            </container>
+                        </container>
+                    </widgets>
+                </section-iterate>
+            </widgets>
+        </section>
+
+        <section name="PropertySection">
+            <widgets>
+                <container>
+                    <label text="Property" type="h4"/>
+                </container>
+
+                <container style="q-pt-md">
+                    <container-row>
+                        <row-col sm="8" xs="8" md="8" lg="8"  style="padding-all-0">
+                            <label text="Property Information" type="h6"/>
+                        </row-col>
+                        <row-col sm="4" xs="4" md="4" lg="4" style="text-right">
+                            <section-include name="EditProperty" location="component://mk-dashboard/template/party/PartyForms.xml"/>
+                        </row-col>
+                    </container-row>
+                    <container style="q-pt-sm">
+                        <container-row>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Address" style="text-light-grey"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${postalAddressString}"/></row-col>
+                        </container-row>
+                        <container-row>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Type" style="text-light-grey"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${assetClass.description ?: '-'}"/></row-col>
+                        </container-row>
+                        <container-row>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Current Property Value (Estimate)" style="text-light-grey"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(salvageValue ?: 0, orderHeader.currencyUomId)}"/></row-col>
+                        </container-row>
+                        <container-row>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Original Purchase Price" style="text-light-grey"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(acquireCost ?: 0, orderHeader.currencyUomId)}"/></row-col>
+                        </container-row>
+                        <container-row>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="HOA Fee Monthly" style="text-light-grey"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(hoaFeeMonthly ?: 0, orderHeader.currencyUomId)}"/></row-col>
+                        </container-row>
+                        <container-row>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Property Tax Annually" style="text-light-grey"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(propertyTaxesAnnually ?: 0, orderHeader.currencyUomId)}"/></row-col>
+                        </container-row>
+                        <container-row>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Property Insurance Costs Annually" style="text-light-grey"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(propertyInsuranceCostsAnnually ?: 0, orderHeader.currencyUomId)}"/></row-col>
+                        </container-row>
+                    </container>
+                </container>
+
+                <section-iterate name="MortgageRelationIterator" list="mortgageRelationList" entry="mortgageRelation">
+                    <actions>
+                        <entity-find-one entity-name="mk.close.FinancialFlow" value-field="financialFlow">
+                            <field-map field-name="partyId" from="mortgageRelation.fromPartyId"/>
+                            <field-map field-name="financialFlowTypeEnumId" value="MkFinFlowMortgage"/>
+                            <field-map field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                            <field-map field-name="partyRelationshipId" from="mortgageRelation.partyRelationshipId"/>
+                        </entity-find-one>
+
+                        <set field="partyRelationshipId" from="mortgageRelation.partyRelationshipId"/>
+                        <set field="lenderName" from="mortgageRelation.organizationName"/>
+                        <set field="mortgageBalance" from="financialFlow.balance"/>
+                        <set field="mortgagePaymentMonthly" from="financialFlow.amount"/>
+                    </actions>
+                    <widgets>
+                        <container style="q-pt-md">
+                            <container-row>
+                                <row-col sm="8" xs="8" md="8" lg="8"  style="padding-all-0">
+                                    <label text="Mortgage ${mortgageRelation_index + 1}" type="h6"/>
+                                </row-col>
+                                <row-col sm="4" xs="4" md="4" lg="4" style="text-right">
+                                    <section-include name="EditMortgage" location="component://mk-dashboard/template/party/PartyForms.xml"/>
+                                </row-col>
+                            </container-row>
+                            <container style="q-pt-sm">
+                                <container-row>
+                                    <row-col lg="12" md="12" sm="12" xs="12" style="padding-all-0"><label text="Mortgage ${sectionEntryIndex + 1}" style="text-light-grey"/></row-col>
+                                </container-row>
+                                <container-row>
+                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Lender Name" style="text-light-grey"/></row-col>
+                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${lenderName ?: '-'}"/></row-col>
+                                </container-row>
+                                <container-row>
+                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Mortgage Balance" style="text-light-grey"/></row-col>
+                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(mortgageBalance, orderHeader.currencyUomId)}"/></row-col>
+                                </container-row>
+                                <container-row>
+                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Mortgage Payment Monthly" style="text-light-grey"/></row-col>
+                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(mortgagePaymentMonthly, orderHeader.currencyUomId)}"/></row-col>
                                 </container-row>
                             </container>
                         </container>

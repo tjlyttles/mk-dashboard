@@ -36,6 +36,14 @@
         <service-call name="mkdecision.dashboard.PartyServices.update#IncomeSource" in-map="context"/>
         <default-response url="."/>
     </transition>
+    <transition name="updateProperty">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Property" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateMortgage">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Mortgage" in-map="context"/>
+        <default-response url="."/>
+    </transition>
 
     <actions>
         <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
@@ -43,25 +51,20 @@
             <field-map field-name="orderId" from="orderId"/>
             <field-map field-name="orderPartSeqId" value="01"/>
         </entity-find-one>
-        <set field="orderPartSeqId" from="orderPart.orderPartSeqId"/>
-
         <entity-find-one entity-name="mantle.order.OrderItem" value-field="orderItem">
             <field-map field-name="orderId" from="orderId"/>
             <field-map field-name="orderItemSeqId" value="01"/>
         </entity-find-one>
-        <set field="orderItemSeqId" from="orderItem.orderItemSeqId"/>
-
         <entity-find entity-name="mantle.product.ProductDbForm" list="formList">
             <econdition field-name="productId" from="orderItem.productId"/>
         </entity-find>
-        <set field="formId" from="formList.isEmpty() ? null : formList.getFirst().get('formId')"/>
-
         <entity-find entity-name="mantle.order.OrderItemFormResponse" list="responseList">
             <econdition field-name="orderId" from="orderId"/>
-            <econdition field-name="orderItemSeqId" value="01"/>
+            <econdition field-name="orderItemSeqId" from="orderItem.orderItemSeqId"/>
         </entity-find>
-        <set field="formResponseId" from="responseList?.getFirst()?.formResponseId ?: null"/>
 
+        <set field="formId" from="formList.isEmpty() ? null : formList.getFirst().get('formId')"/>
+        <set field="formResponseId" from="responseList?.getFirst()?.formResponseId ?: null"/>
         <if condition="formResponseId != null">
             <entity-find entity-name="moqui.screen.form.FormResponseAnsAndDbFormField" list="answerList">
                 <econdition field-name="formResponseId" from="formResponseId"/>
@@ -80,10 +83,9 @@
                 <econdition field-name="roleTypeId" value="CoApplicant"/>
             </econditions>
         </entity-find>
-        <set field="partyIdList" from="partyList?.partyId?.toSet()"/>
 
         <entity-find entity-name="mantle.product.asset.Asset" list="assetList">
-            <econdition field-name="ownerPartyId" operator="in" from="partyIdList"/>
+            <econdition field-name="ownerPartyId" operator="in" from="partyList?.partyId?.toSet()"/>
         </entity-find>
     </actions>
 
@@ -128,85 +130,20 @@
                         <econdition field-name="fromPartyId" from="asset.ownerPartyId"/>
                         <econdition field-name="fromRoleTypeId" value="Borrower"/>
                     </entity-find>
+
+                    <set field="assetId" from="asset.assetId"/>
+                    <set field="classEnumId" from="asset.classEnumId"/>
+                    <set field="salvageValue" from="asset.salvageValue"/>
+                    <set field="acquireCost" from="asset.acquireCost"/>
+                    <set field="hoaFeeMonthly" from="hoaMonthlyFeeFinFlowList?.getFirst().amount ?: 0"/>
+                    <set field="propertyTaxesAnnually" from="annualPropertyTaxFinFlowList?.getFirst().amount ?: 0"/>
+                    <set field="propertyInsuranceCostsAnnually" from="annualInsuranceCostFinFlowList?.getFirst().amount ?: 0"/>
                 </actions>
                 <widgets>
                     <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
                         <container style="padding-all-05">
                             <container style="padding-all-1 border-all-1 rounded-borders">
-                                <container>
-                                    <label text="Property" type="h4"/>
-                                </container>
-
-                                <container style="q-pt-md">
-                                    <label text="Property Information" type="h6"/>
-                                    <container style="q-pt-sm">
-                                        <container-row>
-                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Address" style="text-light-grey"/></row-col>
-                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${postalAddressString}"/></row-col>
-                                        </container-row>
-                                        <container-row>
-                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Type" style="text-light-grey"/></row-col>
-                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${assetClass.description ?: '-'}"/></row-col>
-                                        </container-row>
-                                        <container-row>
-                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Current Property Value (Estimate)" style="text-light-grey"/></row-col>
-                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(asset.salvageValue ?: 0, orderHeader.currencyUomId)}"/></row-col>
-                                        </container-row>
-                                        <container-row>
-                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Original Purchase Price" style="text-light-grey"/></row-col>
-                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(asset.acquireCost ?: 0, orderHeader.currencyUomId)}"/></row-col>
-                                        </container-row>
-                                        <container-row>
-                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="HOA Fee Monthly" style="text-light-grey"/></row-col>
-                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(hoaMonthlyFeeFinFlowList?.getFirst().amount ?: 0, orderHeader.currencyUomId)}"/></row-col>
-                                        </container-row>
-                                        <container-row>
-                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Property Tax Annually" style="text-light-grey"/></row-col>
-                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(annualPropertyTaxFinFlowList?.getFirst().amount ?: 0, orderHeader.currencyUomId)}"/></row-col>
-                                        </container-row>
-                                        <container-row>
-                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Property Insurance Costs Annually" style="text-light-grey"/></row-col>
-                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(annualInsuranceCostFinFlowList?.getFirst().amount ?: 0, orderHeader.currencyUomId)}"/></row-col>
-                                        </container-row>
-                                    </container>
-                                </container>
-
-                                <section name="MortgageSection" condition="mortgageRelationList.size() > 0">
-                                    <widgets>
-                                        <container style="q-pt-md">
-                                            <label text="Mortgage" type="h6"/>
-                                            <container style="q-pt-sm">
-                                                <section-iterate name="MortgageRelationIterator" list="mortgageRelationList" entry="mortgageRelation">
-                                                    <actions>
-                                                        <entity-find-one entity-name="mk.close.FinancialFlow" value-field="financialFlow">
-                                                            <field-map field-name="partyId" from="mortgageRelation.fromPartyId"/>
-                                                            <field-map field-name="financialFlowTypeEnumId" value="MkFinFlowMortgage"/>
-                                                            <field-map field-name="entryTypeEnumId" value="MkEntryExpense"/>
-                                                            <field-map field-name="partyRelationshipId" from="mortgageRelation.partyRelationshipId"/>
-                                                        </entity-find-one>
-                                                    </actions>
-                                                    <widgets>
-                                                        <container-row>
-                                                            <row-col lg="12" md="12" sm="12" xs="12" style="padding-all-0"><label text="Mortgage ${sectionEntryIndex + 1}" style="text-light-grey"/></row-col>
-                                                        </container-row>
-                                                        <container-row>
-                                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Lender Name" style="text-light-grey"/></row-col>
-                                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${mortgageRelation.organizationName}"/></row-col>
-                                                        </container-row>
-                                                        <container-row>
-                                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Mortgage Balance" style="text-light-grey"/></row-col>
-                                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(financialFlow.balance, orderHeader.currencyUomId)}"/></row-col>
-                                                        </container-row>
-                                                        <container-row>
-                                                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Mortgage Payment Monthly" style="text-light-grey"/></row-col>
-                                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(financialFlow.amount, orderHeader.currencyUomId)}"/></row-col>
-                                                        </container-row>
-                                                    </widgets>
-                                                </section-iterate>
-                                            </container>
-                                        </container>
-                                    </widgets>
-                                </section>
+                                <section-include name="PropertySection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
                             </container>
                         </container>
                     </container>
@@ -229,7 +166,6 @@
                     <entity-find-one entity-name="moqui.basic.Enumeration" value-field="maritalStatus">
                         <field-map field-name="enumId" from="partyDetail.maritalStatusEnumId"/>
                     </entity-find-one>
-
                     <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
                         <field-map field-name="partyId" from="party.partyId"/>
                     </service-call>
@@ -245,45 +181,42 @@
                     <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" out-map="context">
                         <field-map field-name="partyId" from="party.partyId"/>
                     </service-call>
-
-                    <set field="firstName" from="partyDetail?.firstName ?: ''"/>
-                    <set field="middleName" from="partyDetail?.middleName ?: ''"/>
-                    <set field="lastName" from="partyDetail?.lastName ?: ''"/>
-                    <set field="suffix" from="partyDetail?.suffix ?: ''"/>
-                    <set field="nickname" from="partyDetail?.nickname ?: ''"/>
-                    <set field="birthDate" from="ec.l10n.format(partyDetail?.birthDate, 'MM/dd/yyyy') ?: ''"/>
-                    <set field="maritalStatusEnumId" from="partyDetail?.maritalStatusEnumId ?: ''"/>
-                    <set field="employmentStatusEnumId" from="partyDetail?.employmentStatusEnumId ?: ''"/>
-                    <set field="address1" from="postalAddress?.address1 ?: ''"/>
-                    <set field="unitNumber" from="postalAddress?.unitNumber ?: ''"/>
-                    <set field="postalCode" from="postalAddress?.postalCode ?: ''"/>
-                    <set field="city" from="postalAddress?.city ?: ''"/>
-                    <set field="stateProvinceGeoId" from="postalAddress?.stateProvinceGeoId ?: ''"/>
-                    <set field="email" from="emailAddress"/>
-                    <set field="emailVerify" from="emailAddress"/>
-
                     <entity-find entity-name="mantle.party.PartyIdentification" list="identityList">
                         <econdition field-name="partyId" from="party.partyId"/>
                         <econdition field-name="partyIdTypeEnumId" operator="not-equals" value="PtidSsn"/>
                     </entity-find>
-
                     <entity-find entity-name="mantle.party.PartyToAndRelationship" list="currentEmploymentRelationList">
                         <econdition field-name="relationshipTypeEnumId" value="PrtEmployee"/>
                         <econdition field-name="fromPartyId" from="party.partyId"/>
                         <econdition field-name="fromRoleTypeId" value="Employee"/>
                     </entity-find>
-
                     <entity-find entity-name="mk.close.FinancialFlow" list="incomeFinFlowList">
                         <econdition field-name="partyId" from="partyId"/>
                         <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
                         <econdition field-name="partyRelationshipId" operator="is-null" value=""/>
                     </entity-find>
-
                     <entity-find entity-name="mantle.party.PartyToAndRelationship" list="previousEmploymentRelationList">
                         <econdition field-name="relationshipTypeEnumId" value="PrtPreviousEmployee"/>
                         <econdition field-name="fromPartyId" from="party.partyId"/>
                         <econdition field-name="fromRoleTypeId" value="Employee"/>
                     </entity-find>
+
+                    <set field="firstName" from="partyDetail?.firstName ?: null"/>
+                    <set field="middleName" from="partyDetail?.middleName ?: null"/>
+                    <set field="lastName" from="partyDetail?.lastName ?: null"/>
+                    <set field="suffix" from="partyDetail?.suffix ?: null"/>
+                    <set field="nickname" from="partyDetail?.nickname ?: null"/>
+                    <set field="occupation" from="partyDetail?.occupation ?: null"/>
+                    <set field="birthDate" from="ec.l10n.format(partyDetail?.birthDate, 'MM/dd/yyyy') ?: null"/>
+                    <set field="maritalStatusEnumId" from="partyDetail?.maritalStatusEnumId ?: null"/>
+                    <set field="employmentStatusEnumId" from="partyDetail?.employmentStatusEnumId ?: null"/>
+                    <set field="address1" from="postalAddress?.address1 ?: null"/>
+                    <set field="unitNumber" from="postalAddress?.unitNumber ?: null"/>
+                    <set field="postalCode" from="postalAddress?.postalCode ?: null"/>
+                    <set field="city" from="postalAddress?.city ?: null"/>
+                    <set field="stateProvinceGeoId" from="postalAddress?.stateProvinceGeoId ?: null"/>
+                    <set field="email" from="emailAddress"/>
+                    <set field="emailVerify" from="emailAddress"/>
                 </actions>
                 <widgets>
                     <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">

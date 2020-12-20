@@ -2036,6 +2036,98 @@
                 </container-dialog>
             </widgets>
         </section>
+
+        <section name="EditProperty">
+            <widgets>
+                <container-dialog id="EditPropertyDialog" button-text="Edit">
+                    <form-single name="EditPropertyForm" transition="updateProperty">
+                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                        <field name="assetId"><default-field><hidden default-value="${assetId}"/></default-field></field>
+
+                        <field name="classEnumId">
+                            <default-field title="Property Type">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${enumId}">
+                                        <entity-find entity-name="moqui.basic.Enumeration">
+                                            <econdition field-name="enumTypeId" value="AssetClass"/>
+                                            <econdition field-name="parentEnumId" value="AsClsProperty"/>
+                                            <order-by field-name="sequenceNum,description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="salvageValue">
+                            <default-field title="Current Property Value (Estimate)">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+                        <field name="acquireCost">
+                            <default-field title="Original Purchase Price">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+                        <field name="hoaFeeMonthly">
+                            <default-field title="HOA Fee Monthly">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+                        <field name="propertyTaxesAnnually">
+                            <default-field title="Property Taxes Annually">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+                        <field name="propertyInsuranceCostsAnnually">
+                            <default-field title="Property Insurance Costs Annually">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+
+                        <field name="submit">
+                            <default-field>
+                                <submit text="Save"/>
+                            </default-field>
+                        </field>
+                    </form-single>
+                </container-dialog>
+            </widgets>
+        </section>
+
+        <section name="EditMortgage">
+            <widgets>
+                <container-dialog id="EditMortgageDialog" button-text="Edit">
+                    <form-single name="EditMortgageForm" transition="updateMortgage">
+                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                        <field name="partyRelationshipId"><default-field><hidden default-value="${partyRelationshipId}"/></default-field></field>
+
+                        <field name="lenderName">
+                            <default-field>
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="mortgageBalance">
+                            <default-field>
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+                        <field name="mortgagePaymentMonthly">
+                            <default-field>
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                                <label text="Exclude property taxes, insurance, or HOA fees" style="text-caption"/>
+                            </default-field>
+                        </field>
+
+                        <field name="submit">
+                            <default-field>
+                                <submit text="Save"/>
+                            </default-field>
+                        </field>
+                    </form-single>
+                </container-dialog>
+            </widgets>
+        </section>
     </widgets>
 
 </screen>
