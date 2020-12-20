@@ -283,12 +283,12 @@
                                     </default-field>
                                 </field>
                                 <field name="totalPurchaseAmount">
-                                    <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order">
+                                    <default-field>
                                         <text-line/>
                                     </default-field>
                                 </field>
                                 <field name="downPayment">
-                                    <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order">
+                                    <default-field>
                                         <text-line/>
                                     </default-field>
                                 </field>
@@ -426,10 +426,10 @@
                     <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
-                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryTelecomNumber" out-map="context">
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
-                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryEmailAddress" out-map="context">
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryEmailAddress" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
                 </row-actions>
@@ -443,12 +443,12 @@
                         <display text="${partyName ?: '-'}"/>
                     </default-field>
                 </field>
-                <field name="telecomNumber">
-                    <conditional-field condition="telecomNumber == null" title="Phone">
-                        <display text="${telecomNumber ?: '-'}"/>
+                <field name="contactNumber">
+                    <conditional-field condition="contactNumber == null" title="Phone">
+                        <display text="${contactNumber ?: '-'}"/>
                     </conditional-field>
                     <default-field title="Phone">
-                        <link link-type="anchor" url="tel:${telecomNumber}" text="${telecomNumber}" url-type="plain"/>
+                        <link link-type="anchor" url="tel:${contactNumber}" text="${contactNumber}" url-type="plain"/>
                     </default-field>
                 </field>
                 <field name="emailAddress">
@@ -466,7 +466,7 @@
                         <field-ref name="partyName"/>
                     </column>
                     <column>
-                        <field-ref name="telecomNumber"/>
+                        <field-ref name="contactNumber"/>
                         <field-ref name="emailAddress"/>
                     </column>
                 </columns>
@@ -499,10 +499,10 @@
                     <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
-                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryTelecomNumber" out-map="context">
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
-                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryEmailAddress" out-map="context">
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryEmailAddress" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
                 </row-actions>
@@ -516,17 +516,12 @@
                         <display text="${partyName ?: '-'}"/>
                     </default-field>
                 </field>
-                <field name="nickname">
-                    <default-field title="Other Name (AKA)">
-                        <display text="${nickname ?: '-'}"/>
-                    </default-field>
-                </field>
-                <field name="telecomNumber">
-                    <conditional-field condition="telecomNumber == null" title="Phone">
-                        <display text="${telecomNumber ?: '-'}"/>
+                <field name="contactNumber">
+                    <conditional-field condition="contactNumber == null" title="Phone">
+                        <display text="${contactNumber ?: '-'}"/>
                     </conditional-field>
                     <default-field title="Phone">
-                        <link link-type="anchor" url="tel:${telecomNumber}" text="${telecomNumber}" url-type="plain"/>
+                        <link link-type="anchor" url="tel:${contactNumber}" text="${contactNumber}" url-type="plain"/>
                     </default-field>
                 </field>
                 <field name="emailAddress">
@@ -550,7 +545,7 @@
                         <field-ref name="partyName"/>
                     </column>
                     <column>
-                        <field-ref name="telecomNumber"/>
+                        <field-ref name="contactNumber"/>
                         <field-ref name="emailAddress"/>
                     </column>
                     <column>

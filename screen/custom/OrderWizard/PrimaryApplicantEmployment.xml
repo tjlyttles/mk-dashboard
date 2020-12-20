@@ -40,7 +40,7 @@
         <set field="partyId" from="partyList?.getFirst()?.partyId ?: null"/>
         <entity-find-one entity-name="mantle.party.Person" value-field="party"/>
 
-        <entity-find entity-name="mantle.party.PartyToAndRelationship" list="employmentRelationList">
+        <entity-find entity-name="mantle.party.PartyToAndRelationship" list="currentEmploymentRelationList">
             <econdition field-name="relationshipTypeEnumId" value="PrtEmployee"/>
             <econdition field-name="fromPartyId" from="partyId"/>
             <econdition field-name="fromRoleTypeId" value="Employee"/>
@@ -82,13 +82,13 @@
                 <label text="Add all current employment sources" style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>
 
-                <section-include name="currentEmploymentSection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
+                <section-include name="CurrentEmploymentSection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
 
                 <label text="Current Non-Employment Income" type="h5" style="margin-t-2 margin-b-1"/>
                 <label text="Add all current non-employment income sources. Alimony, child support, or separate maintenance income need not be provided if applicant does not wish it to be considered as a basis for repaying this obligation." style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>
 
-                <section-include name="incomeSourceSection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
+                <section-include name="IncomeSourceSection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
 
                 <container style="margin-tb-2"/>
 

@@ -6,6 +6,27 @@
 
     <parameter name="orderId" required="true"/>
 
+    <transition name="updatePerson">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Person" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateContact">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Contact" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateIdentity">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Identity" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateEmployment">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Employment" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateIncomeSource">
+        <service-call name="mkdecision.dashboard.PartyServices.update#IncomeSource" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+
     <actions>
         <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
         <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart">
@@ -28,9 +49,9 @@
 
     <widgets>
         <container style="row">
-            <section-iterate name="AssetSection" list="assetList" entry="asset">
+            <section-iterate name="AssetIterator" list="assetList" entry="asset">
                 <actions>
-                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryPostalAddress" out-map="context">
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" out-map="context">
                         <field-map field-name="partyId" from="asset.ownerPartyId"/>
                     </service-call>
                     <entity-find-one entity-name="moqui.basic.Enumeration" value-field="assetClass">
@@ -62,8 +83,8 @@
                 </actions>
                 <widgets>
                     <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                        <container style="h-separator v-separator">
-                            <container style="padding-all-1">
+                        <container style="padding-all-05">
+                            <container style="padding-all-1 border-all-1 rounded-borders">
                                 <container>
                                     <label text="Property" type="h4"/>
                                 </container>
@@ -73,7 +94,7 @@
                                     <container style="q-pt-sm">
                                         <container-row>
                                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Address" style="text-light-grey"/></row-col>
-                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${postalAddress.address1 ?: '-'}, ${postalAddress.stateGeoCodeAlpha2} ${postalAddress.postalCode}"/></row-col>
+                                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${postalAddressString}"/></row-col>
                                         </container-row>
                                         <container-row>
                                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Type" style="text-light-grey"/></row-col>
@@ -107,7 +128,7 @@
                                         <container style="q-pt-md">
                                             <label text="Mortgage" type="h6"/>
                                             <container style="q-pt-sm">
-                                                <section-iterate name="MortgageRelationSection" list="mortgageRelationList" entry="mortgageRelation">
+                                                <section-iterate name="MortgageRelationIterator" list="mortgageRelationList" entry="mortgageRelation">
                                                     <actions>
                                                         <entity-find-one entity-name="mk.close.FinancialFlow" value-field="financialFlow">
                                                             <field-map field-name="partyId" from="mortgageRelation.fromPartyId"/>
@@ -146,7 +167,7 @@
         </container>
 
         <container style="row">
-            <section-iterate name="PartySection" list="partyList" entry="party">
+            <section-iterate name="PartyIterator" list="partyList" entry="party">
                 <actions>
                     <entity-find-one entity-name="mantle.party.PartyDetail" value-field="partyDetail">
                         <field-map field-name="partyId" from="party.partyId"/>
@@ -154,220 +175,79 @@
                     <entity-find-one entity-name="mantle.party.RoleType" value-field="roleType">
                         <field-map field-name="roleTypeId" from="party.roleTypeId"/>
                     </entity-find-one>
+                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="employmentStatus">
+                        <field-map field-name="enumId" from="partyDetail.employmentStatusEnumId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="maritalStatus">
+                        <field-map field-name="enumId" from="partyDetail.maritalStatusEnumId"/>
+                    </entity-find-one>
+
                     <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
                         <field-map field-name="partyId" from="party.partyId"/>
                     </service-call>
-                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryTelecomNumber" out-map="context">
+                    <service-call name="mkdecision.dashboard.PartyServices.get#SocialSecurityNumber" out-map="context">
                         <field-map field-name="partyId" from="party.partyId"/>
                     </service-call>
-                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryEmailAddress" out-map="context">
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" out-map="context">
                         <field-map field-name="partyId" from="party.partyId"/>
                     </service-call>
-                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryPostalAddress" out-map="context">
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryEmailAddress" out-map="context">
                         <field-map field-name="partyId" from="party.partyId"/>
                     </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" out-map="context">
+                        <field-map field-name="partyId" from="party.partyId"/>
+                    </service-call>
+
+                    <set field="firstName" from="partyDetail?.firstName ?: ''"/>
+                    <set field="middleName" from="partyDetail?.middleName ?: ''"/>
+                    <set field="lastName" from="partyDetail?.lastName ?: ''"/>
+                    <set field="suffix" from="partyDetail?.suffix ?: ''"/>
+                    <set field="nickname" from="partyDetail?.nickname ?: ''"/>
+                    <set field="birthDate" from="ec.l10n.format(partyDetail?.birthDate, 'MM/dd/yyyy') ?: ''"/>
+                    <set field="maritalStatusEnumId" from="partyDetail?.maritalStatusEnumId ?: ''"/>
+                    <set field="employmentStatusEnumId" from="partyDetail?.employmentStatusEnumId ?: ''"/>
+                    <set field="address1" from="postalAddress?.address1 ?: ''"/>
+                    <set field="unitNumber" from="postalAddress?.unitNumber ?: ''"/>
+                    <set field="postalCode" from="postalAddress?.postalCode ?: ''"/>
+                    <set field="city" from="postalAddress?.city ?: ''"/>
+                    <set field="stateProvinceGeoId" from="postalAddress?.stateProvinceGeoId ?: ''"/>
+                    <set field="email" from="emailAddress"/>
+                    <set field="emailVerify" from="emailAddress"/>
+
+                    <entity-find entity-name="mantle.party.PartyIdentification" list="identityList">
+                        <econdition field-name="partyId" from="party.partyId"/>
+                        <econdition field-name="partyIdTypeEnumId" operator="not-equals" value="PtidSsn"/>
+                    </entity-find>
+
+                    <entity-find entity-name="mantle.party.PartyToAndRelationship" list="currentEmploymentRelationList">
+                        <econdition field-name="relationshipTypeEnumId" value="PrtEmployee"/>
+                        <econdition field-name="fromPartyId" from="party.partyId"/>
+                        <econdition field-name="fromRoleTypeId" value="Employee"/>
+                    </entity-find>
+
+                    <entity-find entity-name="mk.close.FinancialFlow" list="incomeFinFlowList">
+                        <econdition field-name="partyId" from="partyId"/>
+                        <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                        <econdition field-name="partyRelationshipId" operator="is-null" value=""/>
+                    </entity-find>
+
+                    <entity-find entity-name="mantle.party.PartyToAndRelationship" list="previousEmploymentRelationList">
+                        <econdition field-name="relationshipTypeEnumId" value="PrtPreviousEmployee"/>
+                        <econdition field-name="fromPartyId" from="party.partyId"/>
+                        <econdition field-name="fromRoleTypeId" value="Employee"/>
+                    </entity-find>
                 </actions>
                 <widgets>
-                    <section name="PersonSection" condition="partyDetail.partyTypeEnumId == 'PtyPerson'">
-                        <widgets>
-                            <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                                <container style="h-separator v-separator">
-                                    <container style="padding-all-1">
-                                        <container>
-                                            <label text="${partyName}" type="h4"/>
-                                            <label text="${roleType.description}"/>
-                                        </container>
-
-                                        <container style="q-pt-md">
-                                            <label text="Personal" type="h6"/>
-                                            <container style="q-pt-sm">
-                                                <container-row>
-                                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="First name" style="text-light-grey"/></row-col>
-                                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${partyDetail.firstName ?: '-'}"/></row-col>
-                                                </container-row>
-                                                <container-row>
-                                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Last name" style="text-light-grey"/></row-col>
-                                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${partyDetail.lastName ?: '-'}"/></row-col>
-                                                </container-row>
-                                                <container-row>
-                                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Other Name (AKA)" style="text-light-grey"/></row-col>
-                                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${partyDetail.nickname ?: '-'}"/></row-col>
-                                                </container-row>
-                                            </container>
-                                        </container>
-
-                                        <container style="q-pt-md">
-                                            <label text="Contact" type="h6"/>
-                                            <container style="q-pt-sm">
-                                                <container-row>
-                                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Email" style="text-light-grey"/></row-col>
-                                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0">
-                                                        <link link-type="anchor" url="mailto:${emailAddress ?: '-'}" text="${emailAddress ?: '-'}" url-type="plain"/>
-                                                    </row-col>
-                                                </container-row>
-                                                <container-row>
-                                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Primary phone number" style="text-light-grey"/></row-col>
-                                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0">
-                                                        <link link-type="anchor" url="tel:${telecomNumber ?: '-'}" text="${telecomNumber ?: '-'}" url-type="plain"/>
-                                                    </row-col>
-                                                </container-row>
-                                                <container-row>
-                                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Residential Address" style="text-light-grey"/></row-col>
-                                                    <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${postalAddress.address1 ?: '-'}, ${postalAddress.stateGeoCodeAlpha2} ${postalAddress.postalCode}"/></row-col>
-                                                </container-row>
-                                            </container>
-                                        </container>
-                                    </container>
-                                </container>
+                    <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                        <container style="padding-all-05">
+                            <container style="padding-all-1 border-all-1 rounded-borders">
+                                <section-include name="PersonSection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
                             </container>
-                        </widgets>
-                    </section>
+                        </container>
+                    </container>
                 </widgets>
             </section-iterate>
         </container>
-
-<!--        <container-row>-->
-<!--            <row-col lg="6">-->
-<!--                <container-box>-->
-<!--                    <box-header>MK Decision</box-header>-->
-<!--                    <box-toolbar>-->
-<!--                        <link url="#" text="Edit"/>-->
-<!--                    </box-toolbar>-->
-<!--                    <box-body>-->
-<!--                        <form-single name="OrganizationForm">-->
-<!--                            <field name="organizationName">-->
-<!--                                <default-field>-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="dbaName">-->
-<!--                                <default-field title="DBA Name (Optional)">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="businessName">-->
-<!--                                <default-field title="Business Name on Card">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="structure">-->
-<!--                                <default-field title="Structure">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="naics">-->
-<!--                                <default-field title="NAICS">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="taxNumber">-->
-<!--                                <default-field title="Tax ID Number">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="formationDate">-->
-<!--                                <default-field title="Date of Formation">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="yearsInBusiness">-->
-<!--                                <default-field title="Years In Business">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="employeeCount">-->
-<!--                                <default-field title="Number of Employees">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="annualRevenue">-->
-<!--                                <default-field title="Annual Revenue">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="legalInUs">-->
-<!--                                <default-field title="Legally formed in U.S.?">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="businessState">-->
-<!--                                <default-field title="State of Business Formation">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="activityCountry">-->
-<!--                                <default-field title="Country of Primary Activity">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="primaryPhoneNumber">-->
-<!--                                <default-field title="Primary Phone Number">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="postalAddress">-->
-<!--                                <default-field title="Address">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="unitNumber">-->
-<!--                                <default-field title="Apt/Unit #">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="zipCode">-->
-<!--                                <default-field title="ZIP Code">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="city">-->
-<!--                                <default-field title="City">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            <field name="state">-->
-<!--                                <default-field title="State">-->
-<!--                                    <display/>-->
-<!--                                </default-field>-->
-<!--                            </field>-->
-<!--                            -->
-<!--                            <field-layout>-->
-<!--                                <field-accordion>-->
-<!--                                    <field-group title="Organization Information">-->
-<!--                                        <field-ref name="organizationName"/>-->
-<!--                                        <field-ref name="dbaName"/>-->
-<!--                                        <field-ref name="businessName"/>-->
-<!--                                        <field-ref name="structure"/>-->
-<!--                                        <field-ref name="naics"/>-->
-<!--                                        <field-ref name="taxNumber"/>-->
-<!--                                        <field-ref name="formationDate"/>-->
-<!--                                        <field-ref name="yearsInBusiness"/>-->
-<!--                                        <field-ref name="employeeCount"/>-->
-<!--                                        <field-ref name="annualRevenue"/>-->
-<!--                                        <field-ref name="legalInUs"/>-->
-<!--                                        <field-ref name="businessState"/>-->
-<!--                                        <field-ref name="activityCountry"/>-->
-<!--                                    </field-group>-->
-<!--                                </field-accordion>-->
-<!--                                <field-accordion>-->
-<!--                                    <field-group title="Organization Contact">-->
-<!--                                        <field-ref name="primaryPhoneNumber"/>-->
-<!--                                        <field-ref name="postalAddress"/>-->
-<!--                                        <field-ref name="unitNumber"/>-->
-<!--                                        <field-ref name="zipCode"/>-->
-<!--                                        <field-ref name="city"/>-->
-<!--                                        <field-ref name="state"/>-->
-<!--                                    </field-group>-->
-<!--                                </field-accordion>-->
-<!--                            </field-layout>-->
-<!--                        </form-single>-->
-<!--                    </box-body>-->
-<!--                </container-box>-->
-<!--            </row-col>-->
-<!--            <row-col lg="6">-->
-
-<!--            </row-col>-->
-<!--        </container-row>-->
     </widgets>
 
 </screen>

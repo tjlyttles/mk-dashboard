@@ -63,43 +63,27 @@
             <set field="maritalStatusEnumId" from="party?.maritalStatusEnumId ?: ''"/>
             <set field="employmentStatusEnumId" from="party?.employmentStatusEnumId ?: ''"/>
 
-            <entity-find entity-name="mantle.party.contact.PartyContactMechPostalAddress" list="postalAddressList">
-                <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="contactMechPurposeId" value="PostalPrimary"/>
-                <date-filter/>
-            </entity-find>
-            <set field="address1" from="postalAddressList?.getFirst()?.address1 ?: ''"/>
-            <set field="unitNumber" from="postalAddressList?.getFirst()?.unitNumber ?: ''"/>
-            <set field="postalCode" from="postalAddressList?.getFirst()?.postalCode ?: ''"/>
-            <set field="city" from="postalAddressList?.getFirst()?.city ?: ''"/>
-            <set field="stateProvinceGeoId" from="postalAddressList?.getFirst()?.stateProvinceGeoId ?: ''"/>
+            <service-call name="mkdecision.dashboard.PartyServices.get#SocialSecurityNumber" out-map="context">
+                <field-map field-name="partyId" from="partyId"/>
+            </service-call>
+            <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" out-map="context">
+                <field-map field-name="partyId" from="partyId"/>
+            </service-call>
+            <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryEmailAddress" out-map="context">
+                <field-map field-name="partyId" from="partyId"/>
+            </service-call>
+            <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" out-map="context">
+                <field-map field-name="partyId" from="partyId"/>
+            </service-call>
 
-            <entity-find entity-name="mantle.party.contact.PartyContactMechTelecomNumber" list="telecomNumberList">
-                <econdition field-name="partyId" from="partyId"/>
-                <date-filter/>
-            </entity-find>
-            <set field="contactNumber" from="telecomNumberList?.getFirst()?.contactNumber ?: ''"/>
-            <set field="contactMechPurposeId" from="telecomNumberList?.getFirst()?.contactMechPurposeId ?: ''"/>
+            <set field="address1" from="postalAddress?.address1 ?: ''"/>
+            <set field="unitNumber" from="postalAddress?.unitNumber ?: ''"/>
+            <set field="postalCode" from="postalAddress?.postalCode ?: ''"/>
+            <set field="city" from="postalAddress?.city ?: ''"/>
+            <set field="stateProvinceGeoId" from="postalAddress?.stateProvinceGeoId ?: ''"/>
 
-            <entity-find entity-name="mantle.party.contact.PartyContactMechInfo" list="emailList">
-                <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="contactMechPurposeId" value="EmailPrimary"/>
-                <date-filter/>
-            </entity-find>
-            <set field="email" from="emailList?.getFirst()?.infoString ?: ''"/>
-            <set field="emailVerify" from="emailList?.getFirst()?.infoString ?: ''"/>
-
-            <entity-find entity-name="mantle.party.contact.PartyContactMechPostalAddress" list="postalAddressList">
-                <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="contactMechPurposeId" value="PostalPrimary"/>
-                <date-filter/>
-            </entity-find>
-
-            <entity-find entity-name="mantle.party.PartyIdentification" list="socialSecurityNumberList">
-                <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="partyIdTypeEnumId" value="PtidSsn"/>
-            </entity-find>
-            <set field="socialSecurityNumber" from="socialSecurityNumberList?.getFirst()?.idValue ?: ''"/>
+            <set field="email" from="emailAddress"/>
+            <set field="emailVerify" from="emailAddress"/>
         </if>
     </actions>
 

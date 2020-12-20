@@ -37,7 +37,7 @@
         <set field="partyId" from="partyList?.getFirst()?.partyId ?: null"/>
         <entity-find-one entity-name="mantle.party.Person" value-field="party"/>
 
-        <entity-find entity-name="mantle.party.PartyToAndRelationship" list="employmentRelationList">
+        <entity-find entity-name="mantle.party.PartyToAndRelationship" list="previousEmploymentRelationList">
             <econdition field-name="relationshipTypeEnumId" value="PrtPreviousEmployee"/>
             <econdition field-name="fromPartyId" from="partyId"/>
             <econdition field-name="fromRoleTypeId" value="Employee"/>
@@ -73,7 +73,7 @@
                 <label text="Add all previous employment sources for the past 2 years" style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>
 
-                <section-include name="previousEmploymentSection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
+                <section-include name="PreviousEmploymentSection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
 
                 <container style="margin-tb-2"/>
 
