@@ -73,10 +73,6 @@
         <service-call name="mkdecision.dashboard.OrderServices.update#OrderItem" in-map="context"/>
         <default-response url="."/>
     </transition>
-    <transition name="deleteOrderItem">
-        <service-call name="mkdecision.dashboard.OrderServices.delete#OrderItem" in-map="context"/>
-        <default-response url="."/>
-    </transition>
     <transition name="addNote">
         <service-call name="create#mantle.order.OrderNote" in-map="context"/>
         <default-response url="."/>
@@ -330,7 +326,6 @@
                                 </field>
                             </form-single>
                         </container-dialog>
-                        <link icon="fa fa-trash" link-type="hidden-form-link" btn-type="danger" url="deleteOrderItem" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, orderItemSeqId: orderItemSeqId]"/>
                     </default-field>
                 </field>
 
