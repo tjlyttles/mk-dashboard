@@ -12,43 +12,40 @@
                     <widgets>
                         <section-iterate name="CurrentEmploymentIterator" list="currentEmploymentRelationList" entry="employmentRelation">
                             <actions>
-                                <set field="employerName" from="employmentRelation.organizationName"/>
-                                <set field="jobTitle" from="employmentRelation.relationshipName"/>
-
                                 <entity-find entity-name="mantle.party.PartyClassificationAppl" list="partyClassList">
                                     <econdition field-name="partyId" from="employmentRelation.toPartyId"/>
                                     <date-filter/>
                                 </entity-find>
-                                <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
-
                                 <entity-find-one entity-name="mantle.party.PartyRelationshipSetting" value-field="employmentStatusSetting">
                                     <field-map field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
                                     <field-map field-name="partySettingTypeId" value="EmploymentStatus"/>
                                 </entity-find-one>
-                                <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
-
                                 <entity-find entity-name="mk.close.FinancialFlow" list="monthlyIncomeFinFlowList">
                                     <econdition field-name="partyId" from="employmentRelation.fromPartyId"/>
                                     <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
                                     <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowTotalMonthlyIncome"/>
                                     <econdition field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
                                 </entity-find>
-                                <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
+                                <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" in-map="[partyId: employmentRelation.toPartyId]" out-map="telecomNumberResp"/>
+                                <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" in-map="[partyId: employmentRelation.toPartyId]" out-map="postalAddressResp"/>
 
+                                <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
+                                <set field="employerName" from="employmentRelation.organizationName"/>
+                                <set field="jobTitle" from="employmentRelation.relationshipName"/>
+                                <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
+                                <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
                                 <set field="millis" from="Math.abs(employmentRelation.fromDate.getTime() - ec.user.nowTimestamp.getTime())"/>
                                 <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
                                 <set field="years" from="Math.floor(days / 365)" type="Integer"/>
-                                <set field="months" from="Math.floor(days / 30) - (years * 12)" type="Integer"/>
-
-                                <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" in-map="[partyId: employmentRelation.toPartyId]" out-map="postalAddressResp"/>
+                                <set field="months" from="Math.floor(days / 30.4) - (years * 12)" type="Integer"/>
+                                <log level="warn" message=">> ${years}"/>
+                                <log level="warn" message=">> ${months}"/>
+                                <set field="employerContactNumber" from="telecomNumberResp.contactNumber"/>
                                 <set field="employerAddress1" from="postalAddressResp.postalAddress?.address1"/>
                                 <set field="employerUnitNumber" from="postalAddressResp.postalAddress?.unitNumber"/>
                                 <set field="employerPostalCode" from="postalAddressResp.postalAddress?.postalCode"/>
                                 <set field="employerCity" from="postalAddressResp.postalAddress?.city"/>
                                 <set field="employerStateProvinceGeoId" from="postalAddressResp.postalAddress?.stateProvinceGeoId"/>
-
-                                <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" in-map="[partyId: employmentRelation.toPartyId]" out-map="telecomNumberResp"/>
-                                <set field="employerContactNumber" from="telecomNumberResp.contactNumber"/>
                             </actions>
                             <widgets>
                                 <container-row>
@@ -84,40 +81,36 @@
                     <widgets>
                         <section-iterate name="PreviousEmploymentIterator" list="previousEmploymentRelationList" entry="employmentRelation">
                             <actions>
-                                <set field="employerName" from="employmentRelation.organizationName"/>
-                                <set field="jobTitle" from="employmentRelation.relationshipName"/>
-                                <set field="fromDate" from="ec.l10n.format(employmentRelation.fromDate, 'MM-dd-yyyy') ?: ''"/>
-                                <set field="toDate" from="ec.l10n.format(employmentRelation.thruDate, 'MM-dd-yyyy') ?: ''"/>
-
                                 <entity-find entity-name="mantle.party.PartyClassificationAppl" list="partyClassList">
                                     <econdition field-name="partyId" from="employmentRelation.toPartyId"/>
                                     <date-filter/>
                                 </entity-find>
-                                <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
-
                                 <entity-find-one entity-name="mantle.party.PartyRelationshipSetting" value-field="employmentStatusSetting">
                                     <field-map field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
                                     <field-map field-name="partySettingTypeId" value="EmploymentStatus"/>
                                 </entity-find-one>
-                                <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
-
                                 <entity-find entity-name="mk.close.FinancialFlow" list="monthlyIncomeFinFlowList">
                                     <econdition field-name="partyId" from="employmentRelation.fromPartyId"/>
                                     <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
                                     <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowTotalMonthlyIncome"/>
                                     <econdition field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
                                 </entity-find>
-                                <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
-
+                                <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" in-map="[partyId: employmentRelation.toPartyId]" out-map="telecomNumberResp"/>
                                 <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" in-map="[partyId: employmentRelation.toPartyId]" out-map="postalAddressResp"/>
+
+                                <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
+                                <set field="employerName" from="employmentRelation.organizationName"/>
+                                <set field="jobTitle" from="employmentRelation.relationshipName"/>
+                                <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
+                                <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
+                                <set field="fromDate" from="ec.l10n.format(employmentRelation.fromDate, 'MM-dd-yyyy') ?: null"/>
+                                <set field="toDate" from="ec.l10n.format(employmentRelation.thruDate, 'MM-dd-yyyy') ?: null"/>
+                                <set field="employerContactNumber" from="telecomNumberResp.contactNumber"/>
                                 <set field="employerAddress1" from="postalAddressResp.postalAddress?.address1"/>
                                 <set field="employerUnitNumber" from="postalAddressResp.postalAddress?.unitNumber"/>
                                 <set field="employerPostalCode" from="postalAddressResp.postalAddress?.postalCode"/>
                                 <set field="employerCity" from="postalAddressResp.postalAddress?.city"/>
                                 <set field="employerStateProvinceGeoId" from="postalAddressResp.postalAddress?.stateProvinceGeoId"/>
-
-                                <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" in-map="[partyId: employmentRelation.toPartyId]" out-map="telecomNumberResp"/>
-                                <set field="employerContactNumber" from="telecomNumberResp.contactNumber"/>
                             </actions>
                             <widgets>
                                 <container-row>
@@ -154,13 +147,13 @@
                         <section-iterate name="IncomeSourceFinFlowIterator" list="incomeFinFlowList" entry="incomeFinFlow">
                             <actions>
                                 <entity-find-related-one value-field="incomeFinFlow" relationship-name="flowType" to-value-field="flowType"/>
+
                                 <set field="financialFlowTypeEnumId" from="incomeFinFlow.financialFlowTypeEnumId"/>
                                 <set field="amount" from="incomeFinFlow.amount"/>
-
                                 <set field="millis" from="Math.abs(incomeFinFlow.fromDate.getTime() - ec.user.nowTimestamp.getTime())"/>
                                 <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
                                 <set field="years" from="Math.floor(days / 365)" type="Integer"/>
-                                <set field="months" from="Math.floor(days / 30) - (years * 12)" type="Integer"/>
+                                <set field="months" from="Math.floor(days / 30.4) - (years * 12)" type="Integer"/>
                             </actions>
                             <widgets>
                                 <container-row>
@@ -396,7 +389,7 @@
                         <set field="millis" from="Math.abs(employmentRelation.fromDate.getTime() - ec.user.nowTimestamp.getTime())"/>
                         <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
                         <set field="years" from="Math.floor(days / 365)" type="Integer"/>
-                        <set field="months" from="Math.floor(days / 30) - (years * 12)" type="Integer"/>
+                        <set field="months" from="Math.floor(days / 30.4) - (years * 12)" type="Integer"/>
                         <set field="employerContactNumber" from="telecomNumberResp.contactNumber"/>
                         <set field="employerPostalAddress" from="postalAddressResp.postalAddressString"/>
                         <set field="employerAddress1" from="postalAddressResp.postalAddress?.address1"/>
@@ -455,7 +448,7 @@
                         <set field="millis" from="Math.abs(incomeFinFlow.fromDate.getTime() - ec.user.nowTimestamp.getTime())"/>
                         <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
                         <set field="years" from="Math.floor(days / 365)" type="Integer"/>
-                        <set field="months" from="Math.floor(days / 30) - (years * 12)" type="Integer"/>
+                        <set field="months" from="Math.floor(days / 30.4) - (years * 12)" type="Integer"/>
                     </actions>
                     <widgets>
                         <container style="q-pt-md">
