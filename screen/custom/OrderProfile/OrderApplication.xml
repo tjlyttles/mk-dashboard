@@ -6,6 +6,16 @@
 
     <parameter name="orderId" required="true"/>
 
+    <transition name="updateOrderItemEligibility">
+        <actions>
+            <service-call name="org.moqui.impl.ScreenServices.create#FormResponse" out-map="context">
+                <field-map field-name="formId" from="formId"/>
+                <field-map field-name="responseMap" from="ec.web.parameters"/>
+            </service-call>
+            <service-call name="mkdecision.dashboard.OrderServices.update#OrderItemEligibility" in-map="context"/>
+        </actions>
+        <default-response url="."/>
+    </transition>
     <transition name="updatePerson">
         <service-call name="mkdecision.dashboard.PartyServices.update#Person" in-map="context"/>
         <default-response url="."/>
@@ -33,6 +43,35 @@
             <field-map field-name="orderId" from="orderId"/>
             <field-map field-name="orderPartSeqId" value="01"/>
         </entity-find-one>
+        <set field="orderPartSeqId" from="orderPart.orderPartSeqId"/>
+
+        <entity-find-one entity-name="mantle.order.OrderItem" value-field="orderItem">
+            <field-map field-name="orderId" from="orderId"/>
+            <field-map field-name="orderItemSeqId" value="01"/>
+        </entity-find-one>
+        <set field="orderItemSeqId" from="orderItem.orderItemSeqId"/>
+
+        <entity-find entity-name="mantle.product.ProductDbForm" list="formList">
+            <econdition field-name="productId" from="orderItem.productId"/>
+        </entity-find>
+        <set field="formId" from="formList.isEmpty() ? null : formList.getFirst().get('formId')"/>
+
+        <entity-find entity-name="mantle.order.OrderItemFormResponse" list="responseList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderItemSeqId" value="01"/>
+        </entity-find>
+        <set field="formResponseId" from="responseList?.getFirst()?.formResponseId ?: null"/>
+
+        <if condition="formResponseId != null">
+            <entity-find entity-name="moqui.screen.form.FormResponseAnsAndDbFormField" list="answerList">
+                <econdition field-name="formResponseId" from="formResponseId"/>
+            </entity-find>
+            <service-call name="org.moqui.impl.ScreenServices.get#FormResponse" out-map="formResponse">
+                <field-map field-name="formResponseId" from="formResponseId"/>
+            </service-call>
+            <set field="responseMap" from="formResponse?.responseMap"/>
+        </if>
+
         <entity-find entity-name="mantle.order.OrderPartParty" list="partyList">
             <econdition field-name="orderId" from="orderId"/>
             <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
@@ -42,6 +81,7 @@
             </econditions>
         </entity-find>
         <set field="partyIdList" from="partyList?.partyId?.toSet()"/>
+
         <entity-find entity-name="mantle.product.asset.Asset" list="assetList">
             <econdition field-name="ownerPartyId" operator="in" from="partyIdList"/>
         </entity-find>
@@ -49,6 +89,14 @@
 
     <widgets>
         <container style="row">
+            <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                <container style="padding-all-05">
+                    <container style="padding-all-1 border-all-1 rounded-borders">
+                        <section-include name="EligibilitySection" location="component://mk-dashboard/template/order/OrderWidgets.xml"/>
+                    </container>
+                </container>
+            </container>
+
             <section-iterate name="AssetIterator" list="assetList" entry="asset">
                 <actions>
                     <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" out-map="context">

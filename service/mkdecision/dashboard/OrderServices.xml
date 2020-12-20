@@ -50,6 +50,19 @@
             <parameter name="orderPartSeqId"/>
         </out-parameters>
     </service>
+    <service verb="update" noun="OrderItemEligibility" type="java" location="com.mkdecision.dashboard.OrderServices" method="updateOrderItemEligibility">
+        <in-parameters>
+            <parameter name="orderId" required="true"/>
+            <parameter name="orderPartSeqId" required="true"/>
+            <parameter name="orderItemSeqId" required="true"/>
+            <parameter name="formResponseId" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="orderItemSeqId"/>
+        </out-parameters>
+    </service>
     <service verb="validate" noun="OrderItemFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateOrderItemFields">
         <in-parameters>
             <parameter name="orderId"/>

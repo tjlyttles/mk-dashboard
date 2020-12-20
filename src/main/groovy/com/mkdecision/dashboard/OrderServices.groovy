@@ -494,6 +494,79 @@ class OrderServices {
         return outParams
     }
 
+    static Map<String, Object> updateOrderItemEligibility(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String orderItemSeqId = (String) cs.getOrDefault("orderItemSeqId", null)
+        String formResponseId = (String) cs.getOrDefault("formResponseId", null)
+
+        // find order item
+        EntityValue orderItem = ef.find("mantle.order.OrderItem")
+                .condition("orderId", orderId)
+                .condition("orderItemSeqId", orderItemSeqId)
+                .one()
+        String productId = orderItem.getString("productId")
+
+        // find product form
+        EntityList formList = ef.find("mantle.product.ProductDbForm")
+                .condition("productId", productId)
+                .list()
+        EntityValue form = formList.isEmpty() ? null : formList.getFirst()
+        if (form == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ELIGIBILITY_FORM"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate form fields
+        String formId = form.getString("formId")
+        EntityList fieldList = ef.find("moqui.screen.form.DbFormField")
+                .condition("formId", formId)
+                .list()
+        for (EntityValue field : fieldList) {
+            long answerCount = ef.find("moqui.screen.form.FormResponseAnswer")
+                    .condition("formResponseId", formResponseId)
+                    .condition("formId", formId)
+                    .condition("fieldName", field.getString("fieldName"))
+                    .condition("valueText", "true")
+                    .count()
+            if (answerCount == 0) {
+                mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
+                return new HashMap<String, Object>()
+            }
+        }
+
+        // delete order item form response
+        sf.sync().name("delete#mantle.order.OrderItemFormResponse")
+                .parameter("orderId", orderId)
+                .parameter("orderItemSeqId", orderItemSeqId)
+                .parameter("formResponseId", "*")
+                .call()
+
+        // create order item form response
+        sf.sync().name("create#mantle.order.OrderItemFormResponse")
+                .parameter("orderId", orderId)
+                .parameter("orderItemSeqId", orderItemSeqId)
+                .parameter("formResponseId", formResponseId)
+                .call()
+
+        // return the output parameters
+        Map<String, Object> outParams = new HashMap<>()
+        outParams.put("orderId", orderId)
+        outParams.put("orderPartSeqId", orderPartSeqId)
+        outParams.put("orderItemSeqId", orderPartSeqId)
+        return outParams
+    }
+
     static Map<String, Object> validateApplicantFields(ExecutionContext ec) {
 
         // shortcuts for convenience
