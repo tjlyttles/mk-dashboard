@@ -69,10 +69,6 @@
         <service-call name="mkdecision.dashboard.OrderServices.archive#OrderParty" in-map="context"/>
         <default-response url="."/>
     </transition>
-    <transition name="addOrderItem">
-        <service-call name="mkdecision.dashboard.OrderServices.add#OrderItem" in-map="context"/>
-        <default-response url="."/>
-    </transition>
     <transition name="updateOrderItem">
         <service-call name="mkdecision.dashboard.OrderServices.update#OrderItem" in-map="context"/>
         <default-response url="."/>
