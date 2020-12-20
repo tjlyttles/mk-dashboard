@@ -10,7 +10,7 @@
     <parameter name="partyId"/>
 
     <transition name="storeApplicant">
-        <service-call name="mkdecision.dashboard.OrderServices.store#Applicant" in-map="context" out-map="context"/>
+        <service-call name="mkdecision.dashboard.OrderServices.store#Applicant" in-map="context"/>
         <default-response url="../PartyIdentity">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>

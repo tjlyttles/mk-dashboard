@@ -9,7 +9,7 @@
     <parameter name="orderPartSeqId" required="true"/>
 
     <transition name="storeApplicant">
-        <service-call name="mkdecision.dashboard.OrderServices.store#Applicant" in-map="context" out-map="context">
+        <service-call name="mkdecision.dashboard.OrderServices.store#Applicant" in-map="context">
             <field-map field-name="roleTypeId" value="CoApplicant"/>
         </service-call>
         <conditional-response url="../CoApplicantIdentity">
