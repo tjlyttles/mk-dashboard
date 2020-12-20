@@ -145,7 +145,11 @@
 
     <widgets>
         <container>
-            <label text="${orderHeader.orderId} - ${orderStatus.description}" type="h4" style="q-my-md"/>
+            <container-row style="margin-b-1">
+                <row-col sm="12" xs="12">
+                    <label text="${orderHeader.orderId} - ${orderStatus.description}" type="h4"/>
+                </row-col>
+            </container-row>
             <container-row>
                 <row-col lg="6" md="6" sm="6" xs="12">
                     <container-row>
@@ -174,11 +178,11 @@
             </container-row>
         </container>
 
-        <container style="h-separator margin-tb-1"/>
+        <container style="h-separator q-my-md"/>
 
         <container>
             <container-row>
-                <row-col sm="6" xs="6">
+                <row-col sm="12" xs="12">
                     <label text="Order Items" type="h4"/>
                 </row-col>
             </container-row>
@@ -349,17 +353,21 @@
             </form-list>
             <section name="EmptyItemList" condition="itemList == null || itemList.isEmpty()">
                 <widgets>
-                    <container style="text-center">
+                    <container style="padding-all-05 text-center">
                         <label text="No items have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
         </container>
 
-        <container style="h-separator margin-tb-1"/>
+        <container style="h-separator q-my-md"/>
 
         <container>
-            <label text="Decision" type="h4" style="q-my-md"/>
+            <container-row>
+                <row-col sm="12" xs="12">
+                    <label text="Decision" type="h4"/>
+                </row-col>
+            </container-row>
             <form-list name="DecisionList" list="decisionList" list-entry="decision">
                 <row-actions>
                     <entity-find-one entity-name="moqui.basic.StatusItem" value-field="decisionStatus">
@@ -397,14 +405,14 @@
             </form-list>
             <section name="EmptyDecisionList" condition="decisionList == null || decisionList.isEmpty()">
                 <widgets>
-                    <container style="text-center">
+                    <container style="padding-all-05 text-center">
                         <label text="No decisions have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
         </container>
 
-        <container style="h-separator margin-tb-1"/>
+        <container style="h-separator q-my-md"/>
 
         <container>
             <container-row>
@@ -465,14 +473,14 @@
             </form-list>
             <section name="EmptyInternalList" condition="internalList == null || internalList.isEmpty()">
                 <widgets>
-                    <container style="text-center">
+                    <container style="padding-all-05 text-center">
                         <label text="No parties have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
         </container>
 
-        <container style="h-separator margin-tb-1"/>
+        <container style="h-separator q-my-md"/>
 
         <container>
             <container-row>
@@ -552,14 +560,14 @@
             </form-list>
             <section name="EmptyPartyList" condition="partyList == null || partyList.isEmpty()">
                 <widgets>
-                    <container style="text-center">
+                    <container style="padding-all-05 text-center">
                         <label text="No parties have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
         </container>
 
-        <container style="h-separator margin-tb-1"/>
+        <container style="h-separator q-my-md"/>
 
         <container>
             <container-row>
@@ -597,24 +605,15 @@
                     </container>
                 </row-col>
             </container-row>
-            <section-iterate name="NoteForm" list="noteList" entry="note">
+            <section-iterate name="NoteIterator" list="noteList" entry="note">
                 <actions>
                     <entity-find-related-one value-field="note" relationship-name="moqui.security.UserAccount" to-value-field="userAccount"/>
                 </actions>
                 <widgets>
                     <container-box>
                         <box-header>
-                            <section name="NoteIcon">
-                                <condition>
-                                    <expression>note.internalNote == 'Y'</expression>
-                                </condition>
-                                <widgets>
-                                    <label text="&amp;nbsp;" style="fa fa-lock" encode="false"/>
-                                </widgets>
-                                <fail-widgets>
-                                    <label text="&amp;nbsp;" style="fa fa-unlock" encode="false"/>
-                                </fail-widgets>
-                            </section>
+                            <label text="&amp;nbsp;" style="fa fa-lock" encode="false" condition="note.internalNote == 'Y'"/>
+                            <label text="&amp;nbsp;" style="fa fa-unlock" encode="false" condition="note.internalNote != 'Y'"/>
                             <label text="${ec.l10n.format(note.noteDate, 'MM/dd/yyyy h:mm:ss a')} - ${userAccount.userFullName}" style="text-bold"/>
                         </box-header>
                         <box-body><label text="${note.noteText}"/></box-body>
@@ -623,7 +622,7 @@
             </section-iterate>
             <section name="EmptyNoteList" condition="noteList == null || noteList.isEmpty()">
                 <widgets>
-                    <container style="text-center">
+                    <container style="padding-all-05 text-center">
                         <label text="No notes have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
