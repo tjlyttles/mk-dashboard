@@ -18,7 +18,7 @@ import org.moqui.util.ContextStack
 @SuppressWarnings("unused")
 class OrderServices {
 
-    static Map<String, Object> validateOrderAccess(ExecutionContext ec) {
+    static void validateOrderAccess(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -77,14 +77,10 @@ class OrderServices {
                 .count()
         if (orderCount == 0) {
             mf.addError(lf.localize("DASHBOARD_ORDER_ACCESS_DENIED"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
-    static Map<String, Object> validateOrderFields(ExecutionContext ec) {
+    static void validateOrderFields(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -94,8 +90,6 @@ class OrderServices {
         L10nFacade lf = ec.getL10n()
 
         // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String salesChannelEnumId = (String) cs.getOrDefault("salesChannelEnumId", null)
         String productStoreId = (String) cs.getOrDefault("productStoreId", null)
         String salesRepresentativeId = (String) cs.getOrDefault("salesRepresentativeId", null)
@@ -124,7 +118,7 @@ class OrderServices {
                 .count()
         if (storeCount == 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT_STORE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate sales representative
@@ -144,11 +138,11 @@ class OrderServices {
                     .count()
             if (salesRepCount == 0) {
                 mf.addError(lf.localize("DASHBOARD_INVALID_SALES_REP"))
-                return new HashMap<String, Object>()
+                return
             }
         } else if (salesRepresentativeId != userPartyId) {
             mf.addError(lf.localize("DASHBOARD_INVALID_SALES_REP"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate product category
@@ -160,7 +154,7 @@ class OrderServices {
                 .count()
         if (productCategoryCount == 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT_CATEGORY"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate product category member
@@ -171,48 +165,44 @@ class OrderServices {
                 .count()
         if (categoryMemberCount == 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate total purchase amount
         if (totalPurchaseAmount == null || totalPurchaseAmount <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_TOTAL_PURCHASE_AMOUNT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate down payment
         if (downPayment == null || downPayment < 0 || downPayment > totalPurchaseAmount) {
             mf.addError(lf.localize("DASHBOARD_INVALID_DOWN_PAYMENT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate net purchase amount
         if (netPurchaseAmount == null || netPurchaseAmount != (totalPurchaseAmount - downPayment)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_NET_PURCHASE_AMOUNT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate loan fee
         if (loanFee == null || loanFee < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_LOAN_FEE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate financed amount
         BigDecimal financedAmountBigDecimal = new BigDecimal(financedAmount)
         if (financedAmountBigDecimal == null || financedAmountBigDecimal != ((totalPurchaseAmount + loanFee) - downPayment)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_FINANCED_AMOUNT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate estimated amount
         if (estimatedPayment == null || estimatedPayment <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ESTIMATED_AMOUNT"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
     static Map<String, Object> storeOrder(ExecutionContext ec) {
@@ -494,7 +484,80 @@ class OrderServices {
         return outParams
     }
 
-    static Map<String, Object> validateApplicantFields(ExecutionContext ec) {
+    static Map<String, Object> updateOrderItemEligibility(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        // get the parameters
+        String orderId = (String) cs.getOrDefault("orderId", null)
+        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
+        String orderItemSeqId = (String) cs.getOrDefault("orderItemSeqId", null)
+        String formResponseId = (String) cs.getOrDefault("formResponseId", null)
+
+        // find order item
+        EntityValue orderItem = ef.find("mantle.order.OrderItem")
+                .condition("orderId", orderId)
+                .condition("orderItemSeqId", orderItemSeqId)
+                .one()
+        String productId = orderItem.getString("productId")
+
+        // find product form
+        EntityList formList = ef.find("mantle.product.ProductDbForm")
+                .condition("productId", productId)
+                .list()
+        EntityValue form = formList.isEmpty() ? null : formList.getFirst()
+        if (form == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ELIGIBILITY_FORM"))
+            return new HashMap<String, Object>()
+        }
+
+        // validate form fields
+        String formId = form.getString("formId")
+        EntityList fieldList = ef.find("moqui.screen.form.DbFormField")
+                .condition("formId", formId)
+                .list()
+        for (EntityValue field : fieldList) {
+            long answerCount = ef.find("moqui.screen.form.FormResponseAnswer")
+                    .condition("formResponseId", formResponseId)
+                    .condition("formId", formId)
+                    .condition("fieldName", field.getString("fieldName"))
+                    .condition("valueText", "true")
+                    .count()
+            if (answerCount == 0) {
+                mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
+                return new HashMap<String, Object>()
+            }
+        }
+
+        // delete order item form response
+        sf.sync().name("delete#mantle.order.OrderItemFormResponse")
+                .parameter("orderId", orderId)
+                .parameter("orderItemSeqId", orderItemSeqId)
+                .parameter("formResponseId", "*")
+                .call()
+
+        // create order item form response
+        sf.sync().name("create#mantle.order.OrderItemFormResponse")
+                .parameter("orderId", orderId)
+                .parameter("orderItemSeqId", orderItemSeqId)
+                .parameter("formResponseId", formResponseId)
+                .call()
+
+        // return the output parameters
+        Map<String, Object> outParams = new HashMap<>()
+        outParams.put("orderId", orderId)
+        outParams.put("orderPartSeqId", orderPartSeqId)
+        outParams.put("orderItemSeqId", orderPartSeqId)
+        return outParams
+    }
+
+    static void validateApplicantFields(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -502,9 +565,6 @@ class OrderServices {
         L10nFacade lf = ec.getL10n()
 
         // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
         String roleTypeId = (String) cs.getOrDefault("roleTypeId", null)
         String firstName = (String) cs.getOrDefault("firstName", null)
         String middleName = (String) cs.getOrDefault("middleName", null)
@@ -528,90 +588,85 @@ class OrderServices {
         // validate first name
         if (StringUtils.isBlank(firstName)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_FIRST_NAME"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate last name
         if (StringUtils.isBlank(lastName)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_LAST_NAME"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate residential address
         if (StringUtils.isBlank(address1)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_RESIDENCE_ADDR"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate postal code
         if (StringUtils.isBlank(postalCode)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_POSTAL_CODE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate city
         if (StringUtils.isBlank(city)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_CITY"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate state
         if (StringUtils.isBlank(stateProvinceGeoId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_STATE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate social security number
         if (StringUtils.isBlank(socialSecurityNumber)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_SSN"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate date of birth
         Date minBirthDate = DateUtils.addYears(new Date(), -18)
         if (birthDate == null) {
             mf.addError(lf.localize("DASHBOARD_INVALID_DOB"))
-            return new HashMap<String, Object>()
+            return
         } else if (birthDate.after(minBirthDate)) {
             mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate marital status
         if (StringUtils.isBlank(maritalStatusEnumId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_MARITAL_STATUS"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate employment status
         if (StringUtils.isBlank(employmentStatusEnumId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_STATUS"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate contact number
         if (StringUtils.isBlank(contactNumber)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PHONE_NUMBER"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate contact purpose
         if (StringUtils.isBlank(contactMechPurposeId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PHONE_NUMBER_TYPE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate email address
         if (StringUtils.isBlank(email)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL"))
-            return new HashMap<String, Object>()
         } else if (!StringUtils.equals(email, emailVerify)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL_VERIFY"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
     static Map<String, Object> storeApplicant(ExecutionContext ec) {
@@ -792,13 +847,11 @@ class OrderServices {
                     .call()
         }
 
-        // delete identifications
+        // create social security number
         sf.sync().name("delete#mantle.party.PartyIdentification")
                 .parameter("partyId", partyId)
                 .parameter("partyIdTypeEnumId", "PtidSsn")
                 .call()
-
-        // create social security number
         sf.sync().name("create#mantle.party.PartyIdentification")
                 .parameter("partyId", partyId)
                 .parameter("partyIdTypeEnumId", "PtidSsn")
@@ -858,7 +911,7 @@ class OrderServices {
         return new HashMap<>()
     }
 
-    static Map<String, Object> validateIdentityFields(ExecutionContext ec) {
+    static void validatePropertyFields(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -866,732 +919,6 @@ class OrderServices {
         L10nFacade lf = ec.getL10n()
 
         // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String partyIdTypeEnumId = (String) cs.getOrDefault("partyIdTypeEnumId", null)
-        String idIssuedBy = (String) cs.getOrDefault("idIssuedBy", null)
-        String idValue = (String) cs.getOrDefault("idValue", null)
-        Date idIssueDate = (Date) cs.getOrDefault("idIssueDate", null)
-        Date idExpiryDate = (Date) cs.getOrDefault("idExpiryDate", null)
-
-        // validate ID type
-        if (StringUtils.isBlank(partyIdTypeEnumId)) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_ID_TYPE"))
-            return new HashMap<String, Object>()
-        }
-
-        // validate ID value
-        if (StringUtils.isBlank(idValue)) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_ID_VALUE"))
-            return new HashMap<String, Object>()
-        }
-
-        // validate ID issued by
-        if (StringUtils.isBlank(idIssuedBy)) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_ID_ISSUER"))
-            return new HashMap<String, Object>()
-        }
-
-        // validate issue date
-        if (idIssueDate == null && !StringUtils.equals(partyIdTypeEnumId, "PtidArn")) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_ID_ISSUE_DATE"))
-            return new HashMap<String, Object>()
-        }
-
-        // validate expiry date
-        if (idExpiryDate == null) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_ID_EXPIRY_DATE"))
-            return new HashMap<String, Object>()
-        }
-
-        // return the output parameters
-        return new HashMap<>()
-    }
-
-    static Map<String, Object> addIdentity(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        ServiceFacade sf = ec.getService()
-        MessageFacade mf = ec.getMessage()
-
-        // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String partyIdTypeEnumId = (String) cs.getOrDefault("partyIdTypeEnumId", null)
-        String idIssuedBy = (String) cs.getOrDefault("idIssuedBy", null)
-        String idValue = (String) cs.getOrDefault("idValue", null)
-        Date idIssueDate = (Date) cs.getOrDefault("idIssueDate", null)
-        Date idExpiryDate = (Date) cs.getOrDefault("idExpiryDate", null)
-
-        // validate fields
-        sf.sync().name("mkdecision.dashboard.OrderServices.validate#IdentityFields")
-                .parameters(cs)
-                .call()
-        if (mf.hasError()) {
-            return new HashMap<String, Object>()
-        }
-
-        // create identity
-        sf.sync().name("create#mantle.party.PartyIdentification")
-                .parameter("partyId", partyId)
-                .parameter("partyIdTypeEnumId", partyIdTypeEnumId)
-                .parameter("idValue", idValue)
-                .parameter("issuedBy", idIssuedBy)
-                .parameter("issueDate", idIssueDate)
-                .parameter("expireDate", idExpiryDate)
-                .call()
-
-        // return the output parameters
-        Map<String, Object> outParams = new HashMap<>()
-        outParams.put("partyId", partyId)
-        outParams.put("partyIdTypeEnumId", partyIdTypeEnumId)
-        return outParams
-    }
-
-    static Map<String, Object> deleteIdentity(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
-
-        // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String partyIdTypeEnumId = (String) cs.getOrDefault("partyIdTypeEnumId", null)
-
-        // find identity
-        EntityValue relationship = ef.find("mantle.party.PartyIdentification")
-                .condition("partyId", partyId)
-                .condition("partyIdTypeEnumId", partyIdTypeEnumId)
-                .one()
-
-        // validate identity
-        if (relationship == null) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_IDENTITY"))
-            return new HashMap<String, Object>()
-        }
-
-        // delete identity
-        sf.sync().name("delete#mantle.party.PartyIdentification")
-                .parameter("partyId", partyId)
-                .parameter("partyIdTypeEnumId", partyIdTypeEnumId)
-                .call()
-
-        // return the output parameters
-        return new HashMap<>()
-    }
-
-    static Map<String, Object> validateEmploymentFields(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
-
-        // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String relationshipTypeEnumId = (String) cs.getOrDefault("relationshipTypeEnumId", null)
-        String employerName = (String) cs.getOrDefault("employerName", null)
-        String employmentStatusEnumId = (String) cs.getOrDefault("employmentStatusEnumId", null)
-        String employerClassificationId = (String) cs.getOrDefault("employerClassificationId", null)
-        String jobTitle = (String) cs.getOrDefault("jobTitle", null)
-        Integer years = (Integer) cs.getOrDefault("years", null)
-        Integer months = (Integer) cs.getOrDefault("months", null)
-        Date fromDate = (Date) cs.getOrDefault("fromDate", null)
-        Date toDate = (Date) cs.getOrDefault("toDate", null)
-        BigDecimal monthlyIncome = (BigDecimal) cs.getOrDefault("monthlyIncome", null)
-        String employerAddress1 = (String) cs.getOrDefault("employerAddress1", null)
-        String employerUnitNumber = (String) cs.getOrDefault("employerUnitNumber", null)
-        String employerPostalCode = (String) cs.getOrDefault("employerPostalCode", null)
-        String employerCity = (String) cs.getOrDefault("employerCity", null)
-        String employerStateProvinceGeoId = (String) cs.getOrDefault("employerStateProvinceGeoId", null)
-        String employerContactNumber = (String) cs.getOrDefault("employerContactNumber", null)
-
-        // validate employer name
-        if (StringUtils.isBlank(employerName)) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYER_NAME"))
-            return new HashMap<String, Object>()
-        }
-
-        // validate based on employment status
-        if (StringUtils.equals(employmentStatusEnumId, "EmpsFullTime") || StringUtils.equals(employmentStatusEnumId, "EmpsPartTime")) {
-            if (StringUtils.isBlank(jobTitle)) {
-                mf.addError(lf.localize("DASHBOARD_INVALID_JOB_TITLE"))
-                return new HashMap<String, Object>()
-            }
-        } else if (StringUtils.equals(employmentStatusEnumId, "EmpsContractor") || StringUtils.equals(employmentStatusEnumId, "EmpsSelf")) {
-            if (StringUtils.isBlank(employerClassificationId)) {
-                mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYER_CLASS"))
-                return new HashMap<String, Object>()
-            }
-        }
-
-        // validate duration
-        if (StringUtils.equals(relationshipTypeEnumId, "PrtEmployee")) {
-            if (years == null || years < 0) {
-                mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
-                return new HashMap<String, Object>()
-            } else if (months == null || months < 0) {
-                mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
-                return new HashMap<String, Object>()
-            } else if (years == 0 && months == 0) {
-                mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
-                return new HashMap<String, Object>()
-            }
-        } else if (StringUtils.equals(relationshipTypeEnumId, "PrtPreviousEmployee")) {
-            if (fromDate == null || toDate == null) {
-                mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
-                return new HashMap<String, Object>()
-            } else if (fromDate.after(toDate)) {
-                mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
-                return new HashMap<String, Object>()
-            } else if (toDate.after(new Date())) {
-                mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
-                return new HashMap<String, Object>()
-            }
-        }
-
-        // validate monthly income
-        if (monthlyIncome == null || monthlyIncome < 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_MONTHLY_INCOME"))
-            return new HashMap<String, Object>()
-        }
-
-        // return the output parameters
-        return new HashMap<>()
-    }
-
-    static Map<String, Object> addEmployment(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
-        MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
-
-        // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String relationshipTypeEnumId = (String) cs.getOrDefault("relationshipTypeEnumId", null)
-        String employerName = (String) cs.getOrDefault("employerName", null)
-        String employmentStatusEnumId = (String) cs.getOrDefault("employmentStatusEnumId", null)
-        String employerClassificationId = (String) cs.getOrDefault("employerClassificationId", null)
-        String jobTitle = (String) cs.getOrDefault("jobTitle", null)
-        Integer years = (Integer) cs.getOrDefault("years", null)
-        Integer months = (Integer) cs.getOrDefault("months", null)
-        Date fromDate = (Date) cs.getOrDefault("fromDate", null)
-        Date toDate = (Date) cs.getOrDefault("toDate", null)
-        BigDecimal monthlyIncome = (BigDecimal) cs.getOrDefault("monthlyIncome", null)
-        String employerAddress1 = (String) cs.getOrDefault("employerAddress1", null)
-        String employerUnitNumber = (String) cs.getOrDefault("employerUnitNumber", null)
-        String employerPostalCode = (String) cs.getOrDefault("employerPostalCode", null)
-        String employerCity = (String) cs.getOrDefault("employerCity", null)
-        String employerStateProvinceGeoId = (String) cs.getOrDefault("employerStateProvinceGeoId", null)
-        String employerContactNumber = (String) cs.getOrDefault("employerContactNumber", null)
-
-        // validate fields
-        sf.sync().name("mkdecision.dashboard.OrderServices.validate#EmploymentFields")
-                .parameters(cs)
-                .call()
-        if (mf.hasError()) {
-            return new HashMap<String, Object>()
-        }
-
-        // calculate from date
-        if (StringUtils.equals(relationshipTypeEnumId, "PrtEmployee")) {
-            fromDate = new Date()
-            fromDate = DateUtils.addYears(fromDate, -years)
-            fromDate = DateUtils.addMonths(fromDate, -months)
-        }
-
-        // create employer
-        Map<String, Object> employerResp = sf.sync().name("mantle.party.PartyServices.create#Organization")
-                .parameter("partyTypeEnumId", "PtyOrganization")
-                .parameter("organizationName", employerName)
-                .parameter("roleTypeId", "OrgEmployer")
-                .call()
-        String employerPartyId = (String) employerResp.get("partyId")
-
-        // create employer classification
-        if (StringUtils.equals(employmentStatusEnumId, "EmpsContractor") || StringUtils.equals(employmentStatusEnumId, "EmpsSelf")) {
-            sf.sync().name("create#mantle.party.PartyClassificationAppl")
-                    .parameter("partyId", employerPartyId)
-                    .parameter("partyClassificationId", employerClassificationId)
-                    .parameter("fromDate", fromDate)
-                    .call()
-        }
-
-        // create employer telecom number
-        if (StringUtils.isNotBlank(employerContactNumber)) {
-            sf.sync().name("mantle.party.ContactServices.create#TelecomNumber")
-                    .parameter("partyId", employerPartyId)
-                    .parameter("contactNumber", employerContactNumber)
-                    .parameter("contactMechPurposeId", "PhonePrimary")
-                    .call()
-        }
-
-        // create employer postal address
-        if (StringUtils.isNotBlank(employerAddress1)) {
-            sf.sync().name("mantle.party.ContactServices.create#PostalAddress")
-                    .parameter("partyId", employerPartyId)
-                    .parameter("address1", employerAddress1)
-                    .parameter("unitNumber", employerUnitNumber)
-                    .parameter("city", employerCity)
-                    .parameter("postalCode", employerPostalCode)
-                    .parameter("stateProvinceGeoId", employerStateProvinceGeoId)
-                    .parameter("contactMechPurposeId", "PostalPrimary")
-                    .call()
-        }
-
-        // create employment relation
-        Map<String, Object> employmentRelationshipResp = sf.sync().name("create#mantle.party.PartyRelationship")
-                .parameter("relationshipTypeEnumId", relationshipTypeEnumId)
-                .parameter("fromPartyId", partyId)
-                .parameter("fromRoleTypeId", "Employee")
-                .parameter("toPartyId", employerPartyId)
-                .parameter("toRoleTypeId", "OrgEmployer")
-                .parameter("fromDate", fromDate)
-                .parameter("thruDate", toDate)
-                .parameter("relationshipName", jobTitle)
-                .call()
-        String partyRelationshipId = employmentRelationshipResp.get("partyRelationshipId")
-
-        // add employment status relationship setting
-        sf.sync().name("create#mantle.party.PartyRelationshipSetting")
-                .parameter("partyRelationshipId", partyRelationshipId)
-                .parameter("partySettingTypeId", "EmploymentStatus")
-                .parameter("settingValue", employmentStatusEnumId)
-                .call()
-
-        // create monthly income
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("partyRelationshipId", partyRelationshipId)
-                .parameter("entryTypeEnumId", "MkEntryIncome")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowTotalMonthlyIncome")
-                .parameter("amount", monthlyIncome)
-                .call()
-
-        // return the output parameters
-        Map<String, Object> outParams = new HashMap<>()
-        outParams.put("partyId", partyId)
-        outParams.put("partyRelationshipId", partyRelationshipId)
-        return outParams
-    }
-
-    static Map<String, Object> updateEmployment(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
-        MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
-
-        // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String partyRelationshipId = (String) cs.getOrDefault("partyRelationshipId", null)
-        String relationshipTypeEnumId = (String) cs.getOrDefault("relationshipTypeEnumId", null)
-        String employerName = (String) cs.getOrDefault("employerName", null)
-        String employmentStatusEnumId = (String) cs.getOrDefault("employmentStatusEnumId", null)
-        String employerClassificationId = (String) cs.getOrDefault("employerClassificationId", null)
-        String jobTitle = (String) cs.getOrDefault("jobTitle", null)
-        Integer years = (Integer) cs.getOrDefault("years", null)
-        Integer months = (Integer) cs.getOrDefault("months", null)
-        Date fromDate = (Date) cs.getOrDefault("fromDate", null)
-        Date toDate = (Date) cs.getOrDefault("toDate", null)
-        BigDecimal monthlyIncome = (BigDecimal) cs.getOrDefault("monthlyIncome", null)
-        String employerAddress1 = (String) cs.getOrDefault("employerAddress1", null)
-        String employerUnitNumber = (String) cs.getOrDefault("employerUnitNumber", null)
-        String employerPostalCode = (String) cs.getOrDefault("employerPostalCode", null)
-        String employerCity = (String) cs.getOrDefault("employerCity", null)
-        String employerStateProvinceGeoId = (String) cs.getOrDefault("employerStateProvinceGeoId", null)
-        String employerContactNumber = (String) cs.getOrDefault("employerContactNumber", null)
-
-        // validate fields
-        sf.sync().name("mkdecision.dashboard.OrderServices.validate#EmploymentFields")
-                .parameters(cs)
-                .call()
-        if (mf.hasError()) {
-            return new HashMap<String, Object>()
-        }
-
-        // calculate from date
-        if (StringUtils.equals(relationshipTypeEnumId, "PrtEmployee")) {
-            fromDate = new Date()
-            fromDate = DateUtils.addYears(fromDate, -years)
-            fromDate = DateUtils.addMonths(fromDate, -months)
-        }
-
-        // validate relationship
-        EntityValue relationship = ef.find("mantle.party.PartyRelationship")
-                .condition("partyRelationshipId", partyRelationshipId)
-                .one()
-        if (relationship == null || !StringUtils.equals(partyId, relationship.getString("fromPartyId")) || (!StringUtils.equals(relationship.getString("relationshipTypeEnumId"), "PrtEmployee") && !StringUtils.equals(relationship.getString("relationshipTypeEnumId"), "PrtPreviousEmployee"))) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT"))
-            return new HashMap<String, Object>()
-        }
-
-        // update employer
-        String employerPartyId = (String) relationship.get("toPartyId")
-        sf.sync().name("update#mantle.party.Organization")
-                .parameter("partyId", employerPartyId)
-                .parameter("organizationName", employerName)
-                .call()
-
-        // update employer classification
-        if (StringUtils.equals(employmentStatusEnumId, "EmpsContractor") || StringUtils.equals(employmentStatusEnumId, "EmpsSelf")) {
-            EntityList partyClasses = ef.find("mantle.party.PartyClassificationAppl")
-                    .condition("partyId", employerPartyId)
-                    .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
-                    .list()
-            for (EntityValue partyClass : partyClasses) {
-                sf.sync().name("mantle.party.PartyServices.remove#PartyClassification")
-                        .parameter("partyId", partyClass.getString("partyId"))
-                        .parameter("partyClassificationId", partyClass.getString("partyClassificationId"))
-                        .call()
-            }
-            sf.sync().name("create#mantle.party.PartyClassificationAppl")
-                    .parameter("partyId", employerPartyId)
-                    .parameter("partyClassificationId", employerClassificationId)
-                    .parameter("fromDate", fromDate)
-                    .call()
-        }
-
-        // update employer telecom number
-        EntityValue telecomNumber = ef.find("mantle.party.contact.PartyContactMechTelecomNumber")
-                .condition("partyId", employerPartyId)
-                .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
-                .list()
-                .getFirst()
-        if (telecomNumber != null) {
-            sf.sync().name("mantle.party.ContactServices.delete#PartyContactMech")
-                    .parameter("partyId", employerPartyId)
-                    .parameter("contactMechId", telecomNumber.getString("contactMechId"))
-                    .call()
-        }
-        if (StringUtils.isNotBlank(employerContactNumber)) {
-            sf.sync().name("mantle.party.ContactServices.create#TelecomNumber")
-                    .parameter("partyId", employerPartyId)
-                    .parameter("contactNumber", employerContactNumber)
-                    .parameter("contactMechPurposeId", "PhonePrimary")
-                    .call()
-        }
-
-        // update employer postal address
-        EntityValue postalAddress = ef.find("mantle.party.contact.PartyContactMechPostalAddress")
-                .condition("partyId", employerPartyId)
-                .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
-                .list()
-                .getFirst()
-        if (postalAddress != null) {
-            sf.sync().name("mantle.party.ContactServices.delete#PartyContactMech")
-                    .parameter("partyId", employerPartyId)
-                    .parameter("contactMechId", postalAddress.getString("contactMechId"))
-                    .call()
-        }
-        if (StringUtils.isNotBlank(employerAddress1)) {
-            sf.sync().name("mantle.party.ContactServices.create#PostalAddress")
-                    .parameter("partyId", employerPartyId)
-                    .parameter("address1", employerAddress1)
-                    .parameter("unitNumber", employerUnitNumber)
-                    .parameter("city", employerCity)
-                    .parameter("postalCode", employerPostalCode)
-                    .parameter("stateProvinceGeoId", employerStateProvinceGeoId)
-                    .parameter("contactMechPurposeId", "PostalPrimary")
-                    .call()
-        }
-
-        // update employment relation
-        Map<String, Object> employmentRelationshipResp = sf.sync().name("update#mantle.party.PartyRelationship")
-                .parameter("partyRelationshipId", partyRelationshipId)
-                .parameter("fromDate", fromDate)
-                .parameter("thruDate", toDate)
-                .parameter("relationshipName", jobTitle)
-                .call()
-
-        // update employment status relationship setting
-        sf.sync().name("update#mantle.party.PartyRelationshipSetting")
-                .parameter("partyRelationshipId", partyRelationshipId)
-                .parameter("partySettingTypeId", "EmploymentStatus")
-                .parameter("settingValue", employmentStatusEnumId)
-                .call()
-
-        // update monthly income
-        EntityValue monthlyIncomeFinFlow = ef.find("mk.close.FinancialFlow")
-                .condition("partyId", partyId)
-                .condition("partyRelationshipId", partyRelationshipId)
-                .condition("entryTypeEnumId", "MkEntryIncome")
-                .condition("financialFlowTypeEnumId", "MkFinFlowTotalMonthlyIncome")
-                .list()
-                .getFirst()
-        sf.sync().name("update#mk.close.FinancialFlow")
-                .parameter("financialFlowId", monthlyIncomeFinFlow.getString("financialFlowId"))
-                .parameter("amount", monthlyIncome)
-                .call()
-
-        // return the output parameters
-        Map<String, Object> outParams = new HashMap<>()
-        outParams.put("partyId", partyId)
-        outParams.put("partyRelationshipId", partyRelationshipId)
-        return outParams
-    }
-
-    static Map<String, Object> deleteEmployment(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
-
-        // get the parameters
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String partyRelationshipId = (String) cs.getOrDefault("partyRelationshipId", null)
-
-        // validate relationship
-        EntityValue relationship = ef.find("mantle.party.PartyRelationship")
-                .condition("partyRelationshipId", partyRelationshipId)
-                .one()
-        if (relationship == null || !StringUtils.equals(partyId, relationship.getString("fromPartyId")) || !StringUtils.equals(relationship.getString("relationshipTypeEnumId"), "PrtEmployee")) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT"))
-            return new HashMap<String, Object>()
-        }
-
-        // delete monthly income
-        EntityValue incomeFinancialFlow = ef.find("mk.close.FinancialFlow")
-                .condition("partyId", partyId)
-                .condition("entryTypeEnumId", "MkEntryIncome")
-                .condition("financialFlowTypeEnumId", "MkFinFlowTotalMonthlyIncome")
-                .condition("partyRelationshipId", partyRelationshipId)
-                .list()
-                .getFirst()
-        sf.sync().name("delete#mk.close.FinancialFlow")
-                .parameter("financialFlowId", incomeFinancialFlow.getString("financialFlowId"))
-                .call()
-
-        // delete relationship settings
-        sf.sync().name("delete#mantle.party.PartyRelationshipSetting")
-                .parameter("partyRelationshipId", partyRelationshipId)
-                .parameter("partySettingTypeId", "*")
-                .call()
-
-        // delete relationship
-        sf.sync().name("delete#mantle.party.PartyRelationship")
-                .parameter("partyRelationshipId", partyRelationshipId)
-                .call()
-
-        // return the output parameters
-        return new HashMap<>()
-    }
-
-    static Map<String, Object> validateIncomeSourceFields(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
-
-        // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String financialFlowTypeEnumId = (String) cs.getOrDefault("financialFlowTypeEnumId", null)
-        BigDecimal amount = (BigDecimal) cs.getOrDefault("amount", null)
-        Integer years = (Integer) cs.getOrDefault("years", null)
-        Integer months = (Integer) cs.getOrDefault("months", null)
-
-        // validate financial flow type
-        if (StringUtils.isBlank(financialFlowTypeEnumId)) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_INCOME_SOURCE_TYPE"))
-            return new HashMap<String, Object>()
-        }
-
-        // validate amount
-        if (amount == null || amount <= 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_INCOME_SOURCE_AMOUNT"))
-            return new HashMap<String, Object>()
-        }
-
-        // validate duration
-        if (years == null || years < 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_INCOME_SOURCE_DURATION"))
-            return new HashMap<String, Object>()
-        } else if (months == null || months < 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_INCOME_SOURCE_DURATION"))
-            return new HashMap<String, Object>()
-        } else if (years == 0 && months == 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_INCOME_SOURCE_DURATION"))
-            return new HashMap<String, Object>()
-        }
-
-        // return the output parameters
-        return new HashMap<>()
-    }
-
-    static Map<String, Object> addIncomeSource(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
-        MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
-
-        // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String financialFlowTypeEnumId = (String) cs.getOrDefault("financialFlowTypeEnumId", null)
-        BigDecimal amount = (BigDecimal) cs.getOrDefault("amount", null)
-        Integer years = (Integer) cs.getOrDefault("years", null)
-        Integer months = (Integer) cs.getOrDefault("months", null)
-
-        // validate fields
-        sf.sync().name("mkdecision.dashboard.OrderServices.validate#IncomeSourceFields")
-                .parameters(cs)
-                .call()
-        if (mf.hasError()) {
-            return new HashMap<String, Object>()
-        }
-
-        // create income source
-        Date incomeStartDate = new Date()
-        incomeStartDate = DateUtils.addYears(incomeStartDate, -years)
-        incomeStartDate = DateUtils.addMonths(incomeStartDate, -months)
-        Map<String, Object> finFlowResp = sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("entryTypeEnumId", "MkEntryIncome")
-                .parameter("financialFlowTypeEnumId", financialFlowTypeEnumId)
-                .parameter("partyId", partyId)
-                .parameter("amount", amount)
-                .parameter("fromDate", incomeStartDate)
-                .call()
-        String financialFlowId = (String) finFlowResp.get("financialFlowId")
-
-        // return the output parameters
-        Map<String, Object> outParams = new HashMap<>()
-        outParams.put("partyId", partyId)
-        outParams.put("financialFlowId", financialFlowId)
-        return outParams
-    }
-
-    static Map<String, Object> updateIncomeSource(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
-        MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
-
-        // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String financialFlowId = (String) cs.getOrDefault("financialFlowId", null)
-        String financialFlowTypeEnumId = (String) cs.getOrDefault("financialFlowTypeEnumId", null)
-        BigDecimal amount = (BigDecimal) cs.getOrDefault("amount", null)
-        Integer years = (Integer) cs.getOrDefault("years", null)
-        Integer months = (Integer) cs.getOrDefault("months", null)
-
-        // validate fields
-        sf.sync().name("mkdecision.dashboard.OrderServices.validate#IncomeSourceFields")
-                .parameters(cs)
-                .call()
-        if (mf.hasError()) {
-            return new HashMap<String, Object>()
-        }
-
-        // validate financial flow
-        EntityValue finFlow = ef.find("mk.close.FinancialFlow")
-                .condition("financialFlowId", financialFlowId)
-                .one()
-        if (finFlow == null || !StringUtils.equals(partyId, finFlow.getString("partyId")) || !StringUtils.equals(finFlow.getString("entryTypeEnumId"), "MkEntryIncome")) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_INCOME_SOURCE"))
-            return new HashMap<String, Object>()
-        }
-
-        // update financial flow
-        Date incomeStartDate = new Date()
-        incomeStartDate = DateUtils.addYears(incomeStartDate, -years)
-        incomeStartDate = DateUtils.addMonths(incomeStartDate, -months)
-        Map<String, Object> finFlowResp = sf.sync().name("update#mk.close.FinancialFlow")
-                .parameter("financialFlowId", financialFlowId)
-                .parameter("financialFlowTypeEnumId", financialFlowTypeEnumId)
-                .parameter("amount", amount)
-                .parameter("fromDate", incomeStartDate)
-                .call()
-
-        // return the output parameters
-        Map<String, Object> outParams = new HashMap<>()
-        outParams.put("partyId", partyId)
-        outParams.put("financialFlowId", financialFlowId)
-        return outParams
-    }
-
-    static Map<String, Object> deleteIncomeSource(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
-
-        // get the parameters
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String financialFlowId = (String) cs.getOrDefault("financialFlowId", null)
-
-        // validate financial flow
-        EntityValue finFlow = ef.find("mk.close.FinancialFlow")
-                .condition("financialFlowId", financialFlowId)
-                .one()
-        if (finFlow == null || !StringUtils.equals(partyId, finFlow.getString("partyId")) || !StringUtils.equals(finFlow.getString("entryTypeEnumId"), "MkEntryIncome")) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_INCOME_SOURCE"))
-            return new HashMap<String, Object>()
-        }
-
-        // delete financial flow
-        sf.sync().name("delete#mk.close.FinancialFlow")
-                .parameter("financialFlowId", financialFlowId)
-                .call()
-
-        // return the output parameters
-        return new HashMap<>()
-    }
-
-    static Map<String, Object> validatePropertyFields(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
-
-        // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String assetId = (String) cs.getOrDefault("assetId", null)
         String classEnumId = (String) cs.getOrDefault("classEnumId", null)
         BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
         BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
@@ -1605,59 +932,55 @@ class OrderServices {
         // validate asset class
         if (StringUtils.isBlank(classEnumId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ASSET_CLASS"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate salvage value
         if (salvageValue == null || salvageValue <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_SALVAGE_VALUE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate acquire cost
         if (acquireCost == null || acquireCost < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ACQUIRE_COST"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate HOA monthly fee
         if (hoaFeeMonthly == null || hoaFeeMonthly < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_HOA_FEE_MONTHLY"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate property tax annually
         if (propertyTaxesAnnually == null || propertyTaxesAnnually < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_TAX_ANNUALLY"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate property insurance cost annually
         if (propertyInsuranceCostsAnnually == null || propertyInsuranceCostsAnnually < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_INSURANCE_COST_ANNUALLY"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate lender name
         if (StringUtils.isBlank(lenderName) && (mortgageBalance != null || mortgagePaymentMonthly != null)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_LENDER_NAME"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate mortgage balance
         if (mortgageBalance != null && mortgageBalance <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE_BALANCE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate mortgage payment monthly
         if (mortgagePaymentMonthly != null && mortgagePaymentMonthly <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE_PAYMENT_MONTHLY"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
     static Map<String, Object> storeProperty(ExecutionContext ec) {
@@ -1693,7 +1016,7 @@ class OrderServices {
         }
 
         // store asset
-        boolean updateAsset = StringUtils.isNotBlank(assetId);
+        boolean updateAsset = StringUtils.isNotBlank(assetId)
         if (updateAsset) {
 
             // update asset
@@ -1818,44 +1141,7 @@ class OrderServices {
         return outParams
     }
 
-    static Map<String, Object> deleteMortgage(ExecutionContext ec) {
-
-        // shortcuts for convenience
-        ContextStack cs = ec.getContext()
-        EntityFacade ef = ec.getEntity()
-        ServiceFacade sf = ec.getService()
-        MessageFacade mf = ec.getMessage()
-        L10nFacade lf = ec.getL10n()
-
-        // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String partyRelationshipId = (String) cs.getOrDefault("partyRelationshipId", null)
-
-        // find relationship
-        EntityValue relationship = ef.find("mantle.party.PartyRelationship")
-                .condition("partyRelationshipId", partyRelationshipId)
-                .one()
-
-        // validate relationship
-        if (relationship == null || !StringUtils.equals(partyId, relationship.getString("fromPartyId")) || !StringUtils.equals(relationship.getString("relationshipTypeEnumId"), "PrtMortgage")) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE"))
-            return new HashMap<String, Object>()
-        }
-
-        // TODO: Cleanup mortgage?
-
-        // delete relationship
-        sf.sync().name("delete#mantle.party.PartyRelationship")
-                .parameter("partyRelationshipId", partyRelationshipId)
-                .call()
-
-        // return the output parameters
-        return new HashMap<>()
-    }
-
-    static Map<String, Object> validateOrderItemFields(ExecutionContext ec) {
+    static void validateOrderItemFields(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -1866,14 +1152,13 @@ class OrderServices {
 
         // get the parameters
         String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
         String productId = (String) cs.getOrDefault("productId", null)
         BigDecimal totalPurchaseAmount = (BigDecimal) cs.getOrDefault("totalPurchaseAmount", null)
         BigDecimal downPayment = (BigDecimal) cs.getOrDefault("downPayment", null)
         BigDecimal netPurchaseAmount = (BigDecimal) cs.getOrDefault("netPurchaseAmount", null)
         BigDecimal loanFee = (BigDecimal) cs.getOrDefault("loanFee", null)
-        String financedAmount = (String) cs.getOrDefault("financedAmount", null)
+        BigDecimal financedAmount = (BigDecimal) cs.getOrDefault("financedAmount", null)
         BigDecimal estimatedPayment = (BigDecimal) cs.getOrDefault("estimatedPayment", null)
 
         // validate order header
@@ -1882,7 +1167,7 @@ class OrderServices {
                 .one()
         if (orderHeader == null) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ORDER"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate product store
@@ -1902,7 +1187,7 @@ class OrderServices {
                 .count()
         if (storeCount == 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT_STORE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate product category
@@ -1914,7 +1199,7 @@ class OrderServices {
                 .count()
         if (productCategoryCount == 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT_CATEGORY"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate product category member
@@ -1925,48 +1210,44 @@ class OrderServices {
                 .count()
         if (categoryMemberCount == 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate total purchase amount
         if (totalPurchaseAmount == null || totalPurchaseAmount <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_TOTAL_PURCHASE_AMOUNT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate down payment
         if (downPayment == null || downPayment < 0 || downPayment > totalPurchaseAmount) {
             mf.addError(lf.localize("DASHBOARD_INVALID_DOWN_PAYMENT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate net purchase amount
         if (netPurchaseAmount == null || netPurchaseAmount != (totalPurchaseAmount - downPayment)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_NET_PURCHASE_AMOUNT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate loan fee
         if (loanFee == null || loanFee < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_LOAN_FEE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate financed amount
         BigDecimal financedAmountBigDecimal = new BigDecimal(financedAmount)
         if (financedAmountBigDecimal == null || financedAmountBigDecimal != ((totalPurchaseAmount + loanFee) - downPayment)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_FINANCED_AMOUNT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate estimated amount
         if (estimatedPayment == null || estimatedPayment <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ESTIMATED_AMOUNT"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
     static Map<String, Object> addOrderItem(ExecutionContext ec) {

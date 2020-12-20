@@ -6,6 +6,7 @@
 .margin-all-0 { margin: 0em; }
 .margin-all-05 { margin: 0.5em; }
 .margin-all-1 { margin: 1em; }
+.margin-all-2 { margin: 2em; }
 .margin-tb-05 { margin: 0.5em 0 0.5em 0; }
 .margin-tb-1 { margin: 1em 0 1em 0; }
 .margin-tb-2 { margin: 2em 0 2em 0; }
@@ -22,18 +23,26 @@
 .padding-all-0 { padding: 0em; }
 .padding-all-05 { padding: 0.5em; }
 .padding-all-1 { padding: 1em; }
+.padding-all-2 { padding: 2em; }
 .padding-tb-05 { padding: 0.5em 0 0.5em 0; }
 .padding-tb-1 { padding: 1em 0 1em 0; }
 .padding-lr-05 { padding: 0 0.5em 0 0.5em; }
 .padding-lr-1 { padding: 0 1em 0 1em; }
 
+.border-all-1 { border: 1px solid rgb(211, 212, 216); }
+
 .h-separator { border-bottom: 1px solid rgb(211, 212, 216); }
 .v-separator { border-right: 1px solid rgb(211, 212, 216); }
 
-@media screen and (max-width: 800px) {
-    .stepper {
+@media screen and (max-width: 1500px) {
+    .stepper .q-stepper__title {
         visibility: hidden;
         display: none;
+    }
+}
+@media screen and (max-width: 420px) {
+    .stepper .q-stepper__tab {
+        padding: 8px 16px !important;
     }
 }
 

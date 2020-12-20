@@ -9,11 +9,15 @@
     <parameter name="orderPartSeqId" required="true"/>
 
     <transition name="addIdentity">
-        <service-call name="mkdecision.dashboard.OrderServices.add#Identity" in-map="context"/>
+        <service-call name="mkdecision.dashboard.PartyServices.add#Identity" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateIdentity">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Identity" in-map="context"/>
         <default-response url="."/>
     </transition>
     <transition name="deleteIdentity">
-        <service-call name="mkdecision.dashboard.OrderServices.delete#Identity" in-map="context"/>
+        <service-call name="mkdecision.dashboard.PartyServices.delete#Identity" in-map="context"/>
         <default-response url="."/>
     </transition>
     <transition name="primaryApplicant">
@@ -48,7 +52,7 @@
         </entity-find>
         <set field="partyId" from="partyList?.getFirst()?.partyId ?: null"/>
 
-        <entity-find entity-name="mantle.party.PartyIdentification" list="idList">
+        <entity-find entity-name="mantle.party.PartyIdentification" list="identityList">
             <econdition field-name="partyId" from="partyId"/>
             <econdition field-name="partyIdTypeEnumId" operator="not-equals" value="PtidSsn"/>
         </entity-find>
@@ -83,7 +87,7 @@
                 <label text="Add a United States of America Government or State issued identification." style="margin-b-1"/>
                 <container style="h-separator margin-tb-2"/>
 
-                <section-include name="idSection" location="component://mk-dashboard/screen/custom/OrderParty/PartyIdentity.xml"/>
+                <section-include name="IdentitySection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
 
                 <container style="margin-tb-2"/>
 

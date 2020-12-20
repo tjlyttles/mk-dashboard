@@ -4,6 +4,10 @@
         default-menu-title="Order Party"
         default-menu-include="false">
 
+    <parameter name="orderId" required="true"/>
+    <parameter name="orderPartSeqId" required="true"/>
+    <parameter name="partyId"/>
+
     <actions>
         <service-call name="mkdecision.dashboard.OrderServices.validate#OrderAccess" in-map="context"/>
     </actions>

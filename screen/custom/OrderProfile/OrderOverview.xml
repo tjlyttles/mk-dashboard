@@ -69,16 +69,8 @@
         <service-call name="mkdecision.dashboard.OrderServices.archive#OrderParty" in-map="context"/>
         <default-response url="."/>
     </transition>
-    <transition name="addOrderItem">
-        <service-call name="mkdecision.dashboard.OrderServices.add#OrderItem" in-map="context"/>
-        <default-response url="."/>
-    </transition>
     <transition name="updateOrderItem">
         <service-call name="mkdecision.dashboard.OrderServices.update#OrderItem" in-map="context"/>
-        <default-response url="."/>
-    </transition>
-    <transition name="deleteOrderItem">
-        <service-call name="mkdecision.dashboard.OrderServices.delete#OrderItem" in-map="context"/>
         <default-response url="."/>
     </transition>
     <transition name="addNote">
@@ -145,7 +137,11 @@
 
     <widgets>
         <container>
-            <label text="${orderHeader.orderId} - ${orderStatus.description}" type="h4" style="q-my-md"/>
+            <container-row style="margin-b-1">
+                <row-col sm="12" xs="12">
+                    <label text="${orderHeader.orderId} - ${orderStatus.description}" type="h4"/>
+                </row-col>
+            </container-row>
             <container-row>
                 <row-col lg="6" md="6" sm="6" xs="12">
                     <container-row>
@@ -174,11 +170,11 @@
             </container-row>
         </container>
 
-        <container style="h-separator margin-tb-1"/>
+        <container style="h-separator q-my-md"/>
 
         <container>
             <container-row>
-                <row-col sm="6" xs="6">
+                <row-col sm="12" xs="12">
                     <label text="Order Items" type="h4"/>
                 </row-col>
             </container-row>
@@ -279,12 +275,12 @@
                                     </default-field>
                                 </field>
                                 <field name="totalPurchaseAmount">
-                                    <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order">
+                                    <default-field>
                                         <text-line/>
                                     </default-field>
                                 </field>
                                 <field name="downPayment">
-                                    <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order">
+                                    <default-field>
                                         <text-line/>
                                     </default-field>
                                 </field>
@@ -330,7 +326,6 @@
                                 </field>
                             </form-single>
                         </container-dialog>
-                        <link icon="fa fa-trash" link-type="hidden-form-link" btn-type="danger" url="deleteOrderItem" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, orderItemSeqId: orderItemSeqId]"/>
                     </default-field>
                 </field>
 
@@ -349,17 +344,21 @@
             </form-list>
             <section name="EmptyItemList" condition="itemList == null || itemList.isEmpty()">
                 <widgets>
-                    <container style="text-center">
+                    <container style="padding-all-05 text-center">
                         <label text="No items have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
         </container>
 
-        <container style="h-separator margin-tb-1"/>
+        <container style="h-separator q-my-md"/>
 
         <container>
-            <label text="Decision" type="h4" style="q-my-md"/>
+            <container-row>
+                <row-col sm="12" xs="12">
+                    <label text="Decision" type="h4"/>
+                </row-col>
+            </container-row>
             <form-list name="DecisionList" list="decisionList" list-entry="decision">
                 <row-actions>
                     <entity-find-one entity-name="moqui.basic.StatusItem" value-field="decisionStatus">
@@ -397,14 +396,14 @@
             </form-list>
             <section name="EmptyDecisionList" condition="decisionList == null || decisionList.isEmpty()">
                 <widgets>
-                    <container style="text-center">
+                    <container style="padding-all-05 text-center">
                         <label text="No decisions have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
         </container>
 
-        <container style="h-separator margin-tb-1"/>
+        <container style="h-separator q-my-md"/>
 
         <container>
             <container-row>
@@ -418,10 +417,10 @@
                     <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
-                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryTelecomNumber" out-map="context">
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
-                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryEmailAddress" out-map="context">
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryEmailAddress" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
                 </row-actions>
@@ -435,12 +434,12 @@
                         <display text="${partyName ?: '-'}"/>
                     </default-field>
                 </field>
-                <field name="telecomNumber">
-                    <conditional-field condition="telecomNumber == null" title="Phone">
-                        <display text="${telecomNumber ?: '-'}"/>
+                <field name="contactNumber">
+                    <conditional-field condition="contactNumber == null" title="Phone">
+                        <display text="${contactNumber ?: '-'}"/>
                     </conditional-field>
                     <default-field title="Phone">
-                        <link link-type="anchor" url="tel:${telecomNumber}" text="${telecomNumber}" url-type="plain"/>
+                        <link link-type="anchor" url="tel:${contactNumber}" text="${contactNumber}" url-type="plain"/>
                     </default-field>
                 </field>
                 <field name="emailAddress">
@@ -458,21 +457,21 @@
                         <field-ref name="partyName"/>
                     </column>
                     <column>
-                        <field-ref name="telecomNumber"/>
+                        <field-ref name="contactNumber"/>
                         <field-ref name="emailAddress"/>
                     </column>
                 </columns>
             </form-list>
             <section name="EmptyInternalList" condition="internalList == null || internalList.isEmpty()">
                 <widgets>
-                    <container style="text-center">
+                    <container style="padding-all-05 text-center">
                         <label text="No parties have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
         </container>
 
-        <container style="h-separator margin-tb-1"/>
+        <container style="h-separator q-my-md"/>
 
         <container>
             <container-row>
@@ -491,10 +490,10 @@
                     <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
-                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryTelecomNumber" out-map="context">
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
-                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyPrimaryEmailAddress" out-map="context">
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryEmailAddress" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
                 </row-actions>
@@ -508,17 +507,12 @@
                         <display text="${partyName ?: '-'}"/>
                     </default-field>
                 </field>
-                <field name="nickname">
-                    <default-field title="Other Name (AKA)">
-                        <display text="${nickname ?: '-'}"/>
-                    </default-field>
-                </field>
-                <field name="telecomNumber">
-                    <conditional-field condition="telecomNumber == null" title="Phone">
-                        <display text="${telecomNumber ?: '-'}"/>
+                <field name="contactNumber">
+                    <conditional-field condition="contactNumber == null" title="Phone">
+                        <display text="${contactNumber ?: '-'}"/>
                     </conditional-field>
                     <default-field title="Phone">
-                        <link link-type="anchor" url="tel:${telecomNumber}" text="${telecomNumber}" url-type="plain"/>
+                        <link link-type="anchor" url="tel:${contactNumber}" text="${contactNumber}" url-type="plain"/>
                     </default-field>
                 </field>
                 <field name="emailAddress">
@@ -542,7 +536,7 @@
                         <field-ref name="partyName"/>
                     </column>
                     <column>
-                        <field-ref name="telecomNumber"/>
+                        <field-ref name="contactNumber"/>
                         <field-ref name="emailAddress"/>
                     </column>
                     <column>
@@ -552,14 +546,14 @@
             </form-list>
             <section name="EmptyPartyList" condition="partyList == null || partyList.isEmpty()">
                 <widgets>
-                    <container style="text-center">
+                    <container style="padding-all-05 text-center">
                         <label text="No parties have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
         </container>
 
-        <container style="h-separator margin-tb-1"/>
+        <container style="h-separator q-my-md"/>
 
         <container>
             <container-row>
@@ -597,24 +591,15 @@
                     </container>
                 </row-col>
             </container-row>
-            <section-iterate name="NoteForm" list="noteList" entry="note">
+            <section-iterate name="NoteIterator" list="noteList" entry="note">
                 <actions>
                     <entity-find-related-one value-field="note" relationship-name="moqui.security.UserAccount" to-value-field="userAccount"/>
                 </actions>
                 <widgets>
                     <container-box>
                         <box-header>
-                            <section name="NoteIcon">
-                                <condition>
-                                    <expression>note.internalNote == 'Y'</expression>
-                                </condition>
-                                <widgets>
-                                    <label text="&amp;nbsp;" style="fa fa-lock" encode="false"/>
-                                </widgets>
-                                <fail-widgets>
-                                    <label text="&amp;nbsp;" style="fa fa-unlock" encode="false"/>
-                                </fail-widgets>
-                            </section>
+                            <label text="&amp;nbsp;" style="fa fa-lock" encode="false" condition="note.internalNote == 'Y'"/>
+                            <label text="&amp;nbsp;" style="fa fa-unlock" encode="false" condition="note.internalNote != 'Y'"/>
                             <label text="${ec.l10n.format(note.noteDate, 'MM/dd/yyyy h:mm:ss a')} - ${userAccount.userFullName}" style="text-bold"/>
                         </box-header>
                         <box-body><label text="${note.noteText}"/></box-body>
@@ -623,7 +608,7 @@
             </section-iterate>
             <section name="EmptyNoteList" condition="noteList == null || noteList.isEmpty()">
                 <widgets>
-                    <container style="text-center">
+                    <container style="padding-all-05 text-center">
                         <label text="No notes have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
