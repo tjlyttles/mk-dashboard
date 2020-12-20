@@ -181,7 +181,9 @@
 
     <widgets>
         <container>
-            <label text="Agreements" type="h4" style="q-my-md"/>
+            <container>
+                <label text="Agreements" type="h4"/>
+            </container>
             <form-list name="AgreementList" list="agreementContentList" list-entry="content">
                 <row-actions>
                     <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
@@ -238,15 +240,19 @@
             </form-list>
             <section name="EmptyContentList" condition="contentList == null || agreementContentList.isEmpty()">
                 <widgets>
-                    <container style="text-center">
+                    <container style="padding-all-05 text-center">
                         <label text="No agreements have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
         </container>
 
+        <container style="q-my-md"/>
+
         <container>
-            <label text="Files" type="h4" style="q-my-md"/>
+            <container>
+                <label text="Files" type="h4"/>
+            </container>
             <form-list name="FileList" list="fileList" list-entry="content">
                 <field name="contentType">
                     <default-field title="Type">
@@ -291,15 +297,19 @@
             </form-list>
             <section name="EmptyFileList" condition="fileList == null || fileList.isEmpty()">
                 <widgets>
-                    <container style="text-center">
+                    <container style="padding-all-05 text-center">
                         <label text="No files have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
         </container>
 
+        <container style="q-my-md"/>
+
         <container>
-            <label text="Emails" type="h4" style="q-my-md"/>
+            <container>
+                <label text="Emails" type="h4"/>
+            </container>
             <form-list name="EmailList" list="emailList" list-entry="email">
                 <row-actions>
                     <entity-find-one entity-name="moqui.basic.email.EmailTemplate" value-field="emailTemplate">
@@ -355,7 +365,7 @@
             </form-list>
             <section name="EmptyEmailList" condition="emailList == null || emailList.isEmpty()">
                 <widgets>
-                    <container style="text-center">
+                    <container style="padding-all-05 text-center">
                         <label text="No emails have been sent yet" style="text-grey"/>
                     </container>
                 </widgets>
