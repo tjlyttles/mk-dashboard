@@ -9,8 +9,6 @@
     </service>
     <service verb="validate" noun="OrderFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateOrderFields">
         <in-parameters>
-            <parameter name="orderId"/>
-            <parameter name="orderPartSeqId"/>
             <parameter name="salesChannelEnumId"/>
             <parameter name="productStoreId"/>
             <parameter name="salesRepresentativeId"/>
@@ -66,7 +64,6 @@
     <service verb="validate" noun="OrderItemFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateOrderItemFields">
         <in-parameters>
             <parameter name="orderId"/>
-            <parameter name="orderPartSeqId"/>
             <parameter name="productCategoryId"/>
             <parameter name="productId"/>
             <parameter name="totalPurchaseAmount" type="BigDecimal"/>
@@ -131,9 +128,6 @@
     <!-- Applicants -->
     <service verb="validate" noun="ApplicantFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateApplicantFields">
         <in-parameters>
-            <parameter name="orderId"/>
-            <parameter name="orderPartSeqId"/>
-            <parameter name="partyId"/>
             <parameter name="roleTypeId"/>
             <parameter name="firstName"/>
             <parameter name="middleName"/>
@@ -209,10 +203,6 @@
     <!-- Property -->
     <service verb="validate" noun="PropertyFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validatePropertyFields">
         <in-parameters>
-            <parameter name="orderId"/>
-            <parameter name="orderPartSeqId"/>
-            <parameter name="partyId"/>
-            <parameter name="assetId"/>
             <parameter name="classEnumId"/>
             <parameter name="salvageValue" type="BigDecimal"/>
             <parameter name="acquireCost" type="BigDecimal"/>

@@ -6,7 +6,7 @@ import org.moqui.context.UserFacade
 import org.moqui.entity.EntityFacade
 import org.moqui.entity.EntityList
 import org.moqui.entity.EntityValue
-import org.moqui.util.ContextStack;
+import org.moqui.util.ContextStack
 
 class ProductServices {
 
@@ -26,8 +26,8 @@ class ProductServices {
                 .condition("productId", productId)
                 .condition("productStoreId", productStoreId)
                 .condition("productParameterId", productParameterId)
-                .list();
-        EntityValue parameter = parameterList.isEmpty() ? null : parameterList.getFirst();
+                .list()
+        EntityValue parameter = parameterList.isEmpty() ? null : parameterList.getFirst()
 
         // return the output parameters
         HashMap<String, Object> outParams = new HashMap<>()
@@ -54,8 +54,8 @@ class ProductServices {
                 .condition("productStoreId", productStoreId)
                 .condition("priceTypeEnumId", priceTypeEnumId)
                 .conditionDate("fromDate", "thruDate", ec.user.getNowTimestamp())
-                .list();
-        EntityValue price = priceList.isEmpty() ? null : priceList.getFirst();
+                .list()
+        EntityValue price = priceList.isEmpty() ? null : priceList.getFirst()
 
         // return the output parameters
         HashMap<String, Object> outParams = new HashMap<>()

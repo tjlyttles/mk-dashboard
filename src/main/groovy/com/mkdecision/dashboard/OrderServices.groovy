@@ -18,7 +18,7 @@ import org.moqui.util.ContextStack
 @SuppressWarnings("unused")
 class OrderServices {
 
-    static Map<String, Object> validateOrderAccess(ExecutionContext ec) {
+    static void validateOrderAccess(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -77,14 +77,10 @@ class OrderServices {
                 .count()
         if (orderCount == 0) {
             mf.addError(lf.localize("DASHBOARD_ORDER_ACCESS_DENIED"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
-    static Map<String, Object> validateOrderFields(ExecutionContext ec) {
+    static void validateOrderFields(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -94,8 +90,6 @@ class OrderServices {
         L10nFacade lf = ec.getL10n()
 
         // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String salesChannelEnumId = (String) cs.getOrDefault("salesChannelEnumId", null)
         String productStoreId = (String) cs.getOrDefault("productStoreId", null)
         String salesRepresentativeId = (String) cs.getOrDefault("salesRepresentativeId", null)
@@ -124,7 +118,7 @@ class OrderServices {
                 .count()
         if (storeCount == 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT_STORE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate sales representative
@@ -144,11 +138,11 @@ class OrderServices {
                     .count()
             if (salesRepCount == 0) {
                 mf.addError(lf.localize("DASHBOARD_INVALID_SALES_REP"))
-                return new HashMap<String, Object>()
+                return
             }
         } else if (salesRepresentativeId != userPartyId) {
             mf.addError(lf.localize("DASHBOARD_INVALID_SALES_REP"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate product category
@@ -160,7 +154,7 @@ class OrderServices {
                 .count()
         if (productCategoryCount == 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT_CATEGORY"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate product category member
@@ -171,48 +165,44 @@ class OrderServices {
                 .count()
         if (categoryMemberCount == 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate total purchase amount
         if (totalPurchaseAmount == null || totalPurchaseAmount <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_TOTAL_PURCHASE_AMOUNT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate down payment
         if (downPayment == null || downPayment < 0 || downPayment > totalPurchaseAmount) {
             mf.addError(lf.localize("DASHBOARD_INVALID_DOWN_PAYMENT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate net purchase amount
         if (netPurchaseAmount == null || netPurchaseAmount != (totalPurchaseAmount - downPayment)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_NET_PURCHASE_AMOUNT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate loan fee
         if (loanFee == null || loanFee < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_LOAN_FEE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate financed amount
         BigDecimal financedAmountBigDecimal = new BigDecimal(financedAmount)
         if (financedAmountBigDecimal == null || financedAmountBigDecimal != ((totalPurchaseAmount + loanFee) - downPayment)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_FINANCED_AMOUNT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate estimated amount
         if (estimatedPayment == null || estimatedPayment <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ESTIMATED_AMOUNT"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
     static Map<String, Object> storeOrder(ExecutionContext ec) {
@@ -567,7 +557,7 @@ class OrderServices {
         return outParams
     }
 
-    static Map<String, Object> validateApplicantFields(ExecutionContext ec) {
+    static void validateApplicantFields(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -575,9 +565,6 @@ class OrderServices {
         L10nFacade lf = ec.getL10n()
 
         // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
         String roleTypeId = (String) cs.getOrDefault("roleTypeId", null)
         String firstName = (String) cs.getOrDefault("firstName", null)
         String middleName = (String) cs.getOrDefault("middleName", null)
@@ -601,90 +588,85 @@ class OrderServices {
         // validate first name
         if (StringUtils.isBlank(firstName)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_FIRST_NAME"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate last name
         if (StringUtils.isBlank(lastName)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_LAST_NAME"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate residential address
         if (StringUtils.isBlank(address1)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_RESIDENCE_ADDR"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate postal code
         if (StringUtils.isBlank(postalCode)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_POSTAL_CODE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate city
         if (StringUtils.isBlank(city)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_CITY"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate state
         if (StringUtils.isBlank(stateProvinceGeoId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_STATE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate social security number
         if (StringUtils.isBlank(socialSecurityNumber)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_SSN"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate date of birth
         Date minBirthDate = DateUtils.addYears(new Date(), -18)
         if (birthDate == null) {
             mf.addError(lf.localize("DASHBOARD_INVALID_DOB"))
-            return new HashMap<String, Object>()
+            return
         } else if (birthDate.after(minBirthDate)) {
             mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate marital status
         if (StringUtils.isBlank(maritalStatusEnumId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_MARITAL_STATUS"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate employment status
         if (StringUtils.isBlank(employmentStatusEnumId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_STATUS"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate contact number
         if (StringUtils.isBlank(contactNumber)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PHONE_NUMBER"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate contact purpose
         if (StringUtils.isBlank(contactMechPurposeId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PHONE_NUMBER_TYPE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate email address
         if (StringUtils.isBlank(email)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL"))
-            return new HashMap<String, Object>()
         } else if (!StringUtils.equals(email, emailVerify)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL_VERIFY"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
     static Map<String, Object> storeApplicant(ExecutionContext ec) {
@@ -929,7 +911,7 @@ class OrderServices {
         return new HashMap<>()
     }
 
-    static Map<String, Object> validatePropertyFields(ExecutionContext ec) {
+    static void validatePropertyFields(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -937,10 +919,6 @@ class OrderServices {
         L10nFacade lf = ec.getL10n()
 
         // get the parameters
-        String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
-        String partyId = (String) cs.getOrDefault("partyId", null)
-        String assetId = (String) cs.getOrDefault("assetId", null)
         String classEnumId = (String) cs.getOrDefault("classEnumId", null)
         BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
         BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
@@ -954,59 +932,55 @@ class OrderServices {
         // validate asset class
         if (StringUtils.isBlank(classEnumId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ASSET_CLASS"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate salvage value
         if (salvageValue == null || salvageValue <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_SALVAGE_VALUE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate acquire cost
         if (acquireCost == null || acquireCost < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ACQUIRE_COST"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate HOA monthly fee
         if (hoaFeeMonthly == null || hoaFeeMonthly < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_HOA_FEE_MONTHLY"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate property tax annually
         if (propertyTaxesAnnually == null || propertyTaxesAnnually < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_TAX_ANNUALLY"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate property insurance cost annually
         if (propertyInsuranceCostsAnnually == null || propertyInsuranceCostsAnnually < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_INSURANCE_COST_ANNUALLY"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate lender name
         if (StringUtils.isBlank(lenderName) && (mortgageBalance != null || mortgagePaymentMonthly != null)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_LENDER_NAME"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate mortgage balance
         if (mortgageBalance != null && mortgageBalance <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE_BALANCE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate mortgage payment monthly
         if (mortgagePaymentMonthly != null && mortgagePaymentMonthly <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE_PAYMENT_MONTHLY"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
     static Map<String, Object> storeProperty(ExecutionContext ec) {
@@ -1042,7 +1016,7 @@ class OrderServices {
         }
 
         // store asset
-        boolean updateAsset = StringUtils.isNotBlank(assetId);
+        boolean updateAsset = StringUtils.isNotBlank(assetId)
         if (updateAsset) {
 
             // update asset
@@ -1204,7 +1178,7 @@ class OrderServices {
         return new HashMap<>()
     }
 
-    static Map<String, Object> validateOrderItemFields(ExecutionContext ec) {
+    static void validateOrderItemFields(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -1215,7 +1189,6 @@ class OrderServices {
 
         // get the parameters
         String orderId = (String) cs.getOrDefault("orderId", null)
-        String orderPartSeqId = (String) cs.getOrDefault("orderPartSeqId", null)
         String productCategoryId = (String) cs.getOrDefault("productCategoryId", null)
         String productId = (String) cs.getOrDefault("productId", null)
         BigDecimal totalPurchaseAmount = (BigDecimal) cs.getOrDefault("totalPurchaseAmount", null)
@@ -1231,7 +1204,7 @@ class OrderServices {
                 .one()
         if (orderHeader == null) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ORDER"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate product store
@@ -1251,7 +1224,7 @@ class OrderServices {
                 .count()
         if (storeCount == 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT_STORE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate product category
@@ -1263,7 +1236,7 @@ class OrderServices {
                 .count()
         if (productCategoryCount == 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT_CATEGORY"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate product category member
@@ -1274,48 +1247,44 @@ class OrderServices {
                 .count()
         if (categoryMemberCount == 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PRODUCT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate total purchase amount
         if (totalPurchaseAmount == null || totalPurchaseAmount <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_TOTAL_PURCHASE_AMOUNT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate down payment
         if (downPayment == null || downPayment < 0 || downPayment > totalPurchaseAmount) {
             mf.addError(lf.localize("DASHBOARD_INVALID_DOWN_PAYMENT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate net purchase amount
         if (netPurchaseAmount == null || netPurchaseAmount != (totalPurchaseAmount - downPayment)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_NET_PURCHASE_AMOUNT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate loan fee
         if (loanFee == null || loanFee < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_LOAN_FEE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate financed amount
         BigDecimal financedAmountBigDecimal = new BigDecimal(financedAmount)
         if (financedAmountBigDecimal == null || financedAmountBigDecimal != ((totalPurchaseAmount + loanFee) - downPayment)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_FINANCED_AMOUNT"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate estimated amount
         if (estimatedPayment == null || estimatedPayment <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ESTIMATED_AMOUNT"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
     static Map<String, Object> addOrderItem(ExecutionContext ec) {

@@ -118,7 +118,7 @@ class PartyServices {
         EntityValue postalAddress = postalAddresses != null && !postalAddresses.isEmpty() ? postalAddresses.getFirst() : null
 
         // prepare postal address string
-        ArrayList<String> addressParts = new ArrayList<>();
+        ArrayList<String> addressParts = new ArrayList<>()
         if (postalAddress != null) {
             String address1 = postalAddress.getString("address1")
             String city = postalAddress.getString("city")
