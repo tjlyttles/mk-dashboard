@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/entity-definition-2.1.xsd">
+
+    <view-entity entity-name="PartyContentDetail" package="mkdecision.dashboard">
+        <member-entity entity-alias="PCNT" entity-name="mantle.party.PartyContent"/>
+        <member-entity entity-alias="ATHR" entity-name="moqui.security.UserAccount" join-from-alias="PCNT">
+            <key-map field-name="userId"/>
+        </member-entity>
+        <member-entity entity-alias="PRTY" entity-name="mantle.party.Party" join-from-alias="ATHR" join-optional="true">
+            <key-map field-name="partyId"/>
+        </member-entity>
+        <member-entity entity-alias="PSPR" entity-name="mantle.product.store.ProductStoreParty" join-from-alias="PRTY" join-optional="true">
+            <key-map field-name="partyId"/>
+            <entity-condition>
+                <date-filter from-field-name="storePartyFromDate" thru-field-name="storePartyThruDate"/>
+            </entity-condition>
+        </member-entity>
+
+        <alias-all entity-alias="PCNT"/>
+        <alias name="userPartyId" entity-alias="PRTY" field="partyId"/>
+        <alias name="productStoreId" entity-alias="PSPR" field="productStoreId"/>
+        <alias name="storePartyRoleTypeId" entity-alias="PSPR" field="roleTypeId"/>
+        <alias name="storePartyFromDate" entity-alias="PSPR" field="fromDate"/>
+        <alias name="storePartyThruDate" entity-alias="PSPR" field="thruDate"/>
+    </view-entity>
+    <view-entity entity-name="OrderContentDetail" package="mkdecision.dashboard">
+        <member-entity entity-alias="OCNT" entity-name="mantle.order.OrderContent"/>
+        <member-entity entity-alias="ATHR" entity-name="moqui.security.UserAccount" join-from-alias="OCNT">
+            <key-map field-name="userId"/>
+        </member-entity>
+        <member-entity entity-alias="PRTY" entity-name="mantle.party.Party" join-from-alias="ATHR" join-optional="true">
+            <key-map field-name="partyId"/>
+        </member-entity>
+        <member-entity entity-alias="PSPR" entity-name="mantle.product.store.ProductStoreParty" join-from-alias="PRTY" join-optional="true">
+            <key-map field-name="partyId"/>
+            <entity-condition>
+                <date-filter from-field-name="storePartyFromDate" thru-field-name="storePartyThruDate"/>
+            </entity-condition>
+        </member-entity>
+
+        <alias-all entity-alias="OCNT"/>
+        <alias name="userPartyId" entity-alias="PRTY" field="partyId"/>
+        <alias name="productStoreId" entity-alias="PSPR" field="productStoreId"/>
+        <alias name="storePartyRoleTypeId" entity-alias="PSPR" field="roleTypeId"/>
+        <alias name="storePartyFromDate" entity-alias="PSPR" field="fromDate"/>
+        <alias name="storePartyThruDate" entity-alias="PSPR" field="thruDate"/>
+    </view-entity>
+
+</entities>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Party Identity"
+        default-menu-include="false"
+        default-menu-index="2">
+
+    <parameter name="orderId" required="true"/>
+    <parameter name="orderPartSeqId" required="true"/>
+    <parameter name="partyId" required="true"/>
+
+    <transition name="addIdentity">
+        <service-call name="mkdecision.dashboard.PartyServices.add#Identity" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateIdentity">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Identity" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="deleteIdentity">
+        <service-call name="mkdecision.dashboard.PartyServices.delete#Identity" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="party">
+        <default-response url="../Party">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+        </default-response>
+    </transition>
+    <transition name="partyEmployment">
+        <default-response url="../PartyEmployment">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+        </default-response>
+    </transition>
+
+    <actions>
+        <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+
+        <entity-find entity-name="mantle.party.PartyIdentification" list="identityList">
+            <econdition field-name="partyId" from="partyId"/>
+            <econdition field-name="partyIdTypeEnumId" operator="not-equals" value="PtidSsn"/>
+        </entity-find>
+    </actions>
+
+    <widgets>
+        <container-row>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+            <row-col xs="12" sm="10" md="6" lg="6">
+                <container style="stepper margin-b-1">
+                    <render-mode>
+                        <text type="qvt"><![CDATA[
+                            <q-stepper ref="stepper" value="s2" color="primary" :flat="true">
+                                <q-step name="s1" title="Party" icon="person"/>
+                                <q-step name="s2" title="Identity" icon="fingerprint"/>
+                                <q-step name="s3" title="Employment" icon="work"/>
+                            </q-stepper>
+                        ]]></text>
+                    </render-mode>
+                </container>
+            </row-col>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+        </container-row>
+
+        <container-row style="form-no-margin">
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+            <row-col xs="12" sm="10" md="6" lg="6">
+                <label text="Identity" type="h5" style="margin-b-1"/>
+                <label text="Add a United States of America Government or State issued identification." style="margin-b-1"/>
+                <container style="h-separator margin-tb-2"/>
+
+                <section-include name="IdentitySection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
+
+                <container style="margin-tb-2"/>
+
+                <container-row>
+                    <row-col xs="6" sm="6" md="6" lg="6" style="padding-all-0">
+                        <link url="party" text="Back" style="text-black"/>
+                    </row-col>
+                    <row-col xs="6" sm="6" md="6" lg="6" style="padding-all-0 text-right">
+                        <link url="partyEmployment" text="Continue" btn-type="default" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId]"/>
+                    </row-col>
+                </container-row>
+            </row-col>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+        </container-row>
+    </widgets>
+
+</screen>

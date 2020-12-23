@@ -17,7 +17,7 @@ along with this software (see the LICENSE.md file). If not, see
     <input type="hidden" id="confAppRootPath" value="${ec.web.servletContext.contextPath}">
     <!-- ===== NOTE CHANGED: versus moqui-quasar file only these 2 lines changed: ===== -->
     <input type="hidden" id="confBasePath" value="${ec.web.servletContext.contextPath}/custom">
-    <input type="hidden" id="confLinkBasePath" value="${ec.web.servletContext.contextPath}/capps">
+    <input type="hidden" id="confLinkBasePath" value="${ec.web.servletContext.contextPath}/dashboard">
     <input type="hidden" id="confUserId" value="${ec.user.userId!''}">
     <input type="hidden" id="confLocale" value="${ec.user.locale.toLanguageTag()}">
     <input type="hidden" id="confDarkMode" value="${ec.user.getPreference("QUASAR_DARK")!"false"}">
@@ -28,13 +28,13 @@ along with this software (see the LICENSE.md file). If not, see
     <#-- for layout options see: https://quasar.dev/layout/layout -->
     <#-- to build a layout use the handy Quasar tool: https://quasar.dev/layout-builder -->
     <q-layout view="hHh LpR fFf">
-        <q-header reveal bordered class="bg-black text-white" id="top"><q-toolbar style="font-size:15px;">
+        <q-header reveal bordered id="top"><q-toolbar style="font-size:15px;">
             <q-btn dense flat icon="menu" @click="toggleLeftOpen()"></q-btn>
 
             <#assign headerLogoList = sri.getThemeValues("STRT_HEADER_LOGO")>
             <#if headerLogoList?has_content>
                 <m-link href="/apps"><div class="q-mx-md q-mt-sm">
-                    <img src="${sri.buildUrl(headerLogoList?first).getUrl()}" alt="Home" height="32">
+                    <img src="${sri.buildUrl(headerLogoList?first).getUrl()}" alt="Home" height="32" class="invertible">
                 </div></m-link>
             </#if>
             <#assign headerTitleList = sri.getThemeValues("STRT_HEADER_TITLE")>
@@ -43,6 +43,7 @@ along with this software (see the LICENSE.md file). If not, see
             </#if>
 
             <#-- NOTE: tried using q-breadcrumbs but last item with q-breadcrumbs--last class makes never clickable! -->
+            <!-- NOTE: Breadcrumbs are not required
             <template v-for="(navMenuItem, menuIndex) in navMenuList"><template v-if="menuIndex < (navMenuList.length - 1)">
                 <m-link v-if="navMenuItem.hasTabMenu" :href="getNavHref(menuIndex)">{{navMenuItem.title}}</m-link>
                 <div v-else-if="navMenuItem.subscreens && navMenuItem.subscreens.length" class="cursor-pointer">
@@ -65,6 +66,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <q-icon size="1.5em" name="chevron_right" color="grey"></q-icon>
             </template></template>
             <m-link v-if="navMenuList.length > 0" :href="getNavHref(navMenuList.length - 1)">{{navMenuList[navMenuList.length - 1].title}}</m-link>
+            -->
 
             <q-space></q-space>
 
@@ -146,14 +148,6 @@ along with this software (see the LICENSE.md file). If not, see
         <q-page-container class="q-ma-sm"><q-page>
             <m-subscreens-active></m-subscreens-active>
         </q-page></q-page-container>
-
-        <q-footer reveal bordered class="bg-grey-9 text-white row q-pa-xs" id="footer">
-            <#assign footerItemList = sri.getThemeValues("STRT_FOOTER_ITEM")>
-            <#list footerItemList! as footerItem>
-                <#assign footerItemTemplate = footerItem?interpret>
-                <@footerItemTemplate/>
-            </#list>
-        </q-footer>
     </q-layout>
 </div>
 

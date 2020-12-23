@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed-initial">
+
+    <!-- Artifact groups -->
+    <artifactGroups artifactGroupId="DASHBOARD_APP" description="Dashboard App (via root screen)">
+        <artifacts artifactName="component://mk-dashboard/screen/custom.xml" artifactTypeEnumId="AT_XML_SCREEN" inheritAuthz="Y"/>
+    </artifactGroups>
+
+</entity-facade-xml>

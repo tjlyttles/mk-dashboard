@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <!-- Agreement -->
+    <service verb="count" noun="OrderAgreementSignatures" type="java" location="com.mkdecision.dashboard.AgreementServices" method="countOrderAgreementSignatures">
+        <in-parameters>
+            <parameter name="orderId"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId"/>
+            <parameter name="customersSigned" type="Long"/>
+            <parameter name="customersPending" type="Long"/>
+            <parameter name="dealersSigned" type="Long"/>
+            <parameter name="dealersPending" type="Long"/>
+            <parameter name="userSigned" type="Long"/>
+            <parameter name="userPending" type="Long"/>
+        </out-parameters>
+    </service>
+    <service verb="sign" noun="OrderAgreement" type="java" location="com.mkdecision.dashboard.AgreementServices" method="signOrderAgreement">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="agreementTypeEnumId"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId"/>
+            <parameter name="partyId"/>
+            <parameter name="agreementId"/>
+        </out-parameters>
+    </service>
+
+</services>

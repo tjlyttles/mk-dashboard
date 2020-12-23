@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Applicant Eligibility"
+        default-menu-include="false"
+        default-menu-index="2">
+
+    <parameter name="orderId"/>
+    <parameter name="orderPartSeqId"/>
+    <parameter name="salesChannelEnumId"/>
+    <parameter name="productStoreId"/>
+    <parameter name="salesRepresentativeId"/>
+    <parameter name="productCategoryId"/>
+    <parameter name="productId"/>
+    <parameter name="totalPurchaseAmount"/>
+    <parameter name="downPayment"/>
+    <parameter name="netPurchaseAmount"/>
+    <parameter name="loanFee"/>
+    <parameter name="financedAmount"/>
+    <parameter name="estimatedPayment"/>
+
+    <transition name="storeOrder">
+        <actions>
+            <service-call name="org.moqui.impl.ScreenServices.create#FormResponse" out-map="context">
+                <field-map field-name="formId" from="formId"/>
+                <field-map field-name="responseMap" from="ec.web.parameters"/>
+            </service-call>
+            <service-call name="mkdecision.dashboard.OrderServices.store#Order" in-map="context" out-map="context"/>
+        </actions>
+        <default-response url="../PrimaryApplicant">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+        </default-response>
+    </transition>
+    <transition name="orderHeader">
+        <default-response url="../OrderHeader">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="salesChannelEnumId"/>
+            <parameter name="productStoreId"/>
+            <parameter name="salesRepresentativeId"/>
+            <parameter name="productCategoryId"/>
+            <parameter name="productId"/>
+            <parameter name="totalPurchaseAmount"/>
+            <parameter name="downPayment"/>
+            <parameter name="netPurchaseAmount"/>
+            <parameter name="loanFee"/>
+            <parameter name="financedAmount"/>
+            <parameter name="estimatedPayment"/>
+        </default-response>
+    </transition>
+    
+    <actions>
+        <entity-find entity-name="mantle.product.ProductDbForm" list="formList">
+            <econdition field-name="productId"/>
+        </entity-find>
+        <set field="formId" from="formList.isEmpty() ? null : formList.getFirst().get('formId')"/>
+
+        <if condition="orderId != null &amp;&amp; orderPartSeqId != null">
+            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+            <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+            <entity-find entity-name="mantle.order.OrderItem" list="orderItemList">
+                <econdition field-name="orderId" from="orderId"/>
+                <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
+                <order-by field-name="-lastUpdatedStamp"/>
+            </entity-find>
+            <set field="orderItemSeqId" from="orderItemList?.getFirst()?.orderItemSeqId ?: ''"/>
+            <entity-find entity-name="mantle.order.OrderItemFormResponse" list="responseList">
+                <econdition field-name="orderId" from="orderId"/>
+                <econdition field-name="orderItemSeqId" from="orderItemSeqId"/>
+            </entity-find>
+            <set field="formResponseId" from="responseList?.getFirst()?.formResponseId ?: null"/>
+
+            <if condition="formResponseId != null">
+                <service-call name="org.moqui.impl.ScreenServices.get#FormResponse" out-map="formResponse">
+                    <field-map field-name="formResponseId" from="formResponseId"/>
+                </service-call>
+                <set field="responseMap" from="formResponse?.responseMap"/>
+            </if>
+        </if>
+    </actions>
+
+    <widgets>
+        <container-row>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+            <row-col xs="12" sm="10" md="6" lg="6">
+                <container style="stepper margin-b-1">
+                    <render-mode>
+                        <text type="qvt"><![CDATA[
+                            <q-stepper ref="stepper" value="s2" color="primary" :flat="true">
+                                <q-step name="s1" title="Order Items" icon="shopping_cart"/>
+                                <q-step name="s2" title="Eligibility" icon="policy"/>
+                                <q-step name="s3" title="Applicants" icon="person"/>
+                                <q-step name="s4" title="Property" icon="home"/>
+                                <q-step name="s5" title="Agreements" icon="done"/>
+                            </q-stepper>
+                        ]]></text>
+                    </render-mode>
+                </container>
+            </row-col>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+        </container-row>
+
+        <container style="form-no-margin">
+            <section name="EligibilitySection">
+                <condition>
+                    <expression>formId != null</expression>
+                </condition>
+                <widgets>
+                    <form-single name="EligibilityForm" extends="DbForm#${formId}" dynamic="true" transition="storeOrder" map="responseMap">
+                        <field name="eligibilityHeader">
+                            <default-field>
+                                <label text="New Application" type="h4" style="margin-b-1"/>
+                                <label text="Eligibility" type="h5" style="margin-tb-1"/>
+                                <label text="Please verify the applicant's eligibility." style="margin-b-1"/>
+                                <container style="h-separator margin-tb-2"/>
+                            </default-field>
+                        </field>
+
+                        <field name="orderId"><default-field><hidden/></default-field></field>
+                        <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
+                        <field name="formLocation"><default-field><hidden default-value="DbForm#${formId}"/></default-field></field>
+                        <field name="formId" from="formId"><default-field><hidden/></default-field></field>
+                        <field name="salesChannelEnumId"><default-field><hidden/></default-field></field>
+                        <field name="productStoreId"><default-field><hidden/></default-field></field>
+                        <field name="salesRepresentativeId"><default-field><hidden/></default-field></field>
+                        <field name="productCategoryId"><default-field><hidden/></default-field></field>
+                        <field name="productId"><default-field><hidden/></default-field></field>
+                        <field name="totalPurchaseAmount"><default-field><hidden/></default-field></field>
+                        <field name="downPayment"><default-field><hidden/></default-field></field>
+                        <field name="netPurchaseAmount"><default-field><hidden/></default-field></field>
+                        <field name="loanFee"><default-field><hidden/></default-field></field>
+                        <field name="financedAmount"><default-field><hidden/></default-field></field>
+                        <field name="estimatedPayment"><default-field><hidden/></default-field></field>
+
+                        <field name="backButton">
+                            <default-field container-style="dark-link">
+                                <link url="orderHeader" text="Back" btn-type="default"/>
+                            </default-field>
+                        </field>
+                        <field name="submitButton">
+                            <default-field container-style="text-primary">
+                                <submit text="Continue"/>
+                            </default-field>
+                        </field>
+
+                        <field-layout>
+                            <field-col-row>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                                <field-col xs="12" sm="10" md="6" lg="6">
+                                    <field-ref name="eligibilityHeader"/>
+                                    <fields-not-referenced/>
+                                </field-col>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                                <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="backButton"/></field-col>
+                                <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="submitButton"/></field-col>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                            </field-col-row>
+                        </field-layout>
+                    </form-single>
+                </widgets>
+                <fail-widgets>
+                    <form-single name="NoEligibilityForm">
+                        <field name="eligibilityHeader">
+                            <default-field>
+                                <label text="New Application" type="h4" style="margin-b-1"/>
+                                <label text="Eligibility" type="h5" style="margin-tb-1"/>
+                                <label text="Please verify the applicant's eligibility." style="margin-b-1"/>
+                                <container style="h-separator margin-tb-2"/>
+                            </default-field>
+                        </field>
+                        <field name="errorField">
+                            <default-field>
+                                <label text="No eligibility form set for the select product." style="text-red margin-b-1"/>
+                            </default-field>
+                        </field>
+
+                        <field name="backButton">
+                            <default-field container-style="dark-link">
+                                <link url="orderHeader" text="Back" btn-type="default"/>
+                            </default-field>
+                        </field>
+
+                        <field-layout>
+                            <field-col-row>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                                <field-col xs="12" sm="10" md="6" lg="6">
+                                    <field-ref name="eligibilityHeader"/>
+                                    <fields-not-referenced/>
+                                </field-col>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                            </field-col-row>
+
+                            <fields-not-referenced/>
+
+                            <field-col-row>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                                <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="backButton"/></field-col>
+                                <field-col xs="0" sm="1" md="3" lg="3"/>
+                            </field-col-row>
+                        </field-layout>
+                    </form-single>
+                </fail-widgets>
+            </section>
+        </container>
+    </widgets>
+
+</screen>

@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Documents"
+        default-menu-index="3">
+
+    <parameter name="orderId" required="true"/>
+
+    <transition name="downloadPartyContent" read-only="true">
+        <parameter name="contentId"/>
+        <actions>
+            <entity-find-one entity-name="mantle.party.PartyContent" value-field="partyContent">
+                <field-map field-name="partyContentId" from="contentId"/>
+            </entity-find-one>
+            <script>ec.web.sendResourceResponse(partyContent?.contentLocation)</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    <transition name="downloadOrderContent" read-only="true">
+        <parameter name="contentId"/>
+        <actions>
+            <entity-find-one entity-name="mantle.party.OrderContent" value-field="orderContent">
+                <field-map field-name="orderContentId" from="contentId"/>
+            </entity-find-one>
+            <script>ec.web.sendResourceResponse(orderContent?.contentLocation)</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+
+    <actions>
+        <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart">
+            <field-map field-name="orderId" from="orderId"/>
+            <field-map field-name="orderPartSeqId" value="01"/>
+        </entity-find-one>
+        <entity-find-related value-field="orderPart" relationship-name="parties" list="partyList"/>
+        <set field="partyIdList" from="partyList?.partyId?.toSet()"/>
+
+        <entity-find entity-name="mantle.order.OrderAgreement" list="agreementList">
+            <econdition field-name="orderId" from="orderId"/>
+        </entity-find>
+        <set field="agreementIdList" from="agreementList?.agreementId?.toSet()"/>
+        <entity-find entity-name="mantle.party.agreement.AgreementContent" list="agreementContentList">
+            <econdition field-name="agreementId" operator="in" from="agreementIdList"/>
+        </entity-find>
+
+        <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
+            <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+            <econdition field-name="partyId" from="ec.user.userAccount.partyId"/>
+            <econdition field-name="roleTypeId" value="FinanceManager"/>
+            <date-filter/>
+        </entity-find-count>
+        <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="underwriterCount">
+            <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+            <econdition field-name="partyId" from="ec.user.userAccount.partyId"/>
+            <econdition field-name="roleTypeId" value="Underwriter"/>
+            <date-filter/>
+        </entity-find-count>
+        <set field="isFinanceManager" from="financeManagerCount > 0"/>
+        <set field="isUnderwriter" from="underwriterCount > 0"/>
+
+        <if condition="isUnderwriter">
+            <entity-find entity-name="mkdecision.dashboard.PartyContentDetail" list="partyContentList" distinct="true">
+                <econdition field-name="partyId" operator="in" from="partyIdList"/>
+                <select-field field-name="partyContentId"/>
+                <select-field field-name="partyId"/>
+                <select-field field-name="contentLocation"/>
+                <select-field field-name="partyContentTypeEnumId"/>
+                <select-field field-name="description"/>
+                <select-field field-name="contentDate"/>
+                <select-field field-name="userId"/>
+            </entity-find>
+            <else-if condition="isFinanceManager">
+                <entity-find entity-name="mkdecision.dashboard.PartyContentDetail" list="partyContentList" distinct="true">
+                    <econdition field-name="partyId" operator="in" from="partyIdList"/>
+                    <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+                    <econditions combine="or">
+                        <econdition field-name="storePartyRoleTypeId" value="FinanceManager"/>
+                        <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
+                    </econditions>
+                    <select-field field-name="partyContentId"/>
+                    <select-field field-name="partyId"/>
+                    <select-field field-name="contentLocation"/>
+                    <select-field field-name="partyContentTypeEnumId"/>
+                    <select-field field-name="description"/>
+                    <select-field field-name="contentDate"/>
+                    <select-field field-name="userId"/>
+                </entity-find>
+                <else>
+                    <entity-find entity-name="mkdecision.dashboard.PartyContentDetail" list="partyContentList" distinct="true">
+                        <econdition field-name="partyId" operator="in" from="partyIdList"/>
+                        <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+                        <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
+                        <econdition field-name="userId" from="ec.user.userId"/>
+                        <select-field field-name="partyContentId"/>
+                        <select-field field-name="partyId"/>
+                        <select-field field-name="contentLocation"/>
+                        <select-field field-name="partyContentTypeEnumId"/>
+                        <select-field field-name="description"/>
+                        <select-field field-name="contentDate"/>
+                        <select-field field-name="userId"/>
+                    </entity-find>
+                </else>
+            </else-if>
+        </if>
+
+        <if condition="isUnderwriter">
+            <entity-find entity-name="mkdecision.dashboard.OrderContentDetail" list="orderContentList" distinct="true">
+                <econdition field-name="orderId" from="orderId"/>
+                <select-field field-name="orderContentId"/>
+                <select-field field-name="orderContentTypeEnumId"/>
+                <select-field field-name="orderId"/>
+                <select-field field-name="contentLocation"/>
+                <select-field field-name="description"/>
+                <select-field field-name="contentDate"/>
+                <select-field field-name="userId"/>
+            </entity-find>
+            <else-if condition="isFinanceManager">
+                <entity-find entity-name="mkdecision.dashboard.OrderContentDetail" list="orderContentList" distinct="true">
+                    <econdition field-name="orderId" from="orderId"/>
+                    <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+                    <econditions combine="or">
+                        <econdition field-name="storePartyRoleTypeId" value="FinanceManager"/>
+                        <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
+                    </econditions>
+                    <select-field field-name="orderContentId"/>
+                    <select-field field-name="orderContentTypeEnumId"/>
+                    <select-field field-name="orderId"/>
+                    <select-field field-name="contentLocation"/>
+                    <select-field field-name="description"/>
+                    <select-field field-name="contentDate"/>
+                    <select-field field-name="userId"/>
+                </entity-find>
+                <else>
+                    <entity-find entity-name="mkdecision.dashboard.OrderContentDetail" list="orderContentList" distinct="true">
+                        <econdition field-name="orderId" from="orderId"/>
+                        <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+                        <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
+                        <econdition field-name="userId" from="ec.user.userId"/>
+                        <select-field field-name="orderContentId"/>
+                        <select-field field-name="orderContentTypeEnumId"/>
+                        <select-field field-name="orderId"/>
+                        <select-field field-name="contentLocation"/>
+                        <select-field field-name="description"/>
+                        <select-field field-name="contentDate"/>
+                        <select-field field-name="userId"/>
+                    </entity-find>
+                </else>
+            </else-if>
+        </if>
+
+        <set field="fileList" from="[]"/>
+        <iterate list="partyContentList" entry="partyContent">
+            <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
+                <field-map field-name="enumId" from="partyContent.partyContentTypeEnumId"/>
+            </entity-find-one>
+            <entity-find-one entity-name="moqui.security.UserAccount" value-field="userAccount">
+                <field-map field-name="userId" from="partyContent.userId"/>
+            </entity-find-one>
+            <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="party">
+                <field-map field-name="partyId" from="partyContent.partyId"/>
+            </service-call>
+            <set field="resourceRef" from="ec.resource.getLocationReference(partyContent.contentLocation)"/>
+            <script>fileList.add([contentId: partyContent.partyContentId, contentOrigin: 'Party', contentType:contentType?.description ?: '-', partyName: party.partyName ?: '-', source: resourceRef?.getFileName() ?: '-', performedBy: userAccount?.userFullName ?: '-', contentDate: partyContent.contentDate])</script>
+        </iterate>
+        <iterate list="orderContentList" entry="orderContent">
+            <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
+                <field-map field-name="enumId" from="orderContent.orderContentTypeEnumId"/>
+            </entity-find-one>
+            <entity-find-one entity-name="moqui.security.UserAccount" value-field="userAccount">
+                <field-map field-name="userId" from="orderContent.userId"/>
+            </entity-find-one>
+            <set field="resourceRef" from="ec.resource.getLocationReference(orderContent.contentLocation)"/>
+            <script>fileList.add([contentId: orderContent.orderContentId, contentOrigin: 'Order', contentType:contentType?.description ?: '-', partyName: '-', source: resourceRef?.getFileName() ?: '-', performedBy: userAccount?.userFullName ?: '-', contentDate: orderContent.contentDate])</script>
+        </iterate>
+
+        <entity-find entity-name="mantle.order.OrderEmailMessageDetail" list="emailList">
+            <econdition field-name="orderId" from="orderId"/>
+        </entity-find>
+    </actions>
+
+    <widgets>
+        <container>
+            <container>
+                <label text="Agreements" type="h4"/>
+            </container>
+            <form-list name="AgreementList" list="agreementContentList" list-entry="content">
+                <row-actions>
+                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
+                        <field-map field-name="enumId" from="content.contentTypeEnumId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="moqui.security.UserAccount" value-field="userAccount">
+                        <field-map field-name="userId" from="content.userId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="mantle.party.agreement.Agreement" value-field="agreement">
+                        <field-map field-name="agreementId" from="content.agreementId"/>
+                    </entity-find-one>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="party">
+                        <field-map field-name="partyId" from="agreement.otherPartyId"/>
+                    </service-call>
+                    <set field="resourceRef" from="ec.resource.getLocationReference(content.contentLocation)"/>
+                </row-actions>
+                <field name="description">
+                    <default-field>
+                        <display text="${contentType?.description ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="party">
+                    <default-field>
+                        <display text="${party.partyName ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="source">
+                    <default-field>
+                        <display text="${resourceRef?.getFileName() ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="performedBy">
+                    <default-field>
+                        <display text="${userAccount?.userFullName ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="contentDate">
+                    <default-field title="Date">
+                        <display format="MM/dd/yyyy h:mm:ss a"/>
+                    </default-field>
+                </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="description"/>
+                        <field-ref name="party"/>
+                        <field-ref name="source"/>
+                    </column>
+                    <column>
+                        <field-ref name="contentDate"/>
+                        <field-ref name="performedBy"/>
+                    </column>
+                </columns>
+            </form-list>
+            <section name="EmptyContentList" condition="contentList == null || agreementContentList.isEmpty()">
+                <widgets>
+                    <container style="padding-all-05 text-center">
+                        <label text="No agreements have been added yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
+
+        <container style="q-my-md"/>
+
+        <container>
+            <container>
+                <label text="Files" type="h4"/>
+            </container>
+            <form-list name="FileList" list="fileList" list-entry="content">
+                <field name="contentType">
+                    <default-field title="Type">
+                        <display/>
+                    </default-field>
+                </field>
+                <field name="partyName">
+                    <default-field title="Party">
+                        <display/>
+                    </default-field>
+                </field>
+                <field name="source">
+                    <conditional-field condition="contentOrigin == 'Order'">
+                        <link url="downloadOrderContent" text="${source}" parameter-map="[contentId: contentId]" link-type="anchor"/>
+                    </conditional-field>
+                    <default-field>
+                        <link url="downloadPartyContent" text="${source}" parameter-map="[contentId: contentId]" link-type="anchor"/>
+                    </default-field>
+                </field>
+                <field name="performedBy">
+                    <default-field>
+                        <display/>
+                    </default-field>
+                </field>
+                <field name="contentDate">
+                    <default-field title="Date">
+                        <display format="MM/dd/yyyy h:mm:ss a"/>
+                    </default-field>
+                </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="contentType"/>
+                        <field-ref name="partyName"/>
+                        <field-ref name="source"/>
+                    </column>
+                    <column>
+                        <field-ref name="contentDate"/>
+                        <field-ref name="performedBy"/>
+                    </column>
+                </columns>
+            </form-list>
+            <section name="EmptyFileList" condition="fileList == null || fileList.isEmpty()">
+                <widgets>
+                    <container style="padding-all-05 text-center">
+                        <label text="No files have been added yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
+
+        <container style="q-my-md"/>
+
+        <container>
+            <container>
+                <label text="Emails" type="h4"/>
+            </container>
+            <form-list name="EmailList" list="emailList" list-entry="email">
+                <row-actions>
+                    <entity-find-one entity-name="moqui.basic.email.EmailTemplate" value-field="emailTemplate">
+                        <field-map field-name="emailTemplateId" from="email.emailTemplateId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="moqui.basic.email.EmailMessage" value-field="emailMessage">
+                        <field-map field-name="emailMessageId" from="email.emailMessageId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="emailType">
+                        <field-map field-name="enumId" from="email.emailTypeEnumId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="moqui.security.UserAccount" value-field="userAccount">
+                        <field-map field-name="userId" from="email.fromUserId"/>
+                    </entity-find-one>
+                </row-actions>
+                <field name="type">
+                    <default-field>
+                        <display text="${emailType.description ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="party">
+                    <default-field>
+                        <display text="${emailMessage.toAddresses ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="source">
+                    <default-field>
+                        <display text="${emailTemplate?.description ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="performedBy">
+                    <default-field>
+                        <display text="${userAccount?.userFullName ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="sentDate">
+                    <default-field title="Date">
+                        <display format="MM/dd/yyyy h:mm:ss a"/>
+                    </default-field>
+                </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="type"/>
+                        <field-ref name="party"/>
+                        <field-ref name="source"/>
+                    </column>
+                    <column>
+                        <field-ref name="sentDate"/>
+                        <field-ref name="performedBy"/>
+                    </column>
+                </columns>
+            </form-list>
+            <section name="EmptyEmailList" condition="emailList == null || emailList.isEmpty()">
+                <widgets>
+                    <container style="padding-all-05 text-center">
+                        <label text="No emails have been sent yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
+    </widgets>
+
+</screen>

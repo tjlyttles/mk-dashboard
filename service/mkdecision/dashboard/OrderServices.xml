@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <!-- Order -->
+    <service verb="validate" noun="OrderAccess" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateOrderAccess">
+        <in-parameters>
+            <parameter name="orderId"/>
+        </in-parameters>
+    </service>
+    <service verb="validate" noun="OrderFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateOrderFields">
+        <in-parameters>
+            <parameter name="salesChannelEnumId"/>
+            <parameter name="productStoreId"/>
+            <parameter name="salesRepresentativeId"/>
+            <parameter name="productCategoryId"/>
+            <parameter name="productId"/>
+            <parameter name="totalPurchaseAmount" type="BigDecimal"/>
+            <parameter name="downPayment" type="BigDecimal"/>
+            <parameter name="netPurchaseAmount" type="BigDecimal"/>
+            <parameter name="loanFee" type="BigDecimal"/>
+            <parameter name="financedAmount" type="BigDecimal"/>
+            <parameter name="estimatedPayment" type="BigDecimal"/>
+        </in-parameters>
+    </service>
+    <service verb="store" noun="Order" type="java" location="com.mkdecision.dashboard.OrderServices" method="storeOrder">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="salesChannelEnumId" required="true"/>
+            <parameter name="productStoreId" required="true"/>
+            <parameter name="salesRepresentativeId" required="true"/>
+            <parameter name="productCategoryId" required="true"/>
+            <parameter name="productId" required="true"/>
+            <parameter name="formResponseId" required="true"/>
+            <parameter name="totalPurchaseAmount" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter total purchase price"/>
+            </parameter>
+            <parameter name="downPayment" type="BigDecimal" required="true">
+                <number-range min="0" message="Please enter a down payment."/>
+            </parameter>
+            <parameter name="netPurchaseAmount" type="BigDecimal" required="true"/>
+            <parameter name="loanFee" type="BigDecimal" required="true"/>
+            <parameter name="financedAmount" type="BigDecimal" required="true"/>
+            <parameter name="estimatedPayment" type="BigDecimal" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+        </out-parameters>
+    </service>
+    <service verb="update" noun="OrderItemEligibility" type="java" location="com.mkdecision.dashboard.OrderServices" method="updateOrderItemEligibility">
+        <in-parameters>
+            <parameter name="orderId" required="true"/>
+            <parameter name="orderPartSeqId" required="true"/>
+            <parameter name="orderItemSeqId" required="true"/>
+            <parameter name="formResponseId" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="orderItemSeqId"/>
+        </out-parameters>
+    </service>
+    <service verb="validate" noun="OrderItemFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateOrderItemFields">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="productCategoryId"/>
+            <parameter name="productId"/>
+            <parameter name="totalPurchaseAmount" type="BigDecimal"/>
+            <parameter name="downPayment" type="BigDecimal"/>
+            <parameter name="loanFee" type="BigDecimal"/>
+            <parameter name="netPurchaseAmount" type="BigDecimal"/>
+            <parameter name="financedAmount" type="BigDecimal"/>
+            <parameter name="estimatedPayment" type="BigDecimal"/>
+        </in-parameters>
+    </service>
+    <service verb="add" noun="OrderItem" type="java" location="com.mkdecision.dashboard.OrderServices" method="addOrderItem">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="productCategoryId" required="true"/>
+            <parameter name="productId" required="true"/>
+            <parameter name="totalPurchaseAmount" type="BigDecimal" required="true"/>
+            <parameter name="downPayment" type="BigDecimal" required="true"/>
+            <parameter name="netPurchaseAmount" type="BigDecimal" required="true"/>
+            <parameter name="loanFee" type="BigDecimal" required="true"/>
+            <parameter name="financedAmount" type="BigDecimal" required="true"/>
+            <parameter name="estimatedPayment" type="BigDecimal" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderItemSeqId"/>
+        </out-parameters>
+    </service>
+    <service verb="update" noun="OrderItem" type="java" location="com.mkdecision.dashboard.OrderServices" method="updateOrderItem">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="productCategoryId" required="true"/>
+            <parameter name="productId" required="true"/>
+            <parameter name="totalPurchaseAmount" type="BigDecimal" required="true"/>
+            <parameter name="downPayment" type="BigDecimal" required="true"/>
+            <parameter name="netPurchaseAmount" type="BigDecimal" required="true"/>
+            <parameter name="loanFee" type="BigDecimal" required="true"/>
+            <parameter name="financedAmount" type="BigDecimal" required="true"/>
+            <parameter name="estimatedPayment" type="BigDecimal" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderItemSeqId"/>
+        </out-parameters>
+    </service>
+    <service verb="delete" noun="OrderItem" type="java" location="com.mkdecision.dashboard.OrderServices" method="deleteOrderItem">
+        <in-parameters>
+            <parameter name="orderId" required="true"/>
+            <parameter name="orderPartSeqId" required="true"/>
+            <parameter name="orderItemSeqId" required="true"/>
+        </in-parameters>
+    </service>
+    <service verb="archive" noun="OrderParty" type="java" location="com.mkdecision.dashboard.OrderServices" method="archiveOrderParty">
+        <in-parameters>
+            <parameter name="orderId" required="true"/>
+            <parameter name="orderPartSeqId" required="true"/>
+            <parameter name="partyId" required="true"/>
+        </in-parameters>
+    </service>
+
+    <!-- Applicants -->
+    <service verb="validate" noun="ApplicantFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validateApplicantFields">
+        <in-parameters>
+            <parameter name="roleTypeId"/>
+            <parameter name="firstName"/>
+            <parameter name="middleName"/>
+            <parameter name="lastName"/>
+            <parameter name="suffix"/>
+            <parameter name="nickname"/>
+            <parameter name="address1"/>
+            <parameter name="unitNumber"/>
+            <parameter name="postalCode"/>
+            <parameter name="city"/>
+            <parameter name="stateProvinceGeoId"/>
+            <parameter name="socialSecurityNumber"/>
+            <parameter name="birthDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="maritalStatusEnumId"/>
+            <parameter name="employmentStatusEnumId"/>
+            <parameter name="contactNumber"/>
+            <parameter name="contactMechPurposeId"/>
+            <parameter name="email"/>
+            <parameter name="emailVerify"/>
+        </in-parameters>
+    </service>
+    <service verb="store" noun="Applicant" type="java" location="com.mkdecision.dashboard.OrderServices" method="storeApplicant">
+        <description>General service to create or update order applicants.</description>
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="partyId"/>
+            <parameter name="roleTypeId"/>
+            <parameter name="firstName" required="true">
+                <matches regexp="^[- A-Za-z']+$" message="Please enter a first name."/>
+            </parameter>
+            <parameter name="middleName">
+                <matches regexp="^[- A-Za-z']{1}$" message="Please enter a middle initial using only letters."/>
+            </parameter>
+            <parameter name="lastName" required="true">
+                <matches regexp="^[- A-Za-z']+$" message="Please enter a last name."/>
+            </parameter>
+            <parameter name="suffix"/>
+            <parameter name="nickname"/>
+            <parameter name="address1" required="true">
+                <matches regexp="^[- #a-zA-Z0-9.',\/]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, commas, and -, /, ', or #."/>
+            </parameter>
+            <parameter name="unitNumber"/>
+            <parameter name="postalCode" required="true">
+                <matches regexp="^\d{5}$" message="Please enter a valid ZIP code."/>
+            </parameter>
+            <parameter name="city" required="true">
+                <matches regexp="^[- A-Za-z'.]+$" message="Please enter a city using only letters, spaces, periods, apostrophes or hyphens."/>
+            </parameter>
+            <parameter name="stateProvinceGeoId" required="true"/>
+            <parameter name="socialSecurityNumber" required="true">
+                <matches regexp="^\d{3}-\d{2}-\d{4}$" message="Please enter a valid social security number."/>
+            </parameter>
+            <parameter name="birthDate" type="Date" format="MM-dd-yyyy" required="true"/>
+            <parameter name="maritalStatusEnumId" required="true"/>
+            <parameter name="employmentStatusEnumId" required="true"/>
+            <parameter name="contactNumber" required="true">
+                <matches regexp="^[0,2-9]{1}\d{2}([-])\d{3}([-])\d{4}" message="Please enter a valid phone number"/>
+            </parameter>
+            <parameter name="contactMechPurposeId"/>
+            <parameter name="email" required="true">
+                <text-email/>
+            </parameter>
+            <parameter name="emailVerify" required="true">
+                <text-email/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+        </out-parameters>
+    </service>
+
+    <!-- Property -->
+    <service verb="validate" noun="PropertyFields" type="java" location="com.mkdecision.dashboard.OrderServices" method="validatePropertyFields">
+        <in-parameters>
+            <parameter name="classEnumId"/>
+            <parameter name="salvageValue" type="BigDecimal"/>
+            <parameter name="acquireCost" type="BigDecimal"/>
+            <parameter name="hoaFeeMonthly" type="BigDecimal"/>
+            <parameter name="propertyTaxesAnnually" type="BigDecimal"/>
+            <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal"/>
+            <parameter name="lenderName"/>
+            <parameter name="mortgageBalance" type="BigDecimal"/>
+            <parameter name="mortgagePaymentMonthly" type="BigDecimal"/>
+        </in-parameters>
+    </service>
+    <service verb="store" noun="Property" type="java" location="com.mkdecision.dashboard.OrderServices" method="storeProperty">
+        <in-parameters>
+            <parameter name="orderId" required="true"/>
+            <parameter name="orderPartSeqId" required="true"/>
+            <parameter name="partyId" required="true"/>
+            <parameter name="assetId"/>
+            <parameter name="classEnumId" required="true"/>
+            <parameter name="salvageValue" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter the Current Property Value"/>
+            </parameter>
+            <parameter name="acquireCost" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="true" message="Please enter the Original Purchase Price"/>
+            </parameter>
+            <parameter name="hoaFeeMonthly" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="true" message="Please enter the HOA Fee Monthly"/>
+            </parameter>
+            <parameter name="propertyTaxesAnnually" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="true" message="Please enter the Property Taxes Annually"/>
+            </parameter>
+            <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="true" message="Please enter the Insurance Costs Annually"/>
+            </parameter>
+            <parameter name="lenderName"/>
+            <parameter name="mortgageBalance" type="BigDecimal">
+                <number-range min="0" min-include-equals="false" message="Please enter the current Mortgage Balance"/>
+            </parameter>
+            <parameter name="mortgagePaymentMonthly" type="BigDecimal">
+                <number-range min="0" min-include-equals="false" message="Please enter the Mortgage Payment Monthly"/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="assetId"/>
+        </out-parameters>
+    </service>
+
+</services>

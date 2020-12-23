@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Overview"
+        default-menu-index="1">
+
+    <parameter name="orderId" required="true"/>
+
+    <transition name="getStoreProductCategories">
+        <actions>
+            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+            <entity-find entity-name="mkdecision.dashboard.ProductStoreCategoryDetail" list="categoryList">
+                <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+                <econdition field-name="storeCategoryTypeEnumId" value="PsctFinanceableProducts"/>
+                <date-filter/>
+            </entity-find>
+
+            <set field="resultList" from="[]"/>
+            <iterate list="categoryList" entry="category">
+                <script>resultList.add([value:category.productCategoryId, label:(category.categoryName)])</script>
+            </iterate>
+            <script>ec.web.sendJsonResponse(resultList)</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    <transition name="getStoreProducts">
+        <actions>
+            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+            <entity-find-count entity-name="mantle.product.store.ProductStoreCategory" count-field="productStoreCategoryCount">
+                <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+                <econdition field-name="productCategoryId"/>
+                <econdition field-name="storeCategoryTypeEnumId" value="PsctFinanceableProducts"/>
+                <date-filter/>
+            </entity-find-count>
+
+            <set field="resultList" from="[]"/>
+            <if condition="productStoreCategoryCount > 0">
+                <entity-find entity-name="mantle.product.category.ProductCategoryMemberProduct" list="productList">
+                    <econdition field-name="productCategoryId"/>
+                    <date-filter/>
+                </entity-find>
+                <iterate list="productList" entry="product">
+                    <script>resultList.add([value:product.productId, label:(product.productName)])</script>
+                </iterate>
+            </if>
+            <script>ec.web.sendJsonResponse(resultList)</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    <transition-include name="calculateNetPurchaseAmount" location="component://mk-dashboard/screen/custom/OrderWizard/OrderHeader.xml"/>
+    <transition-include name="calculateLoanFee" location="component://mk-dashboard/screen/custom/OrderWizard/OrderHeader.xml"/>
+    <transition-include name="calculateFinancedAmount" location="component://mk-dashboard/screen/custom/OrderWizard/OrderHeader.xml"/>
+    <transition-include name="calculateEstimatedPayment" location="component://mk-dashboard/screen/custom/OrderWizard/OrderHeader.xml"/>
+
+    <transition name="addParty">
+        <default-response url="../../OrderParty/Party">
+            <parameter name="orderId" from="orderId"/>
+            <parameter name="orderPartSeqId" value="01"/>
+        </default-response>
+    </transition>
+    <transition name="editParty">
+        <default-response url="../../OrderParty/Party">
+            <parameter name="orderId" from="orderId"/>
+            <parameter name="orderPartSeqId" value="01"/>
+            <parameter name="partyId" from="partyId"/>
+        </default-response>
+    </transition>
+    <transition name="archiveParty">
+        <service-call name="mkdecision.dashboard.OrderServices.archive#OrderParty" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateOrderItem">
+        <service-call name="mkdecision.dashboard.OrderServices.update#OrderItem" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="addNote">
+        <service-call name="create#mantle.order.OrderNote" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+
+    <actions>
+        <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart">
+            <field-map field-name="orderId" from="orderId"/>
+            <field-map field-name="orderPartSeqId" value="01"/>
+        </entity-find-one>
+        <entity-find-one entity-name="mantle.order.OrderItem" value-field="orderItem">
+            <field-map field-name="orderId" from="orderId"/>
+            <field-map field-name="orderPartSeqId" value="01"/>
+            <field-map field-name="parentItemSeqId" from="null"/>
+        </entity-find-one>
+        <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="enteredBy">
+            <field-map field-name="partyId" from="orderHeader.enteredByPartyId"/>
+        </service-call>
+        <entity-find entity-name="mantle.order.OrderDecision" list="decisionList">
+            <econdition field-name="orderId" from="orderId"/>
+            <order-by field-name="-decisionDate"/>
+        </entity-find>
+        <entity-find-related-one value-field="orderHeader" relationship-name="status" to-value-field="orderStatus"/>
+        <entity-find-related-one value-field="orderHeader" relationship-name="productStore" to-value-field="productStore"/>
+        <entity-find-related-one value-field="orderHeader" relationship-name="salesChannel" to-value-field="salesChannel"/>
+        <entity-find-related-one value-field="orderItem" relationship-name="product" to-value-field="product"/>
+        <entity-find-related value-field="orderPart" relationship-name="items" list="itemList"/>
+        <entity-find entity-name="mantle.order.OrderPartParty" list="partyList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
+            <econditions combine="or">
+                <econdition field-name="roleTypeId" value="PrimaryApplicant"/>
+                <econdition field-name="roleTypeId" value="CoApplicant"/>
+            </econditions>
+        </entity-find>
+        <entity-find entity-name="mantle.order.OrderPartParty" list="internalList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
+            <econditions combine="and">
+                <econdition field-name="roleTypeId" operator="not-equals" value="PrimaryApplicant"/>
+                <econdition field-name="roleTypeId" operator="not-equals" value="CoApplicant"/>
+            </econditions>
+        </entity-find>
+
+        <if condition="ec.user.hasPermission('MK_DASHBOARD_ORDER_NOTES_VIEW_INTERNAL')">
+            <entity-find-related value-field="orderHeader" relationship-name="notes" list="noteList"/>
+            <else>
+                <entity-find entity-name="mantle.order.OrderNote" list="noteList">
+                    <econdition field-name="orderId" from="orderId"/>
+                    <econditions combine="or">
+                        <econdition field-name="internalNote" operator="is-null" value=""/>
+                        <econdition field-name="internalNote" value="N"/>
+                        <econdition field-name="internalNote" value=""/>
+                    </econditions>
+                </entity-find>
+            </else>
+        </if>
+
+        <set field="editableOrderState" from="['OrderOpen', 'OrderRequested', 'OrderProposed']"/>
+    </actions>
+
+    <widgets>
+        <container>
+            <container-row style="margin-b-1">
+                <row-col sm="12" xs="12">
+                    <label text="${orderHeader.orderId} - ${orderStatus.description}" type="h4"/>
+                </row-col>
+            </container-row>
+            <container-row>
+                <row-col lg="6" md="6" sm="6" xs="12">
+                    <container-row>
+                        <row-col lg="3" md="3" sm="4" xs="12"><label text="Agent" style="text-light-grey"/></row-col>
+                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${productStore.storeName}"/></row-col>
+                    </container-row>
+                    <container-row>
+                        <row-col lg="3" md="3" sm="4" xs="12"><label text="Method" style="text-light-grey"/></row-col>
+                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${salesChannel?.description ?: '-'}"/></row-col>
+                    </container-row>
+                    <container-row>
+                        <row-col lg="3" md="3" sm="4" xs="12"><label text="Entered by" style="text-light-grey"/></row-col>
+                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${enteredBy.partyName ?: '-'}"/></row-col>
+                    </container-row>
+                </row-col>
+                <row-col lg="6" md="6" sm="6" xs="12">
+                    <container-row>
+                        <row-col lg="3" md="3" sm="4" xs="12"><label text="Entered on" style="text-light-grey"/></row-col>
+                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${ec.l10n.format(orderHeader.entryDate, 'MM/dd/yyyy h:mm:ss a')}"/></row-col>
+                    </container-row>
+                    <container-row>
+                        <row-col lg="3" md="3" sm="4" xs="12"><label text="Last updated" style="text-light-grey"/></row-col>
+                        <row-col lg="9" md="9" sm="8" xs="12"><label text="${ec.l10n.format(orderHeader.lastUpdatedStamp, 'MM/dd/yyyy h:mm:ss a')}"/></row-col>
+                    </container-row>
+                </row-col>
+            </container-row>
+        </container>
+
+        <container style="h-separator q-my-md"/>
+
+        <container>
+            <container-row>
+                <row-col sm="12" xs="12">
+                    <label text="Order Items" type="h4"/>
+                </row-col>
+            </container-row>
+            <form-list name="ItemList" list="itemList">
+                <row-actions>
+                    <entity-find-one entity-name="mantle.product.Product" value-field="product"/>
+                    <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+                    <entity-find-one entity-name="moqui.basic.StatusItem" value-field="orderPartStatus">
+                        <field-map field-name="statusId" from="orderPart.statusId"/>
+                    </entity-find-one>
+                    <set field="netPurchaseAmount" from="unitAmount"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="productCategoryParamList">
+                        <econdition field-name="productParameterId" value="ProductCategory"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="productCategoryId" from="productCategoryParamList?.getFirst()?.parameterValue ?: ''"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="productCategoryParamList">
+                        <econdition field-name="productParameterId" value="ProductCategory"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="productCategoryId" from="productCategoryParamList?.getFirst()?.parameterValue ?: ''"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="totalPurchaseAmountParamList">
+                        <econdition field-name="productParameterId" value="TotalPurchaseAmount"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="totalPurchaseAmount" from="totalPurchaseAmountParamList?.getFirst()?.parameterValue ?: ''"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="downPaymentParamList">
+                        <econdition field-name="productParameterId" value="DownPayment"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="downPayment" from="downPaymentParamList?.getFirst()?.parameterValue ?: ''"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="loanFeeParamList">
+                        <econdition field-name="productParameterId" value="LoanFee"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="loanFee" from="loanFeeParamList?.getFirst()?.parameterValue ?: ''"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="financedAmountParamList">
+                        <econdition field-name="productParameterId" value="FinancedAmount"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="financedAmount" from="financedAmount?.getFirst()?.parameterValue ?: ''"/>
+
+                    <entity-find entity-name="mantle.product.ProductParameterValue" list="estimatedPaymentParamList">
+                        <econdition field-name="productParameterId" value="EstimatedPayment"/>
+                        <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+                    </entity-find>
+                    <set field="estimatedPayment" from="estimatedPaymentParamList?.getFirst()?.parameterValue ?: ''"/>
+                </row-actions>
+                <field name="productName">
+                    <default-field title="Description">
+                        <display text="${product?.productName ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="status">
+                    <default-field>
+                        <display text="${orderPartStatus.description}"/>
+                    </default-field>
+                </field>
+                <field name="unitAmount">
+                    <default-field title="Amount">
+                        <display text="${ec.l10n.formatCurrency(unitAmount, orderHeader.currencyUomId)}"/>
+                    </default-field>
+                </field>
+                <field name="options" hide="!editableOrderState.contains(orderHeader.statusId)">
+                    <default-field title="" container-style="text-right">
+                        <container-dialog id="EditItemDialog" button-text="Edit Item" width="960">
+                            <form-single name="EditItemForm" transition="updateOrderItem">
+                                <field name="orderId">
+                                    <default-field>
+                                        <hidden default-value="${orderId}"/>
+                                    </default-field>
+                                </field>
+                                <field name="orderPartSeqId">
+                                    <default-field>
+                                        <hidden default-value="${orderPart.orderPartSeqId}"/>
+                                    </default-field>
+                                </field>
+                                <field name="productCategoryId">
+                                    <default-field title="Merchandise">
+                                        <drop-down required-manual-select="true">
+                                            <dynamic-options transition="getStoreProductCategories" parameter-map="[orderId: orderId]"/>
+                                        </drop-down>
+                                    </default-field>
+                                </field>
+                                <field name="productId">
+                                    <default-field title="Product">
+                                        <drop-down required-manual-select="true">
+                                            <dynamic-options transition="getStoreProducts">
+                                                <depends-on field="productCategoryId"/>
+                                            </dynamic-options>
+                                        </drop-down>
+                                    </default-field>
+                                </field>
+                                <field name="totalPurchaseAmount">
+                                    <default-field>
+                                        <text-line/>
+                                    </default-field>
+                                </field>
+                                <field name="downPayment">
+                                    <default-field>
+                                        <text-line/>
+                                    </default-field>
+                                </field>
+                                <field name="netPurchaseAmount">
+                                    <default-field>
+                                        <text-line format="#.##" prefix="$" default-transition="calculateNetPurchaseAmount" disabled="true">
+                                            <depends-on field="totalPurchaseAmount"/>
+                                            <depends-on field="downPayment"/>
+                                        </text-line>
+                                    </default-field>
+                                </field>
+                                <field name="loanFee">
+                                    <default-field>
+                                        <text-line format="#.##" prefix="$" default-transition="calculateLoanFee" disabled="true">
+                                            <depends-on field="productStoreId"/>
+                                            <depends-on field="productId"/>
+                                        </text-line>
+                                    </default-field>
+                                </field>
+                                <field name="financedAmount">
+                                    <default-field title="Amount Financed">
+                                        <text-line format="#.##" prefix="$" default-transition="calculateFinancedAmount" disabled="true">
+                                            <depends-on field="totalPurchaseAmount"/>
+                                            <depends-on field="downPayment"/>
+                                            <depends-on field="loanFee"/>
+                                        </text-line>
+                                    </default-field>
+                                </field>
+                                <field name="estimatedPayment">
+                                    <default-field>
+                                        <text-line format="#.##" prefix="$" default-transition="calculateEstimatedPayment" disabled="true">
+                                            <depends-on field="productId"/>
+                                            <depends-on field="totalPurchaseAmount"/>
+                                            <depends-on field="downPayment"/>
+                                            <depends-on field="loanFee"/>
+                                        </text-line>
+                                    </default-field>
+                                </field>
+                                <field name="submit">
+                                    <default-field>
+                                        <submit text="Save"/>
+                                    </default-field>
+                                </field>
+                            </form-single>
+                        </container-dialog>
+                    </default-field>
+                </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="productName"/>
+                        <field-ref name="unitAmount"/>
+                    </column>
+                    <column>
+                        <field-ref name="status"/>
+                    </column>
+                    <column>
+                        <field-ref name="options"/>
+                    </column>
+                </columns>
+            </form-list>
+            <section name="EmptyItemList" condition="itemList == null || itemList.isEmpty()">
+                <widgets>
+                    <container style="padding-all-05 text-center">
+                        <label text="No items have been added yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
+
+        <container style="h-separator q-my-md"/>
+
+        <container>
+            <container-row>
+                <row-col sm="12" xs="12">
+                    <label text="Decision" type="h4"/>
+                </row-col>
+            </container-row>
+            <form-list name="DecisionList" list="decisionList" list-entry="decision">
+                <row-actions>
+                    <entity-find-one entity-name="moqui.basic.StatusItem" value-field="decisionStatus">
+                        <field-map field-name="statusId" from="decision.statusId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="mantle.party.PartyDetail" value-field="decisionBy">
+                        <field-map field-name="partyId" from="decision.decisionByPartyId"/>
+                    </entity-find-one>
+                </row-actions>
+                <field name="description">
+                    <default-field>
+                        <display text="${decisionStatus.description}"/>
+                    </default-field>
+                </field>
+                <field name="decisionBy">
+                    <default-field title="Completed by">
+                        <display text="${decisionBy.firstName} ${decisionBy.lastName}"/>
+                    </default-field>
+                </field>
+                <field name="decisionDate">
+                    <default-field title="Date">
+                        <display format="MM/dd/yyyy h:mm:ss a"/>
+                    </default-field>
+                </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="description"/>
+                        <field-ref name="decisionDate"/>
+                    </column>
+                    <column>
+                        <field-ref name="decisionBy"/>
+                    </column>
+                </columns>
+            </form-list>
+            <section name="EmptyDecisionList" condition="decisionList == null || decisionList.isEmpty()">
+                <widgets>
+                    <container style="padding-all-05 text-center">
+                        <label text="No decisions have been added yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
+
+        <container style="h-separator q-my-md"/>
+
+        <container>
+            <container-row>
+                <row-col sm="12" xs="12">
+                    <label text="Internal" type="h4"/>
+                </row-col>
+            </container-row>
+            <form-list name="InternalList" list="internalList">
+                <row-actions>
+                    <entity-find-one entity-name="mantle.party.RoleType" value-field="roleType"/>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
+                        <field-map field-name="partyId" from="partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" out-map="context">
+                        <field-map field-name="partyId" from="partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryEmailAddress" out-map="context">
+                        <field-map field-name="partyId" from="partyId"/>
+                    </service-call>
+                </row-actions>
+                <field name="roleType">
+                    <default-field title="Role">
+                        <display text="${roleType.description}"/>
+                    </default-field>
+                </field>
+                <field name="partyName">
+                    <default-field title="Name">
+                        <display text="${partyName ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="contactNumber">
+                    <conditional-field condition="contactNumber == null" title="Phone">
+                        <display text="${contactNumber ?: '-'}"/>
+                    </conditional-field>
+                    <default-field title="Phone">
+                        <link link-type="anchor" url="tel:${contactNumber}" text="${contactNumber}" url-type="plain"/>
+                    </default-field>
+                </field>
+                <field name="emailAddress">
+                    <conditional-field condition="emailAddress == null" title="Email">
+                        <display text="${emailAddress ?: '-'}"/>
+                    </conditional-field>
+                    <default-field title="Email">
+                        <link link-type="anchor" url="mailto:${emailAddress}" text="${emailAddress}" url-type="plain"/>
+                    </default-field>
+                </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="roleType"/>
+                        <field-ref name="partyName"/>
+                    </column>
+                    <column>
+                        <field-ref name="contactNumber"/>
+                        <field-ref name="emailAddress"/>
+                    </column>
+                </columns>
+            </form-list>
+            <section name="EmptyInternalList" condition="internalList == null || internalList.isEmpty()">
+                <widgets>
+                    <container style="padding-all-05 text-center">
+                        <label text="No parties have been added yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
+
+        <container style="h-separator q-my-md"/>
+
+        <container>
+            <container-row>
+                <row-col sm="6" xs="6">
+                    <label text="Parties" type="h4"/>
+                </row-col>
+                <row-col sm="6" xs="6">
+                    <container style="text-right">
+                        <link url="addParty" text="Add Party" condition="editableOrderState.contains(orderHeader.statusId)"/>
+                    </container>
+                </row-col>
+            </container-row>
+            <form-list name="PartyList" list="partyList">
+                <row-actions>
+                    <entity-find-one entity-name="mantle.party.RoleType" value-field="roleType"/>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
+                        <field-map field-name="partyId" from="partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" out-map="context">
+                        <field-map field-name="partyId" from="partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryEmailAddress" out-map="context">
+                        <field-map field-name="partyId" from="partyId"/>
+                    </service-call>
+                </row-actions>
+                <field name="applicants">
+                    <default-field>
+                        <display text="${roleType.description}"/>
+                    </default-field>
+                </field>
+                <field name="partyName">
+                    <default-field title="Name">
+                        <display text="${partyName ?: '-'}"/>
+                    </default-field>
+                </field>
+                <field name="contactNumber">
+                    <conditional-field condition="contactNumber == null" title="Phone">
+                        <display text="${contactNumber ?: '-'}"/>
+                    </conditional-field>
+                    <default-field title="Phone">
+                        <link link-type="anchor" url="tel:${contactNumber}" text="${contactNumber}" url-type="plain"/>
+                    </default-field>
+                </field>
+                <field name="emailAddress">
+                    <conditional-field condition="emailAddress == null" title="Email">
+                        <display text="${emailAddress ?: '-'}"/>
+                    </conditional-field>
+                    <default-field title="Email">
+                        <link link-type="anchor" url="mailto:${emailAddress}" text="${emailAddress}" url-type="plain"/>
+                    </default-field>
+                </field>
+                <field name="options" hide="!editableOrderState.contains(orderHeader.statusId)">
+                    <default-field title="" container-style="text-right">
+                        <link icon="fa fa-pencil" link-type="hidden-form-link" url="editParty" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId]"/>
+                        <link icon="fa fa-trash" link-type="hidden-form-link" btn-type="danger" url="archiveParty" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId]"/>
+                    </default-field>
+                </field>
+
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="applicants"/>
+                        <field-ref name="partyName"/>
+                    </column>
+                    <column>
+                        <field-ref name="contactNumber"/>
+                        <field-ref name="emailAddress"/>
+                    </column>
+                    <column>
+                        <field-ref name="options"/>
+                    </column>
+                </columns>
+            </form-list>
+            <section name="EmptyPartyList" condition="partyList == null || partyList.isEmpty()">
+                <widgets>
+                    <container style="padding-all-05 text-center">
+                        <label text="No parties have been added yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
+
+        <container style="h-separator q-my-md"/>
+
+        <container>
+            <container-row>
+                <row-col sm="6" xs="6">
+                    <label text="Notes" type="h4"/>
+                </row-col>
+                <row-col sm="6" xs="6">
+                    <container style="text-right">
+                        <container-dialog id="AddNoteDialog" button-text="Add Note" width="960">
+                            <form-single name="AddNoteForm" transition="addNote">
+                                <field name="orderId">
+                                    <default-field>
+                                        <hidden default-value="${orderId}"/>
+                                    </default-field>
+                                </field>
+                                <field name="internalNote" hide="!ec.user.hasPermission('MK_DASHBOARD_ORDER_NOTES_ADD_INTERNAL')">
+                                    <default-field title="Make this note private?">
+                                        <check>
+                                            <option key="Y" text=" "/>
+                                        </check>
+                                    </default-field>
+                                </field>
+                                <field name="noteText">
+                                    <default-field title="Note">
+                                        <text-area/>
+                                    </default-field>
+                                </field>
+                                <field name="submit">
+                                    <default-field>
+                                        <submit text="Save"/>
+                                    </default-field>
+                                </field>
+                            </form-single>
+                        </container-dialog>
+                    </container>
+                </row-col>
+            </container-row>
+            <section-iterate name="NoteIterator" list="noteList" entry="note">
+                <actions>
+                    <entity-find-related-one value-field="note" relationship-name="moqui.security.UserAccount" to-value-field="userAccount"/>
+                </actions>
+                <widgets>
+                    <container-box>
+                        <box-header>
+                            <label text="&amp;nbsp;" style="fa fa-lock" encode="false" condition="note.internalNote == 'Y'"/>
+                            <label text="&amp;nbsp;" style="fa fa-unlock" encode="false" condition="note.internalNote != 'Y'"/>
+                            <label text="${ec.l10n.format(note.noteDate, 'MM/dd/yyyy h:mm:ss a')} - ${userAccount.userFullName}" style="text-bold"/>
+                        </box-header>
+                        <box-body><label text="${note.noteText}"/></box-body>
+                    </container-box>
+                </widgets>
+            </section-iterate>
+            <section name="EmptyNoteList" condition="noteList == null || noteList.isEmpty()">
+                <widgets>
+                    <container style="padding-all-05 text-center">
+                        <label text="No notes have been added yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
+    </widgets>
+
+</screen>

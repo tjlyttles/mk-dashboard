@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-include="false">
+
+    <parameter name="orderId"/>
+
+    <widgets>
+        <section name="EligibilitySection">
+            <widgets>
+                <container-row>
+                    <row-col sm="8" xs="8" md="8" lg="8"  style="padding-all-0">
+                        <label text="Eligibility Form" type="h4"/>
+                    </row-col>
+                    <row-col sm="4" xs="4" md="4" lg="4" style="text-right">
+                        <container-dialog id="EditEligibility" button-text="Edit">
+                            <form-single name="EligibilityForm" extends="DbForm#${formId}" dynamic="true" transition="updateOrderItemEligibility" map="responseMap">
+                                <field name="orderId"><default-field><hidden/></default-field></field>
+                                <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
+                                <field name="orderItemSeqId"><default-field><hidden/></default-field></field>
+                                <field name="formLocation"><default-field><hidden default-value="DbForm#${formId}"/></default-field></field>
+                                <field name="formId" from="formId"><default-field><hidden/></default-field></field>
+
+                                <field name="submitButton">
+                                    <default-field container-style="text-primary">
+                                        <submit text="Save"/>
+                                    </default-field>
+                                </field>
+                            </form-single>
+                        </container-dialog>
+                    </row-col>
+                </container-row>
+
+                <container-row style="q-pt-md">
+                    <row-col xs="12" sm="12" md="10" lg="10"><label text="Description" style="text-bold"/></row-col>
+                    <row-col xs="12" sm="12" md="2" lg="2"><label text="Response" style="text-bold"/></row-col>
+                </container-row>
+                <section-iterate name="AnswerIterator" list="answerList" entry="answer">
+                    <widgets>
+                        <container-row style="margin-t-1">
+                            <row-col xs="12" sm="12" md="10" lg="10">
+                                <label text="${answer.title}"/>
+                            </row-col>
+                            <row-col xs="12" sm="12" md="2" lg="2">
+                                <label text="Yes" condition="answer.valueText == 'true'"/>
+                                <label text="No" condition="answer.valueText != 'true'"/>
+                            </row-col>
+                        </container-row>
+                    </widgets>
+                </section-iterate>
+            </widgets>
+        </section>
+    </widgets>
+
+</screen>

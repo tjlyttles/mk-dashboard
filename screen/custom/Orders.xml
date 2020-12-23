@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Orders">
+
+    <transition name="newOrder">
+        <default-response url="../OrderWizard"/>
+    </transition>
+    <transition name="editOrder">
+        <default-response url="../OrderProfile"/>
+    </transition>
+
+    <transition-include name="searchPartyList" location="component://SimpleScreens/template/party/PartyForms.xml"/>
+
+    <actions>
+        <entity-find entity-name="mantle.product.store.ProductStoreParty" list="partyProductStoreList">
+            <econdition field-name="partyId" from="ec.user.userAccount.partyId"/>
+            <econditions combine="or">
+                <econdition field-name="roleTypeId" value="FinanceManager"/>
+                <econdition field-name="roleTypeId" value="SalesRepresentative"/>
+            </econditions>
+            <date-filter/>
+        </entity-find>
+        <set field="productStoreIdSet" from="new TreeSet(partyProductStoreList*.productStoreId)"/>
+
+        <entity-find entity-name="mkdecision.dashboard.ProductStoreCategoryDetail" list="categoryList">
+            <econdition field-name="productStoreId" operator="in" from="productStoreIdSet"/>
+            <econdition field-name="storeCategoryTypeEnumId" value="PsctFinanceableProducts"/>
+            <date-filter/>
+        </entity-find>
+        <set field="productCategoryIdSet" from="new TreeSet(categoryList*.productCategoryId)"/>
+
+        <set field="evergreenOrderState" from="['OrderOpen', 'OrderRequested', 'OrderProposed', 'OrderConditionalApproved', 'OrderCustomerProcessing', 'OrderFundingRequested', 'OrderApproved', 'OrderSent', 'OrderPendingRejected', 'OrderRejected', 'OrderCancelled', 'OrderCancelledTest']"/>
+    </actions>
+    
+    <widgets>
+        <container>
+            <link url="newOrder" text="New Order" icon="fa fa-plus" style="q-btn--rectangle q-btn--rounded margin-all-05"/>
+
+            <form-list name="OrderList" list="orderList" list-entry="order" header-dialog="true" select-columns="true" saved-finds="true">
+                <entity-find entity-name="mkdecision.dashboard.OrderHeaderDetail" list="orderList" distinct="true">
+                    <search-form-inputs default-order-by="-entryDate"/>
+                    <econditions combine="or">
+                        <econditions>
+                            <econdition field-name="orderPartPartyId" from="ec.user.userAccount.partyId"/>
+                            <econdition field-name="orderPartRoleTypeId" value="SalesRepresentative"/>
+                        </econditions>
+                        <econditions>
+                            <econdition field-name="storePartyId" from="ec.user.userAccount.partyId"/>
+                            <econdition field-name="storeRoleTypeId" value="SalesRepresentative"/>
+                            <econdition field-name="storeAllowSalesRepViewAll" value="Y"/>
+                        </econditions>
+                        <econditions>
+                            <econdition field-name="storePartyId" from="ec.user.userAccount.partyId"/>
+                            <econdition field-name="storeRoleTypeId" value="FinanceManager"/>
+                        </econditions>
+                        <econditions>
+                            <econdition field-name="vendorRelationshipTypeId" value="PrtEmployee"/>
+                            <econdition field-name="vendorRelationshipFromPartyId" from="ec.user.userAccount.partyId"/>
+                            <econdition field-name="vendorRelationshipFromRoleTypeId" value="Underwriter"/>
+                        </econditions>
+                    </econditions>
+                    <select-field field-name="orderId"/>
+                    <select-field field-name="statusId"/>
+                    <select-field field-name="statusDescription"/>
+                    <select-field field-name="unitAmount"/>
+                    <select-field field-name="currencyUomId"/>
+                </entity-find>
+
+                <row-actions>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
+                        <field-map field-name="partyId" from="order.customerPartyId"/>
+                    </service-call>
+                </row-actions>
+
+                <field name="customerPartyId">
+                    <header-field title="Parties" show-order-by="true">
+                        <drop-down allow-empty="true">
+                            <dynamic-options transition="searchPartyList" server-search="true" min-length="2" parameter-map="[roleTypeId:'PrimaryApplicant']"/>
+                        </drop-down>
+                    </header-field>
+                    <default-field>
+                        <link url="editOrder" text="${partyName ?: '-'}" link-type="anchor"/>
+                    </default-field>
+                </field>
+
+                <field name="statusId">
+                    <header-field title="Status" show-order-by="true">
+                        <drop-down allow-empty="true" allow-multiple="true">
+                            <entity-options text="${description}" key="${statusId}">
+                                <entity-find entity-name="moqui.basic.StatusItem">
+                                    <econdition field-name="statusTypeId" value="OrderHeader"/>
+                                    <econdition field-name="statusId" operator="in" from="evergreenOrderState"/>
+                                    <order-by field-name="description"/>
+                                </entity-find>
+                            </entity-options>
+                        </drop-down>
+                    </header-field>
+                    <default-field>
+                        <display text="${statusDescription}"/>
+                    </default-field>
+                </field>
+
+                <field name="productId">
+                    <header-field title="Order Details" show-order-by="true">
+                        <drop-down allow-empty="true">
+                            <entity-options text="${productName}" key="${productId}">
+                                <entity-find entity-name="mantle.product.category.ProductCategoryMemberProduct">
+                                    <econdition field-name="productCategoryId" operator="in" from="productCategoryIdSet"/>
+                                    <order-by field-name="productName"/>
+                                </entity-find>
+                            </entity-options>
+                        </drop-down>
+                    </header-field>
+                    <default-field>
+                        <display-entity entity-name="mantle.product.Product" text="${((ec.l10n.formatCurrency(unitAmount, currencyUomId, 2) ?: '') + ' - ' + (productName ?: '')).trim()}"/>
+                    </default-field>
+                </field>
+
+                <field name="orderId">
+                    <header-field show-order-by="true">
+                        <text-find/>
+                    </header-field>
+                    <default-field>
+                        <link url="editOrder" text="${orderId}" link-type="anchor"/>
+                    </default-field>
+                </field>
+
+                <field name="compositeOrderId">
+                    <default-field title="Order ID">
+                        <link url="editOrder" text="${orderId} - ${statusDescription}" link-type="anchor"/>
+                    </default-field>
+                </field>
+
+                <field name="entryDate">
+                    <header-field show-order-by="true" title="Date">
+                        <date-period/>
+                    </header-field>
+                    <conditional-field condition="org.apache.commons.lang3.time.DateUtils.toCalendar(entryDate).get(Calendar.YEAR) == org.apache.commons.lang3.time.DateUtils.toCalendar(ec.user.getNowTimestamp()).get(Calendar.YEAR)">
+                        <display format="MMM d h:mm a"/>
+                    </conditional-field>
+                    <default-field>
+                        <display format="MMM d yyyy h:mm a"/>
+                    </default-field>
+                </field>
+
+                <field name="find">
+                    <header-field title="Find">
+                        <submit/>
+                    </header-field>
+                </field>
+
+                <columns>
+                    <column>
+                        <field-ref name="customerPartyId"/>
+                    </column>
+                    <column>
+                        <field-ref name="statusId"/>
+                    </column>
+                    <column>
+                        <field-ref name="productId"/>
+                    </column>
+                    <column>
+                        <field-ref name="orderId"/>
+                    </column>
+                    <column>
+                        <field-ref name="entryDate"/>
+                    </column>
+                </columns>
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="customerPartyId"/>
+                        <field-ref name="compositeOrderId"/>
+                        <field-ref name="productId"/>
+                    </column>
+                    <column>
+                        <field-ref name="entryDate"/>
+                    </column>
+                </columns>
+            </form-list>
+        </container>
+    </widgets>
+</screen>

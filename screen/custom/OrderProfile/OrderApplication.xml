@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Application"
+        default-menu-index="2">
+
+    <parameter name="orderId" required="true"/>
+
+    <transition name="updateOrderItemEligibility">
+        <actions>
+            <service-call name="org.moqui.impl.ScreenServices.create#FormResponse" out-map="context">
+                <field-map field-name="formId" from="formId"/>
+                <field-map field-name="responseMap" from="ec.web.parameters"/>
+            </service-call>
+            <service-call name="mkdecision.dashboard.OrderServices.update#OrderItemEligibility" in-map="context"/>
+        </actions>
+        <default-response url="."/>
+    </transition>
+    <transition name="updatePerson">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Person" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateContact">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Contact" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateIdentity">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Identity" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateEmployment">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Employment" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateIncomeSource">
+        <service-call name="mkdecision.dashboard.PartyServices.update#IncomeSource" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateProperty">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Property" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+    <transition name="updateMortgage">
+        <service-call name="mkdecision.dashboard.PartyServices.update#Mortgage" in-map="context"/>
+        <default-response url="."/>
+    </transition>
+
+    <actions>
+        <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart">
+            <field-map field-name="orderId" from="orderId"/>
+            <field-map field-name="orderPartSeqId" value="01"/>
+        </entity-find-one>
+        <entity-find-one entity-name="mantle.order.OrderItem" value-field="orderItem">
+            <field-map field-name="orderId" from="orderId"/>
+            <field-map field-name="orderItemSeqId" value="01"/>
+        </entity-find-one>
+        <entity-find entity-name="mantle.product.ProductDbForm" list="formList">
+            <econdition field-name="productId" from="orderItem.productId"/>
+        </entity-find>
+        <entity-find entity-name="mantle.order.OrderItemFormResponse" list="responseList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderItemSeqId" from="orderItem.orderItemSeqId"/>
+        </entity-find>
+        <entity-find entity-name="mantle.order.OrderPartParty" list="partyList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
+            <econditions combine="or">
+                <econdition field-name="roleTypeId" value="PrimaryApplicant"/>
+                <econdition field-name="roleTypeId" value="CoApplicant"/>
+            </econditions>
+        </entity-find>
+        <entity-find entity-name="mantle.product.asset.Asset" list="assetList">
+            <econdition field-name="ownerPartyId" operator="in" from="partyList?.partyId?.toSet()"/>
+        </entity-find>
+
+        <set field="formId" from="formList.isEmpty() ? null : formList.getFirst().get('formId')"/>
+        <set field="formResponseId" from="responseList?.getFirst()?.formResponseId ?: null"/>
+        <if condition="formResponseId != null">
+            <entity-find entity-name="moqui.screen.form.FormResponseAnsAndDbFormField" list="answerList">
+                <econdition field-name="formResponseId" from="formResponseId"/>
+            </entity-find>
+            <service-call name="org.moqui.impl.ScreenServices.get#FormResponse" out-map="formResponse">
+                <field-map field-name="formResponseId" from="formResponseId"/>
+            </service-call>
+            <set field="responseMap" from="formResponse?.responseMap"/>
+        </if>
+    </actions>
+
+    <widgets>
+        <container style="full-width row wrap items-stretch">
+            <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                <container style="padding-all-05 full-height">
+                    <container style="padding-all-1 border-all-1 rounded-borders full-height">
+                        <section-include name="EligibilitySection" location="component://mk-dashboard/template/order/OrderWidgets.xml"/>
+                    </container>
+                </container>
+            </container>
+
+            <section-iterate name="AssetIterator" list="assetList" entry="asset">
+                <actions>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" out-map="context">
+                        <field-map field-name="partyId" from="asset.ownerPartyId"/>
+                    </service-call>
+                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="assetClass">
+                        <field-map field-name="enumId" from="asset.classEnumId"/>
+                    </entity-find-one>
+                    <entity-find entity-name="mk.close.FinancialFlow" list="hoaMonthlyFeeFinFlowList">
+                        <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                        <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowHoaMonthlyFee"/>
+                        <econdition field-name="partyId" from="asset.ownerPartyId"/>
+                        <econdition field-name="assetId" from="asset.assetId"/>
+                    </entity-find>
+                    <entity-find entity-name="mk.close.FinancialFlow" list="annualPropertyTaxFinFlowList">
+                        <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                        <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowAnnualPropertyTaxes"/>
+                        <econdition field-name="partyId" from="asset.ownerPartyId"/>
+                        <econdition field-name="assetId" from="asset.assetId"/>
+                    </entity-find>
+                    <entity-find entity-name="mk.close.FinancialFlow" list="annualInsuranceCostFinFlowList">
+                        <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                        <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowAnnualInsuranceCosts"/>
+                        <econdition field-name="partyId" from="asset.ownerPartyId"/>
+                        <econdition field-name="assetId" from="asset.assetId"/>
+                    </entity-find>
+                    <entity-find entity-name="mantle.party.PartyToAndRelationship" list="mortgageRelationList">
+                        <econdition field-name="relationshipTypeEnumId" value="PrtMortgage"/>
+                        <econdition field-name="fromPartyId" from="asset.ownerPartyId"/>
+                        <econdition field-name="fromRoleTypeId" value="Borrower"/>
+                    </entity-find>
+
+                    <set field="assetId" from="asset.assetId"/>
+                    <set field="classEnumId" from="asset.classEnumId"/>
+                    <set field="salvageValue" from="asset.salvageValue"/>
+                    <set field="acquireCost" from="asset.acquireCost"/>
+                    <set field="hoaFeeMonthly" from="hoaMonthlyFeeFinFlowList?.getFirst().amount ?: 0"/>
+                    <set field="propertyTaxesAnnually" from="annualPropertyTaxFinFlowList?.getFirst().amount ?: 0"/>
+                    <set field="propertyInsuranceCostsAnnually" from="annualInsuranceCostFinFlowList?.getFirst().amount ?: 0"/>
+                </actions>
+                <widgets>
+                    <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                        <container style="padding-all-05 full-height">
+                            <container style="padding-all-1 border-all-1 rounded-borders full-height">
+                                <section-include name="PropertySection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
+                            </container>
+                        </container>
+                    </container>
+                </widgets>
+            </section-iterate>
+        </container>
+
+        <container style="row">
+            <section-iterate name="PartyIterator" list="partyList" entry="party">
+                <actions>
+                    <entity-find-one entity-name="mantle.party.PartyDetail" value-field="partyDetail">
+                        <field-map field-name="partyId" from="party.partyId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="mantle.party.RoleType" value-field="roleType">
+                        <field-map field-name="roleTypeId" from="party.roleTypeId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="employmentStatus">
+                        <field-map field-name="enumId" from="partyDetail.employmentStatusEnumId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="maritalStatus">
+                        <field-map field-name="enumId" from="partyDetail.maritalStatusEnumId"/>
+                    </entity-find-one>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
+                        <field-map field-name="partyId" from="party.partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#SocialSecurityNumber" out-map="context">
+                        <field-map field-name="partyId" from="party.partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" out-map="context">
+                        <field-map field-name="partyId" from="party.partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryEmailAddress" out-map="context">
+                        <field-map field-name="partyId" from="party.partyId"/>
+                    </service-call>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" out-map="context">
+                        <field-map field-name="partyId" from="party.partyId"/>
+                    </service-call>
+                    <entity-find entity-name="mantle.party.PartyIdentification" list="identityList">
+                        <econdition field-name="partyId" from="party.partyId"/>
+                        <econdition field-name="partyIdTypeEnumId" operator="not-equals" value="PtidSsn"/>
+                    </entity-find>
+                    <entity-find entity-name="mantle.party.PartyToAndRelationship" list="currentEmploymentRelationList">
+                        <econdition field-name="relationshipTypeEnumId" value="PrtEmployee"/>
+                        <econdition field-name="fromPartyId" from="party.partyId"/>
+                        <econdition field-name="fromRoleTypeId" value="Employee"/>
+                    </entity-find>
+                    <entity-find entity-name="mk.close.FinancialFlow" list="incomeFinFlowList">
+                        <econdition field-name="partyId" from="partyId"/>
+                        <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+                        <econdition field-name="partyRelationshipId" operator="is-null" value=""/>
+                    </entity-find>
+                    <entity-find entity-name="mantle.party.PartyToAndRelationship" list="previousEmploymentRelationList">
+                        <econdition field-name="relationshipTypeEnumId" value="PrtPreviousEmployee"/>
+                        <econdition field-name="fromPartyId" from="party.partyId"/>
+                        <econdition field-name="fromRoleTypeId" value="Employee"/>
+                    </entity-find>
+
+                    <set field="firstName" from="partyDetail?.firstName ?: null"/>
+                    <set field="middleName" from="partyDetail?.middleName ?: null"/>
+                    <set field="lastName" from="partyDetail?.lastName ?: null"/>
+                    <set field="suffix" from="partyDetail?.suffix ?: null"/>
+                    <set field="nickname" from="partyDetail?.nickname ?: null"/>
+                    <set field="occupation" from="partyDetail?.occupation ?: null"/>
+                    <set field="birthDate" from="ec.l10n.format(partyDetail?.birthDate, 'MM/dd/yyyy') ?: null"/>
+                    <set field="maritalStatusEnumId" from="partyDetail?.maritalStatusEnumId ?: null"/>
+                    <set field="employmentStatusEnumId" from="partyDetail?.employmentStatusEnumId ?: null"/>
+                    <set field="address1" from="postalAddress?.address1 ?: null"/>
+                    <set field="unitNumber" from="postalAddress?.unitNumber ?: null"/>
+                    <set field="postalCode" from="postalAddress?.postalCode ?: null"/>
+                    <set field="city" from="postalAddress?.city ?: null"/>
+                    <set field="stateProvinceGeoId" from="postalAddress?.stateProvinceGeoId ?: null"/>
+                    <set field="email" from="emailAddress"/>
+                    <set field="emailVerify" from="emailAddress"/>
+                </actions>
+                <widgets>
+                    <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                        <container style="padding-all-05 full-height">
+                            <container style="padding-all-1 border-all-1 rounded-borders full-height">
+                                <section-include name="PersonSection" location="component://mk-dashboard/template/party/PartyWidgets.xml"/>
+                            </container>
+                        </container>
+                    </container>
+                </widgets>
+            </section-iterate>
+        </container>
+    </widgets>
+
+</screen>

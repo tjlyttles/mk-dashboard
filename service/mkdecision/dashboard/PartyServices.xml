@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <service verb="get" noun="PartyName" type="java" location="com.mkdecision.dashboard.PartyServices" method="getPartyName">
+        <in-parameters>
+            <parameter name="partyId"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyName"/>
+            <parameter name="partyNickname"/>
+        </out-parameters>
+    </service>
+    <service verb="get" noun="PartyProductStoreRoles" type="java" location="com.mkdecision.dashboard.PartyServices" method="getPartyProductStoreRoles">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="productStoreId"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="productStoreId"/>
+            <parameter name="roleTypeIdSet" type="Set"/>
+        </out-parameters>
+    </service>
+
+    <!-- Person -->
+    <service verb="validate" noun="PersonFields" type="java" location="com.mkdecision.dashboard.PartyServices" method="validatePersonFields">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="firstName"/>
+            <parameter name="middleName"/>
+            <parameter name="lastName"/>
+            <parameter name="suffix"/>
+            <parameter name="nickname"/>
+            <parameter name="socialSecurityNumber"/>
+            <parameter name="birthDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="maritalStatusEnumId"/>
+            <parameter name="employmentStatusEnumId"/>
+        </in-parameters>
+    </service>
+    <service verb="update" noun="Person" type="java" location="com.mkdecision.dashboard.PartyServices" method="updatePerson">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="firstName" required="true">
+                <matches regexp="^[- A-Za-z']+$" message="Please enter a first name."/>
+            </parameter>
+            <parameter name="middleName">
+                <matches regexp="^[- A-Za-z']{1}$" message="Please enter a middle initial using only letters."/>
+            </parameter>
+            <parameter name="lastName" required="true">
+                <matches regexp="^[- A-Za-z']+$" message="Please enter a last name."/>
+            </parameter>
+            <parameter name="suffix"/>
+            <parameter name="nickname"/>
+            <parameter name="socialSecurityNumber" required="true">
+                <matches regexp="^\d{3}-\d{2}-\d{4}$" message="Please enter a valid social security number."/>
+            </parameter>
+            <parameter name="birthDate" type="Date" format="MM-dd-yyyy" required="true"/>
+            <parameter name="maritalStatusEnumId" required="true"/>
+            <parameter name="employmentStatusEnumId" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+        </out-parameters>
+    </service>
+
+    <!-- Contact -->
+    <service verb="validate" noun="ContactFields" type="java" location="com.mkdecision.dashboard.PartyServices" method="validateContactFields">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="address1"/>
+            <parameter name="unitNumber"/>
+            <parameter name="postalCode"/>
+            <parameter name="city"/>
+            <parameter name="stateProvinceGeoId"/>
+            <parameter name="contactNumber"/>
+            <parameter name="contactMechPurposeId"/>
+            <parameter name="email"/>
+            <parameter name="emailVerify"/>
+        </in-parameters>
+    </service>
+    <service verb="update" noun="Contact" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateContact">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="address1" required="true">
+                <matches regexp="^[- #a-zA-Z0-9.',\/]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, commas, and -, /, ', or #."/>
+            </parameter>
+            <parameter name="unitNumber"/>
+            <parameter name="postalCode" required="true">
+                <matches regexp="^\d{5}$" message="Please enter a valid ZIP code."/>
+            </parameter>
+            <parameter name="city" required="true">
+                <matches regexp="^[- A-Za-z'.]+$" message="Please enter a city using only letters, spaces, periods, apostrophes or hyphens."/>
+            </parameter>
+            <parameter name="stateProvinceGeoId" required="true"/>
+            <parameter name="contactNumber" required="true">
+                <matches regexp="^[0,2-9]{1}\d{2}([-])\d{3}([-])\d{4}" message="Please enter a valid phone number"/>
+            </parameter>
+            <parameter name="contactMechPurposeId"/>
+            <parameter name="email" required="true">
+                <text-email/>
+            </parameter>
+            <parameter name="emailVerify" required="true">
+                <text-email/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+        </out-parameters>
+    </service>
+    <service verb="get" noun="PrimaryTelecomNumber" type="java" location="com.mkdecision.dashboard.PartyServices" method="getPrimaryTelecomNumber">
+        <in-parameters>
+            <parameter name="partyId"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="contactMechPurposeId"/>
+            <parameter name="contactNumber"/>
+        </out-parameters>
+    </service>
+    <service verb="get" noun="PrimaryEmailAddress" type="java" location="com.mkdecision.dashboard.PartyServices" method="getPrimaryEmailAddress">
+        <in-parameters>
+            <parameter name="partyId"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="emailAddress"/>
+        </out-parameters>
+    </service>
+    <service verb="get" noun="PrimaryPostalAddress" type="java" location="com.mkdecision.dashboard.PartyServices" method="getPrimaryPostalAddress">
+        <in-parameters>
+            <parameter name="partyId"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="postalAddress" type="Map"/>
+            <parameter name="postalAddressString"/>
+        </out-parameters>
+    </service>
+
+    <!-- Identity -->
+    <service verb="validate" noun="IdentityFields" type="java" location="com.mkdecision.dashboard.PartyServices" method="validateIdentityFields">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyIdTypeEnumId"/>
+            <parameter name="idIssuedBy"/>
+            <parameter name="idValue"/>
+            <parameter name="idIssueDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="idExpiryDate" type="Date" format="MM-dd-yyyy"/>
+        </in-parameters>
+    </service>
+    <service verb="add" noun="Identity" type="java" location="com.mkdecision.dashboard.PartyServices" method="addIdentity">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyIdTypeEnumId"/>
+            <parameter name="idIssuedBy" required="true"/>
+            <parameter name="idValue" required="true">
+                <matches regexp="^(?=.*\d)[A-Za-z0-9]+$" message="Please enter a valid ID number using only letters and numbers (at least one number is required)"/>
+            </parameter>
+            <parameter name="idIssueDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="idExpiryDate" type="Date" format="MM-dd-yyyy" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyIdTypeEnumId"/>
+        </out-parameters>
+    </service>
+    <service verb="update" noun="Identity" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateIdentity">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyIdTypeEnumId"/>
+            <parameter name="idIssuedBy" required="true"/>
+            <parameter name="idValue" required="true">
+                <matches regexp="^(?=.*\d)[A-Za-z0-9]+$" message="Please enter a valid ID number using only letters and numbers (at least one number is required)"/>
+            </parameter>
+            <parameter name="idIssueDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="idExpiryDate" type="Date" format="MM-dd-yyyy" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyIdTypeEnumId"/>
+        </out-parameters>
+    </service>
+    <service verb="delete" noun="Identity" type="java" location="com.mkdecision.dashboard.PartyServices" method="deleteIdentity">
+        <in-parameters>
+            <parameter name="partyId" required="true"/>
+            <parameter name="partyIdTypeEnumId" required="true"/>
+        </in-parameters>
+    </service>
+    <service verb="get" noun="SocialSecurityNumber" type="java" location="com.mkdecision.dashboard.PartyServices" method="getSocialSecurityNumber">
+        <in-parameters>
+            <parameter name="partyId"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="socialSecurityNumber"/>
+        </out-parameters>
+    </service>
+
+    <!-- Employment -->
+    <service verb="validate" noun="EmploymentFields" type="java" location="com.mkdecision.dashboard.PartyServices" method="validateEmploymentFields">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="relationshipTypeEnumId"/>
+            <parameter name="employerName"/>
+            <parameter name="employmentStatusEnumId"/>
+            <parameter name="employerClassificationId"/>
+            <parameter name="jobTitle"/>
+            <parameter name="years" type="Integer"/>
+            <parameter name="months" type="Integer"/>
+            <parameter name="fromDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="toDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="monthlyIncome" type="BigDecimal"/>
+            <parameter name="employerAddress1"/>
+            <parameter name="employerUnitNumber"/>
+            <parameter name="employerPostalCode"/>
+            <parameter name="employerCity"/>
+            <parameter name="employerStateProvinceGeoId"/>
+            <parameter name="employerContactNumber"/>
+        </in-parameters>
+    </service>
+    <service verb="add" noun="Employment" type="java" location="com.mkdecision.dashboard.PartyServices" method="addEmployment">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="relationshipTypeEnumId"/>
+            <parameter name="employerName" required="true">
+                <matches regexp="^[- A-Za-z0-9']+$" message="Please enter a name using only letters, numbers, apostrophes or hyphens."/>
+            </parameter>
+            <parameter name="employmentStatusEnumId" required="true"/>
+            <parameter name="employerClassificationId"/>
+            <parameter name="jobTitle"/>
+            <parameter name="years" type="Integer">
+                <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
+            </parameter>
+            <parameter name="months" type="Integer">
+                <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
+            </parameter>
+            <parameter name="fromDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="toDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="monthlyIncome" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter a valid income."/>
+            </parameter>
+            <parameter name="employerAddress1">
+                <matches regexp="^[- #a-zA-Z0-9.',\/]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, commas, and -, /, ', or #."/>
+            </parameter>
+            <parameter name="employerUnitNumber"/>
+            <parameter name="employerPostalCode">
+                <matches regexp="^\d{5}$" message="Please enter a valid ZIP code."/>
+            </parameter>
+            <parameter name="employerCity">
+                <matches regexp="^[- A-Za-z'.]+$" message="Please enter a city using only letters, spaces, periods, apostrophes or hyphens."/>
+            </parameter>
+            <parameter name="employerStateProvinceGeoId"/>
+            <parameter name="employerContactNumber">
+                <matches regexp="^([0,2-9]{1}\d{2}([-])\d{3}([-])\d{4})|(___\-___\-____)" message="Please enter a valid phone number"/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyRelationshipId"/>
+        </out-parameters>
+    </service>
+    <service verb="update" noun="Employment" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateEmployment">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyRelationshipId"/>
+            <parameter name="relationshipTypeEnumId"/>
+            <parameter name="employerName" required="true">
+                <matches regexp="^[- A-Za-z0-9']+$" message="Please enter a name using only letters, numbers, apostrophes or hyphens."/>
+            </parameter>
+            <parameter name="employmentStatusEnumId" required="true"/>
+            <parameter name="employerClassificationId"/>
+            <parameter name="jobTitle"/>
+            <parameter name="years" type="Integer">
+                <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
+            </parameter>
+            <parameter name="months" type="Integer">
+                <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
+            </parameter>
+            <parameter name="fromDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="toDate" type="Date" format="MM-dd-yyyy"/>
+            <parameter name="monthlyIncome" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter a valid income."/>
+            </parameter>
+            <parameter name="employerAddress1">
+                <matches regexp="^[- #a-zA-Z0-9.',\/]+$" message="Please enter a valid street address using only letters, numbers, spaces, periods, commas, and -, /, ', or #."/>
+            </parameter>
+            <parameter name="employerUnitNumber"/>
+            <parameter name="employerPostalCode">
+                <matches regexp="^\d{5}$" message="Please enter a valid ZIP code."/>
+            </parameter>
+            <parameter name="employerCity">
+                <matches regexp="^[- A-Za-z'.]+$" message="Please enter a city using only letters, spaces, periods, apostrophes or hyphens."/>
+            </parameter>
+            <parameter name="employerStateProvinceGeoId"/>
+            <parameter name="employerContactNumber">
+                <matches regexp="^([0,2-9]{1}\d{2}([-])\d{3}([-])\d{4})|(___\-___\-____)" message="Please enter a valid phone number"/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyRelationshipId"/>
+        </out-parameters>
+    </service>
+    <service verb="delete" noun="Employment" type="java" location="com.mkdecision.dashboard.PartyServices" method="deleteEmployment">
+        <in-parameters>
+            <parameter name="partyId" required="true"/>
+            <parameter name="partyRelationshipId" required="true"/>
+        </in-parameters>
+    </service>
+
+    <!-- Income source -->
+    <service verb="validate" noun="IncomeSourceFields" type="java" location="com.mkdecision.dashboard.PartyServices" method="validateIncomeSourceFields">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="financialFlowTypeEnumId"/>
+            <parameter name="amount" type="BigDecimal"/>
+            <parameter name="years" type="Integer"/>
+            <parameter name="months" type="Integer"/>
+        </in-parameters>
+    </service>
+    <service verb="add" noun="IncomeSource" type="java" location="com.mkdecision.dashboard.PartyServices" method="addIncomeSource">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="financialFlowTypeEnumId"/>
+            <parameter name="amount" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter a valid amount."/>
+            </parameter>
+            <parameter name="years" type="Integer" required="true">
+                <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
+            </parameter>
+            <parameter name="months" type="Integer" required="true">
+                <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="financialFlowId"/>
+        </out-parameters>
+    </service>
+    <service verb="update" noun="IncomeSource" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateIncomeSource">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="financialFlowId"/>
+            <parameter name="financialFlowTypeEnumId"/>
+            <parameter name="amount" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter a valid amount."/>
+            </parameter>
+            <parameter name="years" type="Integer" required="true">
+                <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
+            </parameter>
+            <parameter name="months" type="Integer" required="true">
+                <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="financialFlowId"/>
+        </out-parameters>
+    </service>
+    <service verb="delete" noun="IncomeSource" type="java" location="com.mkdecision.dashboard.PartyServices" method="deleteIncomeSource">
+        <in-parameters>
+            <parameter name="partyId" required="true"/>
+            <parameter name="financialFlowId" required="true"/>
+        </in-parameters>
+    </service>
+
+    <!-- Property -->
+    <service verb="validate" noun="PropertyFields" type="java" location="com.mkdecision.dashboard.PartyServices" method="validatePropertyFields">
+        <in-parameters>
+            <parameter name="classEnumId"/>
+            <parameter name="salvageValue" type="BigDecimal"/>
+            <parameter name="acquireCost" type="BigDecimal"/>
+            <parameter name="hoaFeeMonthly" type="BigDecimal"/>
+            <parameter name="propertyTaxesAnnually" type="BigDecimal"/>
+            <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal"/>
+        </in-parameters>
+    </service>
+    <service verb="update" noun="Property" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateProperty">
+        <in-parameters>
+            <parameter name="partyId" required="true"/>
+            <parameter name="assetId"/>
+            <parameter name="classEnumId" required="true"/>
+            <parameter name="salvageValue" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter the Current Property Value"/>
+            </parameter>
+            <parameter name="acquireCost" type="BigDecimal" required="true">
+                <number-range min="0" message="Please enter the Original Purchase Price"/>
+            </parameter>
+            <parameter name="hoaFeeMonthly" type="BigDecimal" required="true">
+                <number-range min="0" message="Please enter the HOA Fee Monthly"/>
+            </parameter>
+            <parameter name="propertyTaxesAnnually" type="BigDecimal" required="true">
+                <number-range min="0" message="Please enter the Property Taxes Annually"/>
+            </parameter>
+            <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal" required="true">
+                <number-range min="0" message="Please enter the Insurance Costs Annually"/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="assetId"/>
+        </out-parameters>
+    </service>
+
+    <!-- Mortgage -->
+    <service verb="validate" noun="MortgageFields" type="java" location="com.mkdecision.dashboard.PartyServices" method="validateMortgageFields">
+        <in-parameters>
+            <parameter name="lenderName"/>
+            <parameter name="mortgageBalance" type="BigDecimal"/>
+            <parameter name="mortgagePaymentMonthly" type="BigDecimal"/>
+        </in-parameters>
+    </service>
+    <service verb="update" noun="Mortgage" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateMortgage">
+        <in-parameters>
+            <parameter name="partyId" required="true"/>
+            <parameter name="partyRelationshipId" required="true"/>
+            <parameter name="lenderName" required="true"/>
+            <parameter name="mortgageBalance" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter the current Mortgage Balance"/>
+            </parameter>
+            <parameter name="mortgagePaymentMonthly" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter the Mortgage Payment Monthly"/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyRelationshipId"/>
+        </out-parameters>
+    </service>
+    <service verb="delete" noun="Mortgage" type="java" location="com.mkdecision.dashboard.PartyServices" method="deleteMortgage">
+        <in-parameters>
+            <parameter name="partyId" required="true"/>
+            <parameter name="partyRelationshipId" required="true"/>
+        </in-parameters>
+    </service>
+
+</services>

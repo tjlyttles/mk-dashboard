@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<secas xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-eca-2.1.xsd">
+
+    <!-- Order service validation -->
+    <seca service="mkdecision\.dashboard\.OrderServices\.(.+)" name-is-pattern="true" when="pre-service">
+        <actions>
+            <if condition="orderId != null">
+                <set field="editableOrderState" from="[
+                    'OrderOpen',
+                    'OrderRequested',
+                    'OrderProposed',
+                    'OrderApproved',
+                    'OrderAutoReorder',
+                    'OrderBeingChanged',
+                    'OrderCancelled',
+                    'OrderCancelledTest',
+                    'OrderCompleted',
+                    'OrderConditionalApproved',
+                    'OrderCustomerProcessing',
+                    'OrderFundingRequested',
+                    'OrderGiftRegistry',
+                    'OrderHold',
+                    'OrderPendingRejected',
+                    'OrderPlaced',
+                    'OrderProcessing',
+                    'OrderRejected',
+                    'OrderSent',
+                    'OrderWishList']"/>
+                <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+                <if condition="!editableOrderState.contains(orderHeader.statusId)">
+                    <return error="true" message="${ec.getL10n().localize('DASHBOARD_ORDER_NOT_EDITABLE')}"/>
+                </if>
+            </if>
+        </actions>
+    </seca>
+
+</secas>

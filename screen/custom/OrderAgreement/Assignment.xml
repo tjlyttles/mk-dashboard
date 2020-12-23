@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Assignment"
+        default-menu-include="false"
+        default-menu-index="2">
+
+    <parameter name="orderId" required="true"/>
+
+    <transition name="certificateOfCompletion">
+        <default-response url="../CertificateOfCompletion"/>
+    </transition>
+    <transition name="signAgreement">
+        <actions>
+            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+            <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+
+            <service-call name="mkdecision.dashboard.AgreementServices.sign#OrderAgreement">
+                <field-map field-name="orderId" from="orderId"/>
+                <field-map field-name="agreementTypeEnumId" value="MkAgrAssignment"/>
+            </service-call>
+
+            <service-call name="mantle.order.OrderServices.update#OrderStatus">
+                <field-map field-name="orderId" from="orderId"/>
+                <field-map field-name="statusId" value="OrderFundingRequested"/>
+            </service-call>
+        </actions>
+        <default-response url="../../OrderProfile"/>
+    </transition>
+
+    <widgets>
+        <container>
+            <container-row>
+                <row-col xs="0" sm="1" md="3" lg="3"/>
+                <row-col xs="12" sm="10" md="6" lg="6">
+                    <label text="Agreements" type="h4" style="margin-tb-1"/>
+                    <label text="Please read and scroll to the end. Select “Sign and Request Funding” to sign the Agreement and request funding." style="margin-b-1"/>
+                    <container style="h-separator margin-tb-2"/>
+                </row-col>
+                <row-col xs="0" sm="1" md="3" lg="3"/>
+            </container-row>
+            <container-row>
+                <row-col xs="0" sm="1" md="3" lg="3"/>
+                <row-col xs="12" sm="10" md="6" lg="6">
+                    <render-mode>
+                        <text type="html,vuet,qvt" location="component://mk-dashboard/template/OrderAgreement/Assignment.html"/>
+                    </render-mode>
+                </row-col>
+                <row-col xs="0" sm="1" md="3" lg="3"/>
+            </container-row>
+            <container-row>
+                <row-col xs="0" sm="1" md="3" lg="3"/>
+                <row-col xs="12" sm="10" md="6" lg="6">
+                    <container style="h-separator margin-b-2"/>
+                    <container style="margin-b-2">
+                        <label text="I acknowledge that I read and agree to the Certificate of Completion." style="text-strong"/>
+                    </container>
+                </row-col>
+                <row-col xs="0" sm="1" md="3" lg="3"/>
+            </container-row>
+            <container-row style="margin-b-2">
+                <row-col xs="0" sm="1" md="3" lg="3"/>
+                <row-col xs="12" sm="10" md="6" lg="6">
+                    <link url="signAgreement" text="Sign and Request Funding"/>
+                    <link url="certificateOfCompletion" text="Back"/>
+                </row-col>
+                <row-col xs="0" sm="1" md="3" lg="3"/>
+            </container-row>
+        </container>
+    </widgets>
+
+</screen>

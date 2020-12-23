@@ -3,8 +3,12 @@
 <moqui-conf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/moqui-conf-2.1.xsd">
     <screen-facade>
         <screen location="component://webroot/screen/webroot.xml">
-            <subscreens-item name="capps" menu-include="false" location="component://moqui-quasar-custom/screen/capps.xml"/>
-            <subscreens-item name="custom" menu-include="false" location="component://moqui-quasar-custom/screen/custom.xml"/>
+            <subscreens-item name="dashboard" menu-include="false" location="component://mk-dashboard/screen/dashboard.xml"/>
+            <subscreens-item name="custom" menu-include="false" location="component://mk-dashboard/screen/custom.xml"/>
+            <subscreens-item name="static" menu-include="false" location="component://mk-dashboard/screen/static.xml"/>
+        </screen>
+        <screen location="component://webroot/screen/webroot/apps.xml">
+            <subscreens-item name="dashboard" menu-title="Dashboard" menu-index="1" location="component://mk-dashboard/screen/launcher.xml"/>
         </screen>
     </screen-facade>
 </moqui-conf>

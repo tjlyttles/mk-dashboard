@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
+        default-menu-title="Order Header"
+        default-menu-include="false"
+        default-menu-index="1">
+
+    <parameter name="orderId"/>
+    <parameter name="orderPartSeqId"/>
+
+    <transition name="checkEligibility">
+        <service-call name="mkdecision.dashboard.OrderServices.validate#OrderFields" in-map="context"/>
+        <default-response url="../Eligibility">
+            <parameter name="orderId"/>
+            <parameter name="orderPartSeqId"/>
+            <parameter name="salesChannelEnumId"/>
+            <parameter name="productStoreId"/>
+            <parameter name="salesRepresentativeId"/>
+            <parameter name="productCategoryId"/>
+            <parameter name="productId"/>
+            <parameter name="totalPurchaseAmount"/>
+            <parameter name="downPayment"/>
+            <parameter name="netPurchaseAmount"/>
+            <parameter name="loanFee"/>
+            <parameter name="financedAmount"/>
+            <parameter name="estimatedPayment"/>
+        </default-response>
+    </transition>
+    <transition name="cancelOrder">
+        <default-response url="../../Orders"/>
+    </transition>
+    <transition name="getStoreSalesReps">
+        <actions>
+            <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
+                <econdition field-name="partyId" from="ec.user.userAccount.partyId"/>
+                <econdition field-name="roleTypeId" value="FinanceManager"/>
+                <date-filter/>
+            </entity-find-count>
+
+            <if condition="financeManagerCount > 0">
+                <entity-find entity-name="mkdecision.dashboard.ProductStorePartyDetail" list="storePartyList">
+                    <econdition field-name="productStoreId"/>
+                    <econdition field-name="roleTypeId" value="SalesRepresentative"/>
+                    <date-filter/>
+                    <select-field field-name="partyId,firstName,lastName"/>
+                </entity-find>
+                <else>
+                    <entity-find entity-name="mkdecision.dashboard.ProductStorePartyDetail" list="storePartyList">
+                        <econdition field-name="productStoreId"/>
+                        <econdition field-name="partyId" from="ec.user.userAccount.partyId"/>
+                        <econdition field-name="roleTypeId" value="SalesRepresentative"/>
+                        <date-filter/>
+                        <select-field field-name="partyId,firstName,lastName"/>
+                    </entity-find>
+                </else>
+            </if>
+
+            <set field="resultList" from="[]"/>
+            <iterate list="storePartyList" entry="storeParty">
+                <script>resultList.add([value:storeParty.partyId, label:(storeParty.firstName+ " " +storeParty.lastName)])</script>
+            </iterate>
+            <script>ec.web.sendJsonResponse(resultList)</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    <transition name="getStoreProductCategories">
+        <actions>
+            <entity-find entity-name="mkdecision.dashboard.ProductStoreCategoryDetail" list="categoryList">
+                <econdition field-name="productStoreId"/>
+                <econdition field-name="storeCategoryTypeEnumId" value="PsctFinanceableProducts"/>
+                <date-filter/>
+            </entity-find>
+
+            <set field="resultList" from="[]"/>
+            <iterate list="categoryList" entry="category">
+                <script>resultList.add([value:category.productCategoryId, label:(category.categoryName)])</script>
+            </iterate>
+            <script>ec.web.sendJsonResponse(resultList)</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    <transition name="getStoreProducts">
+        <actions>
+            <entity-find-count entity-name="mantle.product.store.ProductStoreCategory" count-field="productStoreCategoryCount">
+                <econdition field-name="productStoreId"/>
+                <econdition field-name="productCategoryId"/>
+                <econdition field-name="storeCategoryTypeEnumId" value="PsctFinanceableProducts"/>
+                <date-filter/>
+            </entity-find-count>
+
+            <set field="resultList" from="[]"/>
+            <if condition="productStoreCategoryCount > 0">
+                <entity-find entity-name="mantle.product.category.ProductCategoryMemberProduct" list="productList">
+                    <econdition field-name="productCategoryId"/>
+                    <date-filter/>
+                </entity-find>
+                <iterate list="productList" entry="product">
+                    <script>resultList.add([value:product.productId, label:(product.productName)])</script>
+                </iterate>
+            </if>
+            <script>ec.web.sendJsonResponse(resultList)</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    <transition name="calculateNetPurchaseAmount">
+        <actions>
+            <if condition="totalPurchaseAmount == null || downPayment == null">
+                <script>ec.web.sendTextResponse('')</script>
+                <else>
+                    <set field="netPurchaseAmount" from="(ec.l10n.parseNumber(totalPurchaseAmount, null)).subtract(ec.l10n.parseNumber(downPayment,null))" type="BigDecimal"/>
+                    <script>ec.web.sendTextResponse(String.format("%.2f", netPurchaseAmount))</script>
+                </else>
+            </if>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    <transition name="calculateLoanFee">
+        <actions>
+            <service-call name="mkdecision.dashboard.ProductServices.get#ProductParameterValue" out-map="loanFee">
+                <field-map field-name="productId"/>
+                <field-map field-name="productStoreId"/>
+                <field-map field-name="productParameterId" value="LoanFee"/>
+            </service-call>
+            <script>ec.web.sendTextResponse(String.format("%.2f", Double.parseDouble(loanFee?.parameterValue ?: 0)))</script>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    <transition name="calculateFinancedAmount">
+        <actions>
+            <if condition="totalPurchaseAmount == null || loanFee == null || downPayment == null">
+                <script>ec.web.sendTextResponse('')</script>
+                <else>
+                    <set field="financedAmount" from="(ec.l10n.parseNumber(totalPurchaseAmount, null)).add(ec.l10n.parseNumber(loanFee,null)).subtract(ec.l10n.parseNumber(downPayment,null))" type="BigDecimal"/>
+                    <script>ec.web.sendTextResponse(String.format("%.2f", financedAmount))</script>
+                </else>
+            </if>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+    <transition name="calculateEstimatedPayment">
+        <actions>
+            <if condition="totalPurchaseAmount == null || loanFee == null || downPayment == null">
+                <script>ec.web.sendTextResponse('')</script>
+                <else>
+                    <set field="orderAmount" from="(ec.l10n.parseNumber(totalPurchaseAmount, null)).add(ec.l10n.parseNumber(loanFee,null)).subtract(ec.l10n.parseNumber(downPayment,null))" type="BigDecimal"/>
+                    <service-call name="close.ProductServices.calculate#EstimatedPayment" out-map="estimatedPayment">
+                        <field-map field-name="productId"/>
+                        <field-map field-name="creditLine" from="orderAmount"/>
+                    </service-call>
+                    <script>ec.web.sendTextResponse(String.format("%.2f", estimatedPayment?.estimatedPayment ?: 0))</script>
+                </else>
+            </if>
+        </actions>
+        <default-response type="none"/>
+    </transition>
+
+    <actions>
+        <entity-find entity-name="mantle.product.store.ProductStoreParty" list="partyProductStoreList">
+            <econdition field-name="partyId" from="ec.user.userAccount.partyId"/>
+            <econditions combine="or">
+                <econdition field-name="roleTypeId" value="FinanceManager"/>
+                <econdition field-name="roleTypeId" value="SalesRepresentative"/>
+            </econditions>
+            <date-filter/>
+        </entity-find>
+        <set field="productStoreIdSet" from="new TreeSet(partyProductStoreList*.productStoreId)"/>
+
+        <if condition="orderId != null &amp;&amp; orderPartSeqId != null">
+            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+            <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+            <set field="salesChannelEnumId" from="orderHeader?.salesChannelEnumId ?: ''"/>
+            <set field="productStoreId" from="orderHeader?.productStoreId ?: ''"/>
+
+            <entity-find entity-name="mantle.order.OrderPartParty" list="salesRepresentativeList">
+                <econdition field-name="orderId" from="orderId"/>
+                <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
+                <econdition field-name="roleTypeId" value="SalesRepresentative"/>
+                <order-by field-name="-lastUpdatedStamp"/>
+            </entity-find>
+            <set field="salesRepresentativeId" from="salesRepresentativeList?.getFirst()?.partyId ?: ''"/>
+
+            <entity-find entity-name="mantle.order.OrderItem" list="orderItemList">
+                <econdition field-name="orderId" from="orderId"/>
+                <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
+                <order-by field-name="-lastUpdatedStamp"/>
+            </entity-find>
+            <set field="orderItemSeqId" from="orderItemList?.getFirst()?.orderItemSeqId ?: ''"/>
+            <set field="productParameterSetId" from="orderItemList?.getFirst()?.productParameterSetId ?: ''"/>
+            <set field="productId" from="orderItemList?.getFirst()?.productId ?: ''"/>
+            <set field="netPurchaseAmount" from="orderItemList?.getFirst()?.unitAmount ?: ''"/>
+
+            <entity-find entity-name="mantle.product.ProductParameterValue" list="productCategoryParamList">
+                <econdition field-name="productParameterId" value="ProductCategory"/>
+                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+            </entity-find>
+            <set field="productCategoryId" from="productCategoryParamList?.getFirst()?.parameterValue ?: ''"/>
+
+            <entity-find entity-name="mantle.product.ProductParameterValue" list="totalPurchaseAmountParamList">
+                <econdition field-name="productParameterId" value="TotalPurchaseAmount"/>
+                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+            </entity-find>
+            <set field="totalPurchaseAmount" from="totalPurchaseAmountParamList?.getFirst()?.parameterValue ?: ''"/>
+
+            <entity-find entity-name="mantle.product.ProductParameterValue" list="downPaymentParamList">
+                <econdition field-name="productParameterId" value="DownPayment"/>
+                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+            </entity-find>
+            <set field="downPayment" from="downPaymentParamList?.getFirst()?.parameterValue ?: ''"/>
+
+            <entity-find entity-name="mantle.product.ProductParameterValue" list="loanFeeParamList">
+                <econdition field-name="productParameterId" value="LoanFee"/>
+                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+            </entity-find>
+            <set field="loanFee" from="loanFeeParamList?.getFirst()?.parameterValue ?: ''"/>
+
+            <entity-find entity-name="mantle.product.ProductParameterValue" list="financedAmountParamList">
+                <econdition field-name="productParameterId" value="FinancedAmount"/>
+                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+            </entity-find>
+            <set field="financedAmount" from="financedAmountParamList?.getFirst()?.parameterValue ?: ''"/>
+
+            <entity-find entity-name="mantle.product.ProductParameterValue" list="estimatedPaymentParamList">
+                <econdition field-name="productParameterId" value="EstimatedPayment"/>
+                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
+            </entity-find>
+            <set field="estimatedPayment" from="estimatedPaymentParamList?.getFirst()?.parameterValue ?: ''"/>
+        </if>
+    </actions>
+
+    <widgets>
+        <container-row>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+            <row-col xs="12" sm="10" md="6" lg="6">
+                <container style="stepper margin-b-1">
+                    <render-mode>
+                        <text type="qvt"><![CDATA[
+                            <q-stepper ref="stepper" value="s1" color="primary" :flat="true">
+                                <q-step name="s1" title="Order Items" icon="shopping_cart"/>
+                                <q-step name="s2" title="Eligibility" icon="policy"/>
+                                <q-step name="s3" title="Applicants" icon="person"/>
+                                <q-step name="s4" title="Property" icon="home"/>
+                                <q-step name="s5" title="Agreements" icon="done"/>
+                            </q-stepper>
+                        ]]></text>
+                    </render-mode>
+                </container>
+            </row-col>
+            <row-col xs="0" sm="1" md="3" lg="3"/>
+        </container-row>
+
+        <container style="form-no-margin">
+            <form-single name="OrderForm" transition="checkEligibility">
+                <field name="orderId"><default-field><hidden/></default-field></field>
+                <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
+
+                <field name="applicationHeader">
+                    <default-field>
+                        <label text="New Application" type="h4" style="margin-b-1"/>
+                        <label text="Application Details" type="h5" style="margin-b-1"/>
+                        <label text="Please specify application details." style="margin-b-1"/>
+                        <container style="h-separator margin-tb-2"/>
+                    </default-field>
+                </field>
+                <field name="salesChannelEnumId">
+                    <default-field title="Method" validate-service="mkdecision.dashboard.OrderServices.store#Order">
+                        <drop-down required-manual-select="true">
+                            <entity-options key="${enumId}" text="${description}">
+                                <entity-find entity-name="moqui.basic.EnumAndGroup">
+                                    <econdition field-name="enumGroupEnumId" value="RequestChannelTypes"/>
+                                    <econdition field-name="enumId" value="ScPos"/>
+                                    <order-by field-name="description"/>
+                                </entity-find>
+                            </entity-options>
+                        </drop-down>
+                    </default-field>
+                </field>
+                <field name="productStoreId">
+                    <default-field title="Referrer" validate-service="mkdecision.dashboard.OrderServices.store#Order">
+                        <drop-down required-manual-select="true">
+                            <entity-options key="${productStoreId}" text="${productStoreId}: ${storeName}">
+                                <entity-find entity-name="mantle.product.store.ProductStore">
+                                    <econdition field-name="productStoreId" operator="in" from="productStoreIdSet"/>
+                                    <order-by field-name="storeName"/>
+                                </entity-find>
+                            </entity-options>
+                        </drop-down>
+                    </default-field>
+                </field>
+                <field name="salesRepresentativeId">
+                    <default-field title="Sales Representative" validate-service="mkdecision.dashboard.OrderServices.store#Order">
+                        <drop-down required-manual-select="true">
+                            <dynamic-options transition="getStoreSalesReps">
+                                <depends-on field="productStoreId"/>
+                            </dynamic-options>
+                        </drop-down>
+                    </default-field>
+                </field>
+
+                <field name="productHeader">
+                    <default-field>
+                        <label text="Product Details" type="h5" style="margin-tb-1"/>
+                        <label text="Please specify product details." style="margin-b-1"/>
+                        <container style="h-separator margin-tb-2"/>
+                    </default-field>
+                </field>
+                <field name="productCategoryId">
+                    <default-field title="Merchandise" validate-service="mkdecision.dashboard.OrderServices.store#Order">
+                        <drop-down required-manual-select="true">
+                            <dynamic-options transition="getStoreProductCategories">
+                                <depends-on field="productStoreId"/>
+                            </dynamic-options>
+                        </drop-down>
+                    </default-field>
+                </field>
+                <field name="productId">
+                    <default-field title="Product" validate-service="mkdecision.dashboard.OrderServices.store#Order">
+                        <drop-down required-manual-select="true">
+                            <dynamic-options transition="getStoreProducts">
+                                <depends-on field="productStoreId"/>
+                                <depends-on field="productCategoryId"/>
+                            </dynamic-options>
+                        </drop-down>
+                    </default-field>
+                </field>
+                <field name="totalPurchaseAmount">
+                    <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order">
+                        <text-line input-type="number" format="#.##" prefix="$"/>
+                    </default-field>
+                </field>
+                <field name="downPayment">
+                    <default-field validate-service="mkdecision.dashboard.OrderServices.store#Order">
+                        <text-line input-type="number" format="#.##" prefix="$"/>
+                    </default-field>
+                </field>
+                <field name="netPurchaseAmount">
+                    <default-field>
+                        <text-line format="#.##" prefix="$" default-transition="calculateNetPurchaseAmount" disabled="true">
+                            <depends-on field="totalPurchaseAmount"/>
+                            <depends-on field="downPayment"/>
+                        </text-line>
+                    </default-field>
+                </field>
+                <field name="loanFee">
+                    <default-field>
+                        <text-line format="#.##" prefix="$" default-transition="calculateLoanFee" disabled="true">
+                            <depends-on field="productStoreId"/>
+                            <depends-on field="productId"/>
+                        </text-line>
+                    </default-field>
+                </field>
+                <field name="financedAmount">
+                    <default-field title="Amount Financed">
+                        <text-line format="#.##" prefix="$" default-transition="calculateFinancedAmount" disabled="true">
+                            <depends-on field="totalPurchaseAmount"/>
+                            <depends-on field="downPayment"/>
+                            <depends-on field="loanFee"/>
+                        </text-line>
+                    </default-field>
+                </field>
+                <field name="estimatedPayment">
+                    <default-field>
+                        <text-line format="#.##" prefix="$" default-transition="calculateEstimatedPayment" disabled="true">
+                            <depends-on field="productId"/>
+                            <depends-on field="totalPurchaseAmount"/>
+                            <depends-on field="downPayment"/>
+                            <depends-on field="loanFee"/>
+                        </text-line>
+                    </default-field>
+                </field>
+
+                <field name="cancelButton">
+                    <default-field>
+                        <link url="cancelOrder" text="Cancel"/>
+                    </default-field>
+                </field>
+                <field name="submitButton">
+                    <default-field title="Continue">
+                        <submit/>
+                    </default-field>
+                </field>
+
+                <field-layout>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="applicationHeader"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="salesChannelEnumId"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="productStoreId"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="salesRepresentativeId"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="productHeader"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="productCategoryId"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="productId"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="totalPurchaseAmount"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="downPayment"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="netPurchaseAmount"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="loanFee"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="financedAmount"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="estimatedPayment"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+
+                    <fields-not-referenced/>
+
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="cancelButton"/></field-col>
+                        <field-col xs="6" sm="5" md="3" lg="3" style="text-right"><field-ref name="submitButton"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                </field-layout>
+            </form-single>
+        </container>
+    </widgets>
+
+</screen>

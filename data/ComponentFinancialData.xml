@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed">
+
+    <!-- Product parameters -->
+    <mantle.product.ProductParameter productParameterId="ProductCategory" description="Product Category"/>
+    <mantle.product.ProductParameter productParameterId="TotalPurchaseAmount" description="Total Purchase Amount"/>
+    <mantle.product.ProductParameter productParameterId="DownPayment" description="Down Payment"/>
+    <mantle.product.ProductParameter productParameterId="NetPurchaseAmount" description="Net Purchase Amount"/>
+    <mantle.product.ProductParameter productParameterId="LoanFee" description="Loan Fee"/>
+    <mantle.product.ProductParameter productParameterId="FinancedAmount" description="Financed Amount"/>
+    <mantle.product.ProductParameter productParameterId="EstimatedPayment" description="Estimated Payment"/>
+
+    <!-- Financial flow types -->
+    <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowAnnualInsuranceCosts" description="Annual Insurance Costs"/>
+    <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowAnnualPropertyTaxes" description="Annual Property Taxes"/>
+    <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowHoaMonthlyFee" description="HOA Monthly Fee"/>
+
+    <!-- Income sources -->
+    <moqui.basic.Enumeration enumTypeId="EnumGroup" enumId="DefaultDashboardIncomeSourceGroup" description="Default Dashboard Income Source Group"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowAlimony"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowRent"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowRetirement"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowBonus"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowSocialSecurity"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowChildSupport"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowDisability"/>
+    <moqui.basic.EnumGroupMember enumGroupEnumId="DefaultDashboardIncomeSourceGroup" enumId="MkFinFlowOther"/>
+
+</entity-facade-xml>
