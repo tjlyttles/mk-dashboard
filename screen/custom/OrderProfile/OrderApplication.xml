@@ -213,6 +213,13 @@
                     <set field="postalCode" from="postalAddress?.postalCode ?: null"/>
                     <set field="city" from="postalAddress?.city ?: null"/>
                     <set field="stateProvinceGeoId" from="postalAddress?.stateProvinceGeoId ?: null"/>
+                    <set field="usedSince" from="postalAddress?.usedSince ?: null"/>
+                    <if condition="usedSince">
+                        <set field="millis" from="Math.abs(usedSince.getTime() - ec.user.nowTimestamp.getTime())"/>
+                        <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
+                        <set field="addressYears" from="Math.floor(days / 365)" type="Integer"/>
+                        <set field="addressMonths" from="Math.floor(days / 30.4) - (addressYears * 12)" type="Integer"/>
+                    </if>
                     <set field="email" from="emailAddress"/>
                     <set field="emailVerify" from="emailAddress"/>
                 </actions>

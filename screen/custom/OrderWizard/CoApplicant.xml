@@ -81,6 +81,13 @@
             <set field="postalCode" from="postalAddress?.postalCode ?: ''"/>
             <set field="city" from="postalAddress?.city ?: ''"/>
             <set field="stateProvinceGeoId" from="postalAddress?.stateProvinceGeoId ?: ''"/>
+            <set field="usedSince" from="postalAddress?.usedSince ?: ''"/>
+            <if condition="usedSince">
+                <set field="millis" from="Math.abs(usedSince.getTime() - ec.user.nowTimestamp.getTime())"/>
+                <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
+                <set field="addressYears" from="Math.floor(days / 365)" type="Integer"/>
+                <set field="addressMonths" from="Math.floor(days / 30.4) - (addressYears * 12)" type="Integer"/>
+            </if>
 
             <set field="email" from="emailAddress"/>
             <set field="emailVerify" from="emailAddress"/>
@@ -227,6 +234,22 @@
                         </drop-down>
                     </default-field>
                 </field>
+                <field name="addressDurationHeader">
+                    <default-field>
+                        <label text="Address Duration" type="h5" style="margin-tb-1"/>
+                        <container style="h-separator margin-tb-1"/>
+                    </default-field>
+                </field>
+                <field name="addressYears">
+                    <default-field title="Years">
+                        <text-line input-type="number"/>
+                    </default-field>
+                </field>
+                <field name="addressMonths">
+                    <default-field title="Months">
+                        <text-line input-type="number"/>
+                    </default-field>
+                </field>
 
                 <field name="contactHeader">
                     <default-field>
@@ -334,6 +357,19 @@
                         <field-col xs="0" sm="1" md="3" lg="3"/>
                         <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="city"/></field-col>
                         <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="stateProvinceGeoId"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6">
+                            <field-ref name="addressDurationHeader"/>
+                        </field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="addressYears"/></field-col>
+                        <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="addressMonths"/></field-col>
                         <field-col xs="0" sm="1" md="3" lg="3"/>
                     </field-col-row>
 

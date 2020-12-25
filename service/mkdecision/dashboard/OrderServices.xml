@@ -178,6 +178,12 @@
                 <matches regexp="^[- A-Za-z'.]+$" message="Please enter a city using only letters, spaces, periods, apostrophes or hyphens."/>
             </parameter>
             <parameter name="stateProvinceGeoId" required="true"/>
+            <parameter name="addressYears" type="Integer"  required="true">
+                <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
+            </parameter>
+            <parameter name="addressMonths" type="Integer"  required="true">
+                <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
+            </parameter>
             <parameter name="socialSecurityNumber" required="true">
                 <matches regexp="^\d{3}-\d{2}-\d{4}$" message="Please enter a valid social security number."/>
             </parameter>
