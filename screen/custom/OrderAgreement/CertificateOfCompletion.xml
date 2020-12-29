@@ -91,9 +91,7 @@
                 <row-col xs="0" sm="1" md="3" lg="3"/>
                 <row-col xs="12" sm="10" md="6" lg="6">
                     <render-mode>
-                        <text type="html,vuet,qvt">
-                            ${agreementText}
-                        </text>
+                        <text type="html,vuet,qvt">${agreementText}</text>
                     </render-mode>
                 </row-col>
                 <row-col xs="0" sm="1" md="3" lg="3"/>
@@ -115,7 +113,7 @@
                 <row-col xs="0" sm="1" md="3" lg="3"/>
                 <row-col xs="12" sm="10" md="6" lg="6">
                     <link url="signAgreement" text="Sign and Continue"
-                          parameter-map="[productId: productId,templateLocation: templateLocation, serviceName: serviceName]"/>
+                          parameter-map="[productId: productId, templateLocation: templateLocation, serviceName: serviceName]"/>
                     <link url="orderProfile" text="Cancel"/>
                 </row-col>
                 <row-col xs="0" sm="1" md="3" lg="3"/>
