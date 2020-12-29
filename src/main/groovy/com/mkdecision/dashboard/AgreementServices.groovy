@@ -95,12 +95,14 @@ class AgreementServices {
         UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
         L10nFacade lf = ec.getL10n()
-        ResourceFacade rf = ec.getResource()
 
         // get the parameters
         String orderId = (String) cs.getOrDefault("orderId", null)
         String agreementTypeEnumId = (String) cs.getOrDefault("agreementTypeEnumId", null)
+        String templateLocation = (String) cs.getOrDefault("templateLocation", null)
+        String agreementServiceGenerator = (String) cs.getOrDefault("serviceName", null)
         String partyId = uf.userAccount.getString("partyId")
+        String textData = getAgreementText(sf, orderId , templateLocation, agreementServiceGenerator)
 
         // validate order
         EntityValue orderHeader = ef.find("mantle.order.OrderHeader")
@@ -130,7 +132,7 @@ class AgreementServices {
                 .parameter("organizationRoleTypeId", "Vendor")
                 .parameter("agreementDate", uf.nowTimestamp)
                 .parameter("fromDate", uf.nowTimestamp)
-                .parameter("textData", rf.getLocationText("component://mk-dashboard/template/OrderAgreement/CertificateOfCompletion.html",false))
+                .parameter("textData", textData)
                 .call()
 
         String agreementId = (String) agreementResp.get("agreementId")
@@ -163,5 +165,23 @@ class AgreementServices {
         outParams.put("partyId", partyId)
         outParams.put("agreementId", agreementId)
         return outParams
+    }
+
+    static String getAgreementText(ServiceFacade sf, String orderId, String templateLocation, String agreementServiceGenerator = null){
+        Map<String, Object> agreementParameter = [:]
+
+        if (agreementServiceGenerator){
+            agreementParameter = sf.sync().name(agreementServiceGenerator)
+                .parameter("orderId", orderId)
+                .call()
+        }
+
+        Map<String, Object> agreement = sf.sync().name("close.AgreementServices.create#AgreementText")
+                .parameter("templateLocation", templateLocation)
+                .parameter("templateParameters", agreementParameter)
+                .call()
+
+        return agreement.textData
+
     }
 }
