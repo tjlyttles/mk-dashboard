@@ -5,6 +5,7 @@ import org.apache.commons.lang3.time.DateUtils
 import org.moqui.context.ExecutionContext
 import org.moqui.context.L10nFacade
 import org.moqui.context.MessageFacade
+import org.moqui.context.ResourceFacade
 import org.moqui.context.UserFacade
 import org.moqui.entity.*
 import org.moqui.impl.entity.EntityFacadeImpl
@@ -94,6 +95,7 @@ class AgreementServices {
         UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
         L10nFacade lf = ec.getL10n()
+        ResourceFacade rf = ec.getResource()
 
         // get the parameters
         String orderId = (String) cs.getOrDefault("orderId", null)
@@ -123,12 +125,14 @@ class AgreementServices {
         // create agreement
         Map<String, Object> agreementResp = sf.sync().name("create#mantle.party.agreement.Agreement")
                 .parameter("agreementTypeEnumId", agreementTypeEnumId)
+                .parameter("statusId", "MkAgreeExecuted")
                 .parameter("organizationPartyId", productStore.getString("organizationPartyId"))
                 .parameter("organizationRoleTypeId", "Vendor")
-                .parameter("otherPartyId", orderPart.getString("customerPartyId"))
-                .parameter("otherRoleTypeId", "PrimaryApplicant")
-                .parameter("textData", "")
+                .parameter("agreementDate", uf.nowTimestamp)
+                .parameter("fromDate", uf.nowTimestamp)
+                .parameter("textData", rf.getLocationText("component://mk-dashboard/template/OrderAgreement/CertificateOfCompletion.html",false))
                 .call()
+
         String agreementId = (String) agreementResp.get("agreementId")
 
         // create agreement party
