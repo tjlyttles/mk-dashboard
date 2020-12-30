@@ -32,7 +32,7 @@
                                 <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
                                 <set field="employerName" from="employmentRelation.organizationName"/>
                                 <set field="jobTitle" from="employmentRelation.relationshipName"/>
-                                <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
+                                <set field="employmentStatusEnumId" from="employmentStatusSetting?.settingValue"/>
                                 <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
                                 <set field="millis" from="Math.abs(employmentRelation.fromDate.getTime() - ec.user.nowTimestamp.getTime())"/>
                                 <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
@@ -101,7 +101,7 @@
                                 <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
                                 <set field="employerName" from="employmentRelation.organizationName"/>
                                 <set field="jobTitle" from="employmentRelation.relationshipName"/>
-                                <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
+                                <set field="employmentStatusEnumId" from="employmentStatusSetting?.settingValue"/>
                                 <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
                                 <set field="fromDate" from="ec.l10n.format(employmentRelation.fromDate, 'MM-dd-yyyy') ?: null"/>
                                 <set field="toDate" from="ec.l10n.format(employmentRelation.thruDate, 'MM-dd-yyyy') ?: null"/>
@@ -384,7 +384,7 @@
                         <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
                         <set field="employerName" from="employmentRelation.organizationName"/>
                         <set field="jobTitle" from="employmentRelation.relationshipName"/>
-                        <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
+                        <set field="employmentStatusEnumId" from="employmentStatusSetting?.settingValue"/>
                         <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
                         <set field="millis" from="Math.abs(employmentRelation.fromDate.getTime() - ec.user.nowTimestamp.getTime())"/>
                         <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
@@ -499,7 +499,7 @@
 
                         <set field="employerClassificationId" from="partyClassList?.getFirst()?.partyClassificationId ?: null"/>
                         <set field="employerName" from="employmentRelation.organizationName"/>
-                        <set field="employmentStatusEnumId" from="employmentStatusSetting.settingValue"/>
+                        <set field="employmentStatusEnumId" from="employmentStatusSetting?.settingValue"/>
                         <set field="monthlyIncome" from="monthlyIncomeFinFlowList?.getFirst()?.amount ?: null"/>
                         <set field="jobTitle" from="employmentRelation.relationshipName"/>
                         <set field="fromDate" from="ec.l10n.format(employmentRelation.fromDate, 'MM-dd-yyyy')"/>
