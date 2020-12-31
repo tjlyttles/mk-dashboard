@@ -5,6 +5,7 @@ import org.apache.commons.lang3.time.DateUtils
 import org.moqui.context.ExecutionContext
 import org.moqui.context.L10nFacade
 import org.moqui.context.MessageFacade
+import org.moqui.context.ResourceFacade
 import org.moqui.context.UserFacade
 import org.moqui.entity.*
 import org.moqui.impl.entity.EntityFacadeImpl
@@ -98,7 +99,10 @@ class AgreementServices {
         // get the parameters
         String orderId = (String) cs.getOrDefault("orderId", null)
         String agreementTypeEnumId = (String) cs.getOrDefault("agreementTypeEnumId", null)
+        String templateLocation = (String) cs.getOrDefault("templateLocation", null)
+        String agreementServiceGenerator = (String) cs.getOrDefault("serviceName", null)
         String partyId = uf.userAccount.getString("partyId")
+        String textData = getAgreementText(sf, orderId , templateLocation, agreementServiceGenerator)
 
         // validate order
         EntityValue orderHeader = ef.find("mantle.order.OrderHeader")
@@ -123,12 +127,14 @@ class AgreementServices {
         // create agreement
         Map<String, Object> agreementResp = sf.sync().name("create#mantle.party.agreement.Agreement")
                 .parameter("agreementTypeEnumId", agreementTypeEnumId)
+                .parameter("statusId", "MkAgreeExecuted")
                 .parameter("organizationPartyId", productStore.getString("organizationPartyId"))
                 .parameter("organizationRoleTypeId", "Vendor")
-                .parameter("otherPartyId", orderPart.getString("customerPartyId"))
-                .parameter("otherRoleTypeId", "PrimaryApplicant")
-                .parameter("textData", "")
+                .parameter("agreementDate", uf.nowTimestamp)
+                .parameter("fromDate", uf.nowTimestamp)
+                .parameter("textData", textData)
                 .call()
+
         String agreementId = (String) agreementResp.get("agreementId")
 
         // create agreement party
@@ -159,5 +165,23 @@ class AgreementServices {
         outParams.put("partyId", partyId)
         outParams.put("agreementId", agreementId)
         return outParams
+    }
+
+    static String getAgreementText(ServiceFacade sf, String orderId, String templateLocation, String agreementServiceGenerator = null){
+        Map<String, Object> agreementParameter = [:]
+
+        if (agreementServiceGenerator){
+            agreementParameter = sf.sync().name(agreementServiceGenerator)
+                .parameter("orderId", orderId)
+                .call()
+        }
+
+        Map<String, Object> agreement = sf.sync().name("close.AgreementServices.create#AgreementText")
+                .parameter("templateLocation", templateLocation)
+                .parameter("templateParameters", agreementParameter)
+                .call()
+
+        return agreement.textData
+
     }
 }

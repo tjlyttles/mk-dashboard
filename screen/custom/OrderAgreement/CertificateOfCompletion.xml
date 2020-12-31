@@ -18,6 +18,8 @@
             <service-call name="mkdecision.dashboard.AgreementServices.sign#OrderAgreement">
                 <field-map field-name="orderId" from="orderId"/>
                 <field-map field-name="agreementTypeEnumId" value="MkAgrCertificateOfCompletion"/>
+                <field-map field-name="templateLocation"/>
+                <field-map field-name="serviceName"/>
             </service-call>
 
             <entity-find-count entity-name="mk.close.ProductAgreement" count-field="assignmentCount">
@@ -51,6 +53,29 @@
         <default-response url="../../OrderProfile"/>
     </transition>
 
+    <actions>
+        <entity-find-one entity-name="mantle.order.OrderItem" value-field="orderItem"/>
+        <set field="productId" from="orderItem.productId"/>
+
+        <entity-find-one entity-name="mk.close.ProductAgreement" value-field="cocAgreement">
+            <field-map field-name="productId" from="productId"/>
+            <field-map field-name="agreementTypeEnumId" value="MkAgrCertificateOfCompletion"/>
+            <field-map field-name="partyRoleTypeId" value="FinanceManager"/>
+        </entity-find-one>
+        <entity-find-one entity-name="moqui.service.ServiceRegister" value-field="service">
+            <field-map field-name="serviceRegisterId" from="cocAgreement.serviceRegisterId"/>
+        </entity-find-one>
+        <set field="templateLocation" from="cocAgreement.templateLocation"/>
+
+        <if condition="service">
+            <set field="serviceName" from="service.serviceName"/>
+            <service-call name="${serviceName}" in-map="[orderId: orderId]" out-map="agreementParams"/>
+        </if>
+
+        <service-call name="close.AgreementServices.create#AgreementText" in-map="[templateLocation: templateLocation, templateParameters: agreementParams]" out-map="agreement"/>
+        <set field="agreementText" from="agreement.textData"/>
+    </actions>
+
     <widgets>
         <container>
             <container-row>
@@ -66,7 +91,7 @@
                 <row-col xs="0" sm="1" md="3" lg="3"/>
                 <row-col xs="12" sm="10" md="6" lg="6">
                     <render-mode>
-                        <text type="html,vuet,qvt" location="component://mk-dashboard/template/OrderAgreement/CertificateOfCompletion.html"/>
+                        <text type="html,vuet,qvt">${agreementText}</text>
                     </render-mode>
                 </row-col>
                 <row-col xs="0" sm="1" md="3" lg="3"/>
@@ -87,7 +112,8 @@
             <container-row style="margin-b-2">
                 <row-col xs="0" sm="1" md="3" lg="3"/>
                 <row-col xs="12" sm="10" md="6" lg="6">
-                    <link url="signAgreement" text="Sign and Continue"/>
+                    <link url="signAgreement" text="Sign and Continue"
+                          parameter-map="[productId: productId, templateLocation: templateLocation, serviceName: serviceName]"/>
                     <link url="orderProfile" text="Cancel"/>
                 </row-col>
                 <row-col xs="0" sm="1" md="3" lg="3"/>
