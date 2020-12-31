@@ -102,7 +102,7 @@ class AgreementServices {
         String templateLocation = (String) cs.getOrDefault("templateLocation", null)
         String agreementServiceGenerator = (String) cs.getOrDefault("serviceName", null)
         String partyId = uf.userAccount.getString("partyId")
-        String textData = getAgreementText(sf, orderId , templateLocation, agreementServiceGenerator)
+        String textData = getAgreementText(sf, orderId, templateLocation, agreementServiceGenerator)
 
         // validate order
         EntityValue orderHeader = ef.find("mantle.order.OrderHeader")
@@ -115,9 +115,9 @@ class AgreementServices {
 
         // find order part
         EntityValue orderPart = ef.find("mantle.order.OrderPart")
-            .condition("orderId", orderId)
-            .condition("orderPartSeqId", "01")
-            .one()
+                .condition("orderId", orderId)
+                .condition("orderPartSeqId", "01")
+                .one()
 
         // find product store
         EntityValue productStore = ef.find("mantle.product.store.ProductStore")
@@ -134,15 +134,14 @@ class AgreementServices {
                 .parameter("fromDate", uf.nowTimestamp)
                 .parameter("textData", textData)
                 .call()
-
         String agreementId = (String) agreementResp.get("agreementId")
 
         // create agreement party
         sf.sync().name("create#mantle.party.agreement.AgreementParty")
-            .parameter("agreementId", agreementId)
-            .parameter("partyId", partyId)
-            .parameter("roleTypeId", "FinanceManager")
-            .call()
+                .parameter("agreementId", agreementId)
+                .parameter("partyId", partyId)
+                .parameter("roleTypeId", "FinanceManager")
+                .call()
 
         // create order agreement
         sf.sync().name("create#mantle.order.OrderAgreement")
@@ -153,11 +152,11 @@ class AgreementServices {
 
         // sign agreement
         sf.sync().name("create#mantle.party.agreement.AgreementSignature")
-            .parameter("agreementId", agreementId)
-            .parameter("partyId", uf.userAccount.getString("partyId"))
-            .parameter("signatureDate", uf.nowTimestamp)
-            .parameter("visitId", uf.visitId)
-            .call()
+                .parameter("agreementId", agreementId)
+                .parameter("partyId", uf.userAccount.getString("partyId"))
+                .parameter("signatureDate", uf.nowTimestamp)
+                .parameter("visitId", uf.visitId)
+                .call()
 
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()
@@ -167,21 +166,23 @@ class AgreementServices {
         return outParams
     }
 
-    static String getAgreementText(ServiceFacade sf, String orderId, String templateLocation, String agreementServiceGenerator = null){
-        Map<String, Object> agreementParameter = [:]
+    static String getAgreementText(ServiceFacade sf, String orderId, String templateLocation, String agreementServiceGenerator = null) {
 
-        if (agreementServiceGenerator){
-            agreementParameter = sf.sync().name(agreementServiceGenerator)
-                .parameter("orderId", orderId)
-                .call()
+        // generate template parameters
+        Map<String, Object> templateParameters = [:]
+        if (agreementServiceGenerator) {
+            templateParameters = sf.sync().name(agreementServiceGenerator)
+                    .parameter("orderId", orderId)
+                    .call()
         }
 
+        // create agreement text
         Map<String, Object> agreement = sf.sync().name("close.AgreementServices.create#AgreementText")
                 .parameter("templateLocation", templateLocation)
-                .parameter("templateParameters", agreementParameter)
+                .parameter("templateParameters", templateParameters)
                 .call()
 
+        // return agreement text
         return agreement.textData
-
     }
 }

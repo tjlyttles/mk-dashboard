@@ -425,7 +425,7 @@
                     </service-call>
                 </row-actions>
                 <field name="roleType">
-                    <default-field title="Role">
+                    <default-field title="Role" container-style="">
                         <display text="${roleType.description}"/>
                     </default-field>
                 </field>

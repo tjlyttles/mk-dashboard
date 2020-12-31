@@ -112,8 +112,7 @@
             <container-row style="margin-b-2">
                 <row-col xs="0" sm="1" md="3" lg="3"/>
                 <row-col xs="12" sm="10" md="6" lg="6">
-                    <link url="signAgreement" text="Sign and Continue"
-                          parameter-map="[productId: productId, templateLocation: templateLocation, serviceName: serviceName]"/>
+                    <link url="signAgreement" text="Sign and Continue" parameter-map="[productId: productId, templateLocation: templateLocation, serviceName: serviceName]"/>
                     <link url="orderProfile" text="Cancel"/>
                 </row-col>
                 <row-col xs="0" sm="1" md="3" lg="3"/>

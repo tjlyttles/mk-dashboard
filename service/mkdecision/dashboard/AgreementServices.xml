@@ -16,7 +16,6 @@
             <parameter name="userPending" type="Long"/>
         </out-parameters>
     </service>
-
     <service verb="sign" noun="OrderAgreement" type="java" location="com.mkdecision.dashboard.AgreementServices" method="signOrderAgreement">
         <in-parameters>
             <parameter name="orderId"/>

@@ -40,7 +40,6 @@
             <entity-find-count entity-name="mk.close.ProductAgreement" count-field="cocCount">
                 <econdition field-name="productId" from="productId"/>
                 <econdition field-name="agreementTypeEnumId" value="MkAgrCertificateOfCompletion"/>
-                <econdition field-name="partyRoleTypeId" value="FinanceManager"/>
                 <econdition field-name="orderStatusId" from="orderHeader.statusId"/>
             </entity-find-count>
             <entity-find entity-name="mantle.order.OrderAgreementDetail" list="cocAgreementList">
@@ -56,7 +55,6 @@
             <entity-find-count entity-name="mk.close.ProductAgreement" count-field="assignmentCount">
                 <econdition field-name="productId" from="productId"/>
                 <econdition field-name="agreementTypeEnumId" value="MkAgrAssignment"/>
-                <econdition field-name="partyRoleTypeId" value="FinanceManager"/>
                 <econdition field-name="orderStatusId" from="orderHeader.statusId"/>
             </entity-find-count>
             <entity-find entity-name="mantle.order.OrderAgreementDetail" list="assignmentAgreementList">
