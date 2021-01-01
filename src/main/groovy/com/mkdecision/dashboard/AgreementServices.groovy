@@ -124,6 +124,12 @@ class AgreementServices {
                 .condition("productStoreId", orderHeader.getString("productStoreId"))
                 .one()
 
+        // find all the coApplicant on the order for AgreementParty
+        EntityList orderPartParty = ef.find("mantle.order.OrderPartParty")
+                .condition("orderId", orderId)
+                .condition("roleTypeId", "in", "CoApplicant")
+                .list()
+
         // create agreement
         Map<String, Object> agreementResp = sf.sync().name("create#mantle.party.agreement.Agreement")
                 .parameter("agreementTypeEnumId", agreementTypeEnumId)
@@ -141,6 +147,14 @@ class AgreementServices {
             .parameter("partyId",orderPart.getString("customerPartyId") )
             .parameter("roleTypeId", "PrimaryApplicant")
             .call()
+
+        orderPartParty.each{party ->
+            sf.sync().name("create#mantle.party.agreement.AgreementParty")
+                .parameter("agreementId", agreementId)
+                .parameter("partyId",party.getString("partyId") )
+                .parameter("roleTypeId", "CoApplicant")
+                .call()
+        }
 
         sf.sync().name("create#mantle.order.OrderAgreement")
                 .parameter("orderId", orderId)
