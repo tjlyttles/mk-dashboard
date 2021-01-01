@@ -136,16 +136,16 @@ class AgreementServices {
                 .call()
         String agreementId = (String) agreementResp.get("agreementId")
 
+        sf.sync().name("create#mantle.party.agreement.AgreementParty")
+            .parameter("agreementId", agreementId)
+            .parameter("partyId",orderPart.getString("customerPartyId") )
+            .parameter("roleTypeId", "PrimaryApplicant")
+            .call()
+
         sf.sync().name("create#mantle.order.OrderAgreement")
                 .parameter("orderId", orderId)
                 .parameter("orderPartSeqId", orderPart.getString("orderPartSeqId"))
                 .parameter("agreementId", agreementId)
-                .call()
-        
-        sf.sync().name("create#mantle.party.agreement.AgreementParty")
-                .parameter("agreementId", agreementId)
-                .parameter("partyId",orderPart.getString("customerPartyId") )
-                .parameter("roleTypeId", "PrimaryApplicant")
                 .call()
 
         sf.sync().name("close.AgreementServices.sign#AgreementWithRole")
