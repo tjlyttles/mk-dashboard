@@ -127,7 +127,7 @@ class AgreementServices {
         // create agreement
         Map<String, Object> agreementResp = sf.sync().name("create#mantle.party.agreement.Agreement")
                 .parameter("agreementTypeEnumId", agreementTypeEnumId)
-                .parameter("statusId", "MkAgreeExecuted")
+                .parameter("statusId", "MkAgreeDraft")
                 .parameter("organizationPartyId", productStore.getString("organizationPartyId"))
                 .parameter("organizationRoleTypeId", "Vendor")
                 .parameter("agreementDate", uf.nowTimestamp)
@@ -136,26 +136,22 @@ class AgreementServices {
                 .call()
         String agreementId = (String) agreementResp.get("agreementId")
 
-        // create agreement party
-        sf.sync().name("create#mantle.party.agreement.AgreementParty")
-                .parameter("agreementId", agreementId)
-                .parameter("partyId", partyId)
-                .parameter("roleTypeId", "FinanceManager")
-                .call()
-
-        // create order agreement
         sf.sync().name("create#mantle.order.OrderAgreement")
                 .parameter("orderId", orderId)
                 .parameter("orderPartSeqId", orderPart.getString("orderPartSeqId"))
                 .parameter("agreementId", agreementId)
                 .call()
-
-        // sign agreement
-        sf.sync().name("create#mantle.party.agreement.AgreementSignature")
+        
+        sf.sync().name("create#mantle.party.agreement.AgreementParty")
                 .parameter("agreementId", agreementId)
-                .parameter("partyId", uf.userAccount.getString("partyId"))
-                .parameter("signatureDate", uf.nowTimestamp)
-                .parameter("visitId", uf.visitId)
+                .parameter("partyId",orderPart.getString("customerPartyId") )
+                .parameter("roleTypeId", "PrimaryApplicant")
+                .call()
+
+        sf.sync().name("close.AgreementServices.sign#AgreementWithRole")
+                .parameter("agreementId", agreementId)
+                .parameter("partyId", partyId)
+                .parameter("roleTypeId", "FinanceManager")
                 .call()
 
         // return the output parameters
