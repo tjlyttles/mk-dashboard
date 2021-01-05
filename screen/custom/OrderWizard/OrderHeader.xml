@@ -370,11 +370,11 @@
 
                 <field name="cancelButton">
                     <default-field>
-                        <link url="cancelOrder" text="Cancel"/>
+                        <link url="cancelOrder" text="Cancel" style="text-black"/>
                     </default-field>
                 </field>
                 <field name="submitButton">
-                    <default-field title="Continue">
+                    <default-field title="Continue" container-style="text-primary">
                         <submit/>
                     </default-field>
                 </field>
