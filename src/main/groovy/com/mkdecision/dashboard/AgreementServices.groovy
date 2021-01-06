@@ -124,10 +124,16 @@ class AgreementServices {
                 .condition("productStoreId", orderHeader.getString("productStoreId"))
                 .one()
 
+        // find all the coApplicant on the order for AgreementParty
+        EntityList orderPartParty = ef.find("mantle.order.OrderPartParty")
+                .condition("orderId", orderId)
+                .condition("roleTypeId", "in", "CoApplicant")
+                .list()
+
         // create agreement
         Map<String, Object> agreementResp = sf.sync().name("create#mantle.party.agreement.Agreement")
                 .parameter("agreementTypeEnumId", agreementTypeEnumId)
-                .parameter("statusId", "MkAgreeExecuted")
+                .parameter("statusId", "MkAgreeDraft")
                 .parameter("organizationPartyId", productStore.getString("organizationPartyId"))
                 .parameter("organizationRoleTypeId", "Vendor")
                 .parameter("agreementDate", uf.nowTimestamp)
@@ -136,26 +142,30 @@ class AgreementServices {
                 .call()
         String agreementId = (String) agreementResp.get("agreementId")
 
-        // create agreement party
         sf.sync().name("create#mantle.party.agreement.AgreementParty")
-                .parameter("agreementId", agreementId)
-                .parameter("partyId", partyId)
-                .parameter("roleTypeId", "FinanceManager")
-                .call()
+            .parameter("agreementId", agreementId)
+            .parameter("partyId",orderPart.getString("customerPartyId") )
+            .parameter("roleTypeId", "PrimaryApplicant")
+            .call()
 
-        // create order agreement
+        orderPartParty.each{party ->
+            sf.sync().name("create#mantle.party.agreement.AgreementParty")
+                .parameter("agreementId", agreementId)
+                .parameter("partyId",party.getString("partyId") )
+                .parameter("roleTypeId", "CoApplicant")
+                .call()
+        }
+
         sf.sync().name("create#mantle.order.OrderAgreement")
                 .parameter("orderId", orderId)
                 .parameter("orderPartSeqId", orderPart.getString("orderPartSeqId"))
                 .parameter("agreementId", agreementId)
                 .call()
 
-        // sign agreement
-        sf.sync().name("create#mantle.party.agreement.AgreementSignature")
+        sf.sync().name("close.AgreementServices.sign#AgreementWithRole")
                 .parameter("agreementId", agreementId)
-                .parameter("partyId", uf.userAccount.getString("partyId"))
-                .parameter("signatureDate", uf.nowTimestamp)
-                .parameter("visitId", uf.visitId)
+                .parameter("partyId", partyId)
+                .parameter("roleTypeId", "FinanceManager")
                 .call()
 
         // return the output parameters
