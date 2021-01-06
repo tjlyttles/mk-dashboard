@@ -68,8 +68,8 @@
                 </field>
 
                 <field name="buttons">
-                    <default-field title="Submit">
-                        <link url="openOrder" text="Save"/>
+                    <default-field title="Submit" container-style="text-primary">
+                        <link url="openOrder" text="Save" style="text-black"/>
                         <submit/>
                     </default-field>
                 </field>
