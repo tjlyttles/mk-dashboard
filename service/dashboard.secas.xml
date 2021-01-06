@@ -5,7 +5,7 @@
     <!-- Order service validation -->
     <seca service="mkdecision\.dashboard\.OrderServices\.(.+)" name-is-pattern="true" when="pre-service">
         <actions>
-            <if condition="orderId != null">
+            <if condition="orderId != null &amp;&amp; !orderId.trim().equals('')">
                 <set field="editableOrderState" from="[
                     'OrderOpen',
                     'OrderRequested',
@@ -28,7 +28,7 @@
                     'OrderSent',
                     'OrderWishList']"/>
                 <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
-                <if condition="!editableOrderState.contains(orderHeader.statusId)">
+                <if condition="orderHeader != null &amp;&amp; !editableOrderState.contains(orderHeader.statusId)">
                     <return error="true" message="${ec.getL10n().localize('DASHBOARD_ORDER_NOT_EDITABLE')}"/>
                 </if>
             </if>
