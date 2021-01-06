@@ -28,7 +28,7 @@
                     'OrderSent',
                     'OrderWishList']"/>
                 <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
-                <if condition="!editableOrderState.contains(orderHeader.statusId)">
+                <if condition="orderHeader !=null &amp;&amp; !editableOrderState.contains(orderHeader.statusId)">
                     <return error="true" message="${ec.getL10n().localize('DASHBOARD_ORDER_NOT_EDITABLE')}"/>
                 </if>
             </if>
