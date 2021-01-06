@@ -116,7 +116,7 @@
                     </default-field>
                 </field>
                 <field name="middleName">
-                    <default-field title="M.I (Optional)">
+                    <default-field title="Middle Name (Optional)">
                         <text-line/>
                     </default-field>
                 </field>

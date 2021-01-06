@@ -160,7 +160,7 @@
                 <matches regexp="^[- A-Za-z']+$" message="Please enter a first name."/>
             </parameter>
             <parameter name="middleName">
-                <matches regexp="^[- A-Za-z']{1}$" message="Please enter a middle initial using only letters."/>
+                <matches regexp="^[- A-Za-z']+$" message="Please enter a middle initial using only letters."/>
             </parameter>
             <parameter name="lastName" required="true">
                 <matches regexp="^[- A-Za-z']+$" message="Please enter a last name."/>
