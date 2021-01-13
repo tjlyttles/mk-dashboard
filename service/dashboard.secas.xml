@@ -6,30 +6,24 @@
     <seca service="mkdecision\.dashboard\.OrderServices\.(.+)" name-is-pattern="true" when="pre-service">
         <actions>
             <if condition="orderId != null &amp;&amp; !orderId.trim().equals('')">
-                <set field="editableOrderState" from="[
-                    'OrderOpen',
-                    'OrderRequested',
-                    'OrderProposed',
-                    'OrderApproved',
-                    'OrderAutoReorder',
-                    'OrderBeingChanged',
-                    'OrderCancelled',
-                    'OrderCancelledTest',
-                    'OrderCompleted',
-                    'OrderConditionalApproved',
-                    'OrderCustomerProcessing',
-                    'OrderFundingRequested',
-                    'OrderGiftRegistry',
-                    'OrderHold',
-                    'OrderPendingRejected',
-                    'OrderPlaced',
-                    'OrderProcessing',
-                    'OrderRejected',
-                    'OrderSent',
-                    'OrderWishList']"/>
                 <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
-                <if condition="orderHeader != null &amp;&amp; !editableOrderState.contains(orderHeader.statusId)">
-                    <return error="true" message="${ec.getL10n().localize('DASHBOARD_ORDER_NOT_EDITABLE')}"/>
+                <if condition="orderHeader != null">
+
+                    <!-- check if order is locked -->
+                    <if condition="orderHeader.lockUserId != null &amp;&amp; orderHeader.lockUserId != ec.user.userId">
+                        <return error="true" message="${ec.getL10n().localize('DASHBOARD_ORDER_NOT_EDITABLE')}"/>
+                    </if>
+                    
+                    <!-- check if order status is editable -->
+                    <entity-find-count entity-name="moqui.basic.StatusFlowItem" count-field="editableOrderStatusCount">
+                        <econditions>
+                            <econdition field-name="statusFlowId" value="MkDashboardEditableOrderStatuses"/>
+                            <econdition field-name="statusId" from="orderHeader.statusId"/>
+                        </econditions>
+                    </entity-find-count>
+                    <if condition="editableOrderStatusCount == 0">
+                        <return error="true" message="${ec.getL10n().localize('DASHBOARD_ORDER_NOT_EDITABLE')}"/>
+                    </if>
                 </if>
             </if>
         </actions>
