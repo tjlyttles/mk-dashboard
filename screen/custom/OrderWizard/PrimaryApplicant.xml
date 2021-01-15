@@ -20,7 +20,7 @@
     <parameter name="estimatedPayment"/>
     <parameter name="formResponseId"/>
 
-    <transition name="storeApplicant">
+    <transition name="storeOrder">
         <actions>
             <service-call name="mkdecision.dashboard.OrderServices.store#Order" in-map="context" out-map="context"/>
             <service-call name="mkdecision.dashboard.OrderServices.store#Applicant" in-map="context">
@@ -117,7 +117,7 @@
         </container-row>
 
         <container style="form-no-margin">
-            <form-single name="ApplicantForm" transition="storeApplicant">
+            <form-single name="ApplicantForm" transition="storeOrder">
                 <field name="orderId"><default-field><hidden/></default-field></field>
                 <field name="orderPartSeqId"><default-field><hidden/></default-field></field>
                 <field name="partyId"><default-field><hidden/></default-field></field>

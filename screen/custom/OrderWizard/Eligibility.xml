@@ -7,12 +7,23 @@
 
     <parameter name="orderId"/>
     <parameter name="orderPartSeqId"/>
+    <parameter name="salesChannelEnumId"/>
+    <parameter name="productStoreId"/>
+    <parameter name="salesRepresentativeId"/>
+    <parameter name="productCategoryId"/>
+    <parameter name="productId"/>
+    <parameter name="totalPurchaseAmount"/>
+    <parameter name="downPayment"/>
+    <parameter name="netPurchaseAmount"/>
+    <parameter name="loanFee"/>
+    <parameter name="financedAmount"/>
+    <parameter name="estimatedPayment"/>
 
-    <transition name="storeOrder">
-            <service-call name="org.moqui.impl.ScreenServices.create#FormResponse" out-map="context">
-                <field-map field-name="formId" from="formId"/>
-                <field-map field-name="responseMap" from="ec.web.parameters"/>
-            </service-call>
+    <transition name="storeFormResponse">
+        <service-call name="org.moqui.impl.ScreenServices.create#FormResponse" out-map="context">
+            <field-map field-name="formId" from="formId"/>
+            <field-map field-name="responseMap" from="ec.web.parameters"/>
+        </service-call>
         <default-response url="../PrimaryApplicant">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
@@ -105,7 +116,7 @@
                     <expression>formId != null</expression>
                 </condition>
                 <widgets>
-                    <form-single name="EligibilityForm" extends="DbForm#${formId}" dynamic="true" transition="storeOrder" map="responseMap">
+                    <form-single name="EligibilityForm" extends="DbForm#${formId}" dynamic="true" transition="storeFormResponse" map="responseMap">
                         <field name="eligibilityHeader">
                             <default-field>
                                 <label text="New Application" type="h4" style="margin-b-1"/>
