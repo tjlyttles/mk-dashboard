@@ -122,6 +122,7 @@
                 <econdition field-name="statusId" from="orderHeader.statusId"/>
             </econditions>
         </entity-find-count>
+        <set field="orderEditable" from="editableOrderStatusCount > 0 &amp;&amp; (orderHeader.lockUserId == null || orderHeader.lockUserId == ec.user.userId)"/>
     </actions>
 
     <widgets>
