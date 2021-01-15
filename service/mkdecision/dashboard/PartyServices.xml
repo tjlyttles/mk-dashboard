@@ -74,6 +74,8 @@
             <parameter name="postalCode"/>
             <parameter name="city"/>
             <parameter name="stateProvinceGeoId"/>
+            <parameter name="addressYears" type="Integer"/>
+            <parameter name="addressMonths" type="Integer"/>
             <parameter name="contactNumber"/>
             <parameter name="contactMechPurposeId"/>
             <parameter name="email"/>
@@ -142,7 +144,6 @@
             <parameter name="partyId"/>
             <parameter name="postalAddress" type="Map"/>
             <parameter name="postalAddressString"/>
-            <parameter name="usedSince" type="Date" format="MM-dd-yyyy"/>
         </out-parameters>
     </service>
 

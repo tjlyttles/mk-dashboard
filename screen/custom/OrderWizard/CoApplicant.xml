@@ -81,8 +81,8 @@
             <set field="postalCode" from="postalAddress?.postalCode ?: ''"/>
             <set field="city" from="postalAddress?.city ?: ''"/>
             <set field="stateProvinceGeoId" from="postalAddress?.stateProvinceGeoId ?: ''"/>
-            <set field="usedSince" from="postalAddress?.usedSince ?: ''"/>
-            <if condition="usedSince">
+            <set field="usedSince" from="postalAddress?.usedSince"/>
+            <if condition="usedSince != null">
                 <set field="millis" from="Math.abs(usedSince.getTime() - ec.user.nowTimestamp.getTime())"/>
                 <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
                 <set field="addressYears" from="Math.floor(days / 365)" type="Integer"/>
@@ -234,6 +234,7 @@
                         </drop-down>
                     </default-field>
                 </field>
+
                 <field name="addressDurationHeader">
                     <default-field>
                         <label text="Address Duration" type="h5" style="margin-tb-1"/>
@@ -242,12 +243,12 @@
                 </field>
                 <field name="addressYears">
                     <default-field title="Years">
-                        <text-line input-type="number"/>
+                        <text-line input-type="number" rules="value =&gt; (value &gt;= 0 &amp;&amp; value &lt;= 100) || 'Please enter a number between 0 and 100.'"/>
                     </default-field>
                 </field>
                 <field name="addressMonths">
                     <default-field title="Months">
-                        <text-line input-type="number"/>
+                        <text-line input-type="number" rules="value =&gt; (value &gt;= 0 &amp;&amp; value &lt;= 11) || 'Please enter a number between 0 and 11.'"/>
                     </default-field>
                 </field>
 

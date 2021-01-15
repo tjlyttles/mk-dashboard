@@ -139,6 +139,8 @@
             <parameter name="postalCode"/>
             <parameter name="city"/>
             <parameter name="stateProvinceGeoId"/>
+            <parameter name="addressYears" type="Integer"/>
+            <parameter name="addressMonths" type="Integer"/>
             <parameter name="socialSecurityNumber"/>
             <parameter name="birthDate" type="Date" format="MM-dd-yyyy"/>
             <parameter name="maritalStatusEnumId"/>

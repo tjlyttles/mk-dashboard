@@ -129,14 +129,12 @@ class PartyServices {
             if (StringUtils.isNotBlank(stateGeoCodeAlpha2) && StringUtils.isNotBlank(postalCode)) addressParts.add(String.format("%s %s", stateGeoCodeAlpha2, postalCode))
         }
         String postalAddressString = StringUtils.defaultIfBlank(StringUtils.join(addressParts, ", "), null)
-        String usedSince = postalAddress.getString("usedSince")
 
         // return the output parameters
         HashMap<String, Object> outParams = new HashMap<>()
         outParams.put("partyId", partyId)
         outParams.put("postalAddress", postalAddress)
         outParams.put("postalAddressString", postalAddressString)
-        outParams.put("usedSince", usedSince)
         return outParams
     }
 
@@ -205,7 +203,7 @@ class PartyServices {
         return outParams
     }
 
-    static Map<String, Object> validatePersonFields(ExecutionContext ec) {
+    static void validatePersonFields(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -227,45 +225,41 @@ class PartyServices {
         // validate first name
         if (StringUtils.isBlank(firstName)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_FIRST_NAME"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate last name
         if (StringUtils.isBlank(lastName)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_LAST_NAME"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate social security number
         if (StringUtils.isBlank(socialSecurityNumber)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_SSN"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate date of birth
         Date minBirthDate = DateUtils.addYears(new Date(), -18)
         if (birthDate == null) {
             mf.addError(lf.localize("DASHBOARD_INVALID_DOB"))
-            return new HashMap<String, Object>()
+            return
         } else if (birthDate.after(minBirthDate)) {
             mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate marital status
         if (StringUtils.isBlank(maritalStatusEnumId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_MARITAL_STATUS"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate employment status
         if (StringUtils.isBlank(employmentStatusEnumId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_STATUS"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
     static Map<String, Object> updatePerson(ExecutionContext ec) {
@@ -327,7 +321,7 @@ class PartyServices {
         return outParams
     }
 
-    static Map<String, Object> validateContactFields(ExecutionContext ec) {
+    static void validateContactFields(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -341,6 +335,8 @@ class PartyServices {
         String postalCode = (String) cs.getOrDefault("postalCode", null)
         String city = (String) cs.getOrDefault("city", null)
         String stateProvinceGeoId = (String) cs.getOrDefault("stateProvinceGeoId", null)
+        Integer addressYears = (Integer) cs.getOrDefault("addressYears", 0)
+        Integer addressMonths = (Integer) cs.getOrDefault("addressMonths", 0)
         String contactNumber = (String) cs.getOrDefault("contactNumber", null)
         String contactMechPurposeId = (String) cs.getOrDefault("contactMechPurposeId", null)
         String email = (String) cs.getOrDefault("email", null)
@@ -349,50 +345,51 @@ class PartyServices {
         // validate residential address
         if (StringUtils.isBlank(address1)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_RESIDENCE_ADDR"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate postal code
         if (StringUtils.isBlank(postalCode)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_POSTAL_CODE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate city
         if (StringUtils.isBlank(city)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_CITY"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate state
         if (StringUtils.isBlank(stateProvinceGeoId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_STATE"))
-            return new HashMap<String, Object>()
+            return
+        }
+
+        // validate address duration
+        if (addressYears > 100 || addressMonths > 11) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ADDRESS_DURATION"))
+            return
         }
 
         // validate contact number
         if (StringUtils.isBlank(contactNumber)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PHONE_NUMBER"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate contact purpose
         if (StringUtils.isBlank(contactMechPurposeId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_PHONE_NUMBER_TYPE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate email address
         if (StringUtils.isBlank(email)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL"))
-            return new HashMap<String, Object>()
         } else if (!StringUtils.equals(email, emailVerify)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL_VERIFY"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
     static Map<String, Object> updateContact(ExecutionContext ec) {
@@ -427,7 +424,7 @@ class PartyServices {
         }
 
         // calculate date for address duration
-        def usedSince = new Date()
+        Date usedSince = new Date()
         usedSince = DateUtils.addYears(usedSince, -addressYears)
         usedSince = DateUtils.addMonths(usedSince, -addressMonths)
 
@@ -446,17 +443,11 @@ class PartyServices {
                 .parameter("stateProvinceGeoId", stateProvinceGeoId)
                 .parameter("contactMechPurposeId", "PostalPrimary")
                 .call()
-        sf.sync().name("delete#mantle.party.contact.PartyContactMech")
-                .parameter("partyId", partyId)
-                .parameter("contactMechId", postalAddress.getString("contactMechId"))
-                .parameter("contactMechPurposeId", "PostalPrimary")
-                .parameter("fromDate", "*")
-                .call()
-        sf.sync().name("create#mantle.party.contact.PartyContactMech")
-                .parameter("partyId", partyId)
-                .parameter("contactMechId", postalAddress.getString("contactMechId"))
-                .parameter("contactMechPurposeId", "PostalPrimary")
-                .parameter("fromDate",  uf.getNowTimestamp())
+        sf.sync().name("update#mantle.party.contact.PartyContactMech")
+                .parameter("partyId", postalAddress.get("partyId"))
+                .parameter("contactMechId", postalAddress.get("contactMechId"))
+                .parameter("contactMechPurposeId", postalAddress.get("contactMechPurposeId"))
+                .parameter("fromDate", postalAddress.get("fromDate"))
                 .parameter("usedSince", usedSince)
                 .call()
 
@@ -502,7 +493,7 @@ class PartyServices {
         return outParams
     }
 
-    static Map<String, Object> validateIdentityFields(ExecutionContext ec) {
+    static void validateIdentityFields(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -520,35 +511,31 @@ class PartyServices {
         // validate ID type
         if (StringUtils.isBlank(partyIdTypeEnumId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ID_TYPE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate ID value
         if (StringUtils.isBlank(idValue)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ID_VALUE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate ID issued by
         if (StringUtils.isBlank(idIssuedBy)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ID_ISSUER"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate issue date
         if (idIssueDate == null && !StringUtils.equals(partyIdTypeEnumId, "PtidArn")) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ID_ISSUE_DATE"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate expiry date
         if (idExpiryDate == null) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ID_EXPIRY_DATE"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
     static Map<String, Object> addIdentity(ExecutionContext ec) {
@@ -666,7 +653,7 @@ class PartyServices {
         return new HashMap<>()
     }
 
-    static Map<String, Object> validateEmploymentFields(ExecutionContext ec) {
+    static void validateEmploymentFields(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -696,19 +683,19 @@ class PartyServices {
         // validate employer name
         if (StringUtils.isBlank(employerName)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYER_NAME"))
-            return new HashMap<String, Object>()
+            return
         }
 
         // validate based on employment status
         if (StringUtils.equals(employmentStatusEnumId, "EmpsFullTime") || StringUtils.equals(employmentStatusEnumId, "EmpsPartTime")) {
             if (StringUtils.isBlank(jobTitle)) {
                 mf.addError(lf.localize("DASHBOARD_INVALID_JOB_TITLE"))
-                return new HashMap<String, Object>()
+                return
             }
         } else if (StringUtils.equals(employmentStatusEnumId, "EmpsContractor") || StringUtils.equals(employmentStatusEnumId, "EmpsSelf")) {
             if (StringUtils.isBlank(employerClassificationId)) {
                 mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYER_CLASS"))
-                return new HashMap<String, Object>()
+                return
             }
         }
 
@@ -716,35 +703,31 @@ class PartyServices {
         if (StringUtils.equals(relationshipTypeEnumId, "PrtEmployee")) {
             if (years == null || years < 0) {
                 mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
-                return new HashMap<String, Object>()
+                return
             } else if (months == null || months < 0) {
                 mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
-                return new HashMap<String, Object>()
+                return
             } else if (years == 0 && months == 0) {
                 mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
-                return new HashMap<String, Object>()
+                return
             }
         } else if (StringUtils.equals(relationshipTypeEnumId, "PrtPreviousEmployee")) {
             if (fromDate == null || toDate == null) {
                 mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
-                return new HashMap<String, Object>()
+                return
             } else if (fromDate.after(toDate)) {
                 mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
-                return new HashMap<String, Object>()
+                return
             } else if (toDate.after(new Date())) {
                 mf.addError(lf.localize("DASHBOARD_INVALID_EMPLOYMENT_DURATION"))
-                return new HashMap<String, Object>()
+                return
             }
         }
 
         // validate monthly income
         if (monthlyIncome == null || monthlyIncome < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_MONTHLY_INCOME"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
     static Map<String, Object> addEmployment(ExecutionContext ec) {
@@ -1074,7 +1057,7 @@ class PartyServices {
         return new HashMap<>()
     }
 
-    static Map<String, Object> validateIncomeSourceFields(ExecutionContext ec) {
+    static void validateIncomeSourceFields(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
@@ -1092,29 +1075,21 @@ class PartyServices {
         // validate financial flow type
         if (StringUtils.isBlank(financialFlowTypeEnumId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_INCOME_SOURCE_TYPE"))
-            return new HashMap<String, Object>()
         }
 
         // validate amount
         if (amount == null || amount <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_INCOME_SOURCE_AMOUNT"))
-            return new HashMap<String, Object>()
         }
 
         // validate duration
         if (years == null || years < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_INCOME_SOURCE_DURATION"))
-            return new HashMap<String, Object>()
         } else if (months == null || months < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_INCOME_SOURCE_DURATION"))
-            return new HashMap<String, Object>()
         } else if (years == 0 && months == 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_INCOME_SOURCE_DURATION"))
-            return new HashMap<String, Object>()
         }
-
-        // return the output parameters
-        return new HashMap<>()
     }
 
     static Map<String, Object> addIncomeSource(ExecutionContext ec) {

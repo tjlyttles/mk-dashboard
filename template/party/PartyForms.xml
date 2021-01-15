@@ -152,12 +152,12 @@
                         </field>
                         <field name="addressYears">
                             <default-field title="Years">
-                                <text-line input-type="number"/>
+                                <text-line input-type="number" rules="value =&gt; (value &gt;= 0 &amp;&amp; value &lt;= 100) || 'Please enter a number between 0 and 100.'"/>
                             </default-field>
                         </field>
                         <field name="addressMonths">
                             <default-field title="Months">
-                                <text-line input-type="number"/>
+                                <text-line input-type="number" rules="value =&gt; (value &gt;= 0 &amp;&amp; value &lt;= 11) || 'Please enter a number between 0 and 11.'"/>
                             </default-field>
                         </field>
                         <field name="contactNumber">
