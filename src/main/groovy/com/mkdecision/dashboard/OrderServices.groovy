@@ -576,6 +576,8 @@ class OrderServices {
         String postalCode = (String) cs.getOrDefault("postalCode", null)
         String city = (String) cs.getOrDefault("city", null)
         String stateProvinceGeoId = (String) cs.getOrDefault("stateProvinceGeoId", null)
+        Integer addressYears = (Integer) cs.getOrDefault("addressYears", 0)
+        Integer addressMonths = (Integer) cs.getOrDefault("addressMonths", 0)
         String socialSecurityNumber = (String) cs.getOrDefault("socialSecurityNumber", null)
         Date birthDate = (Date) cs.getOrDefault("birthDate", null)
         String maritalStatusEnumId = (String) cs.getOrDefault("maritalStatusEnumId", null)
@@ -618,6 +620,12 @@ class OrderServices {
         // validate state
         if (StringUtils.isBlank(stateProvinceGeoId)) {
             mf.addError(lf.localize("DASHBOARD_INVALID_STATE"))
+            return
+        }
+
+        // validate address duration
+        if (addressYears > 100 || addressMonths > 11) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ADDRESS_DURATION"))
             return
         }
 
@@ -712,7 +720,7 @@ class OrderServices {
         }
 
         // calculate date for address duration
-        def usedSince = new Date()
+        Date usedSince = new Date()
         usedSince = DateUtils.addYears(usedSince, -addressYears)
         usedSince = DateUtils.addMonths(usedSince, -addressMonths)
 
@@ -758,17 +766,11 @@ class OrderServices {
                     .parameter("stateProvinceGeoId", stateProvinceGeoId)
                     .parameter("contactMechPurposeId", "PostalPrimary")
                     .call()
-            sf.sync().name("delete#mantle.party.contact.PartyContactMech")
-                    .parameter("partyId", partyId)
-                    .parameter("contactMechId", postalAddress.getString("contactMechId"))
-                    .parameter("contactMechPurposeId", "PostalPrimary")
-                    .parameter("fromDate", "*")
-                    .call()
-            sf.sync().name("create#mantle.party.contact.PartyContactMech")
-                    .parameter("partyId", partyId)
-                    .parameter("contactMechId", postalAddress.getString("contactMechId"))
-                    .parameter("contactMechPurposeId", "PostalPrimary")
-                    .parameter("fromDate", uf.getNowTimestamp())
+            sf.sync().name("update#mantle.party.contact.PartyContactMech")
+                    .parameter("partyId", postalAddress.get("partyId"))
+                    .parameter("contactMechId", postalAddress.get("contactMechId"))
+                    .parameter("contactMechPurposeId", postalAddress.get("contactMechPurposeId"))
+                    .parameter("fromDate", postalAddress.get("fromDate"))
                     .parameter("usedSince", usedSince)
                     .call()
 

@@ -21,6 +21,7 @@
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_CITY" locale="en" localized="Invalid city."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_POSTAL_CODE" locale="en" localized="Invalid ZIP code."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_STATE" locale="en" localized="Invalid state."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ADDRESS_DURATION" locale="en" localized="Invalid address duration."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_SSN" locale="en" localized="Invalid social security number."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_DOB" locale="en" localized="Invalid date of birth."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_MARITAL_STATUS" locale="en" localized="Invalid marital status."/>
