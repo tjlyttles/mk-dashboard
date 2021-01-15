@@ -306,6 +306,14 @@
                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Residential Address" style="text-light-grey"/></row-col>
                             <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${postalAddressString ?: '-'}"/></row-col>
                         </container-row>
+                        <container-row>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Address Duration Years" style="text-light-grey"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${addressYears ?: '-'}"/></row-col>
+                        </container-row>
+                        <container-row>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Address Duration Months" style="text-light-grey"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${addressMonths ?: '-'}"/></row-col>
+                        </container-row>
                     </container>
                 </container>
 

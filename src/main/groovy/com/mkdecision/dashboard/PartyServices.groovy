@@ -129,12 +129,14 @@ class PartyServices {
             if (StringUtils.isNotBlank(stateGeoCodeAlpha2) && StringUtils.isNotBlank(postalCode)) addressParts.add(String.format("%s %s", stateGeoCodeAlpha2, postalCode))
         }
         String postalAddressString = StringUtils.defaultIfBlank(StringUtils.join(addressParts, ", "), null)
+        String usedSince = postalAddress.getString("usedSince")
 
         // return the output parameters
         HashMap<String, Object> outParams = new HashMap<>()
         outParams.put("partyId", partyId)
         outParams.put("postalAddress", postalAddress)
         outParams.put("postalAddressString", postalAddressString)
+        outParams.put("usedSince", usedSince)
         return outParams
     }
 
@@ -409,6 +411,8 @@ class PartyServices {
         String postalCode = (String) cs.getOrDefault("postalCode", null)
         String city = (String) cs.getOrDefault("city", null)
         String stateProvinceGeoId = (String) cs.getOrDefault("stateProvinceGeoId", null)
+        Integer addressYears = (Integer) cs.getOrDefault("addressYears", 0)
+        Integer addressMonths = (Integer) cs.getOrDefault("addressMonths", 0)
         String contactNumber = (String) cs.getOrDefault("contactNumber", null)
         String contactMechPurposeId = (String) cs.getOrDefault("contactMechPurposeId", null)
         String email = (String) cs.getOrDefault("email", null)
@@ -421,6 +425,11 @@ class PartyServices {
         if (mf.hasError()) {
             return new HashMap<String, Object>()
         }
+
+        // calculate date for address duration
+        def usedSince = new Date()
+        usedSince = DateUtils.addYears(usedSince, -addressYears)
+        usedSince = DateUtils.addMonths(usedSince, -addressMonths)
 
         // update postal address
         EntityValue postalAddress = ef.find("mantle.party.contact.PartyContactMechPostalAddress")
@@ -436,6 +445,19 @@ class PartyServices {
                 .parameter("postalCode", postalCode)
                 .parameter("stateProvinceGeoId", stateProvinceGeoId)
                 .parameter("contactMechPurposeId", "PostalPrimary")
+                .call()
+        sf.sync().name("delete#mantle.party.contact.PartyContactMech")
+                .parameter("partyId", partyId)
+                .parameter("contactMechId", postalAddress.getString("contactMechId"))
+                .parameter("contactMechPurposeId", "PostalPrimary")
+                .parameter("fromDate", "*")
+                .call()
+        sf.sync().name("create#mantle.party.contact.PartyContactMech")
+                .parameter("partyId", partyId)
+                .parameter("contactMechId", postalAddress.getString("contactMechId"))
+                .parameter("contactMechPurposeId", "PostalPrimary")
+                .parameter("fromDate",  uf.getNowTimestamp())
+                .parameter("usedSince", usedSince)
                 .call()
 
         // update telecom number

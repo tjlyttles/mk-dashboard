@@ -150,6 +150,16 @@
                                 </drop-down>
                             </default-field>
                         </field>
+                        <field name="addressYears">
+                            <default-field title="Years">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="addressMonths">
+                            <default-field title="Months">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
                         <field name="contactNumber">
                             <default-field title="Phone Number">
                                 <text-line mask="###-###-####" input-type="tel"/>
@@ -195,6 +205,10 @@
                             <field-col-row>
                                 <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="city"/></field-col>
                                 <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="stateProvinceGeoId"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="addressYears"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="addressMonths"/></field-col>
                             </field-col-row>
                             <field-col-row>
                                 <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="contactNumber"/></field-col>

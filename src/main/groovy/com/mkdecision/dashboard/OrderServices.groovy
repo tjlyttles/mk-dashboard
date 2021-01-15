@@ -693,6 +693,8 @@ class OrderServices {
         String postalCode = (String) cs.getOrDefault("postalCode", null)
         String city = (String) cs.getOrDefault("city", null)
         String stateProvinceGeoId = (String) cs.getOrDefault("stateProvinceGeoId", null)
+        Integer addressYears = (Integer) cs.getOrDefault("addressYears", 0)
+        Integer addressMonths = (Integer) cs.getOrDefault("addressMonths", 0)
         String socialSecurityNumber = (String) cs.getOrDefault("socialSecurityNumber", null)
         Date birthDate = (Date) cs.getOrDefault("birthDate", null)
         String maritalStatusEnumId = (String) cs.getOrDefault("maritalStatusEnumId", null)
@@ -708,6 +710,11 @@ class OrderServices {
         if (mf.hasError()) {
             return new HashMap<String, Object>()
         }
+
+        // calculate date for address duration
+        def usedSince = new Date()
+        usedSince = DateUtils.addYears(usedSince, -addressYears)
+        usedSince = DateUtils.addMonths(usedSince, -addressMonths)
 
         // store party
         boolean updateParty = StringUtils.isNotBlank(partyId)
@@ -750,6 +757,19 @@ class OrderServices {
                     .parameter("postalCode", postalCode)
                     .parameter("stateProvinceGeoId", stateProvinceGeoId)
                     .parameter("contactMechPurposeId", "PostalPrimary")
+                    .call()
+            sf.sync().name("delete#mantle.party.contact.PartyContactMech")
+                    .parameter("partyId", partyId)
+                    .parameter("contactMechId", postalAddress.getString("contactMechId"))
+                    .parameter("contactMechPurposeId", "PostalPrimary")
+                    .parameter("fromDate", "*")
+                    .call()
+            sf.sync().name("create#mantle.party.contact.PartyContactMech")
+                    .parameter("partyId", partyId)
+                    .parameter("contactMechId", postalAddress.getString("contactMechId"))
+                    .parameter("contactMechPurposeId", "PostalPrimary")
+                    .parameter("fromDate", uf.getNowTimestamp())
+                    .parameter("usedSince", usedSince)
                     .call()
 
             // update telecom number
@@ -829,6 +849,7 @@ class OrderServices {
                     .parameter("city", city)
                     .parameter("postalCode", postalCode)
                     .parameter("stateProvinceGeoId", stateProvinceGeoId)
+                    .parameter("usedSince", usedSince)
                     .parameter("contactMechPurposeId", "PostalPrimary")
                     .call()
 
