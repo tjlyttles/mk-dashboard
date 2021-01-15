@@ -109,6 +109,11 @@
                 <econdition field-name="roleTypeId" value="CoApplicant"/>
             </econditions>
         </entity-find>
+        <entity-find entity-name="mantle.request.requirement.RequirementOrderItem" list="requirementsList">
+            <econdition field-name="orderId" from="orderId"/>
+            <econdition field-name="orderItemSeqId" value="01"/>
+            <order-by field-name="-requirementId"/>
+        </entity-find>
         <entity-find entity-name="mantle.order.OrderPartParty" list="internalList">
             <econdition field-name="orderId" from="orderId"/>
             <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
@@ -548,6 +553,64 @@
                 <widgets>
                     <container style="padding-all-05 text-center">
                         <label text="No parties have been added yet" style="text-grey"/>
+                    </container>
+                </widgets>
+            </section>
+        </container>
+
+        <container style="h-separator q-my-md"/>
+
+        <container>
+            <container-row>
+                <row-col sm="6" xs="6">
+                    <label text="Requirements" type="h4"/>
+                </row-col>
+            </container-row>
+            <form-list name="RequirementList" list="requirementsList" list-entry="requirement">
+                <row-actions>
+                    <entity-find-one entity-name="mantle.request.requirement.Requirement" value-field="requirementId">
+                        <field-map field-name="requirementId" from="requirement?.requirementId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="enumId">
+                        <field-map field-name="enumId" from="requirementId?.requirementTypeEnumId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="mantle.request.requirement.RequirementParty" value-field="requirementParty">
+                        <field-map field-name="requirementId" from="requirement?.requirementId"/>
+                    </entity-find-one>
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
+                        <field-map field-name="partyId" from="requirementParty?.partyId"/>
+                    </service-call>
+                </row-actions>
+
+                <field name="description">
+                    <default-field>
+                        <container>
+                            <label text="${ec.l10n.format(requirementId.requirementStartDate, 'MM/dd/yyyy h:mm:ss a')} - ${partyName?: '-'}" style="text-bold"/>
+                        </container>
+                        <label text="${enumId?.description}"/>
+                    </default-field>
+                </field>
+                <field name="status">
+                    <conditional-field condition="requirementId.statusId == 'RqmtStApproved'">
+                        <display text="Closed"/>
+                    </conditional-field>
+                    <default-field>
+                        <display text="Open"/>
+                    </default-field>
+                </field>
+                <columns type="mobile">
+                    <column>
+                        <field-ref name="description"/>
+                    </column>
+                    <column>
+                        <field-ref name="status"/>
+                    </column>
+                </columns>
+            </form-list>
+            <section name="EmptyAgreementList" condition="requirementsList == null || requirementsList.isEmpty()">
+                <widgets>
+                    <container style="padding-all-05 text-center">
+                        <label text="No requirements have been added yet" style="text-grey"/>
                     </container>
                 </widgets>
             </section>
