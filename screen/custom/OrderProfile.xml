@@ -90,8 +90,6 @@
     <subscreens default-item="OrderOverview"/>
         
     <actions>
-        <service-call name="mkdecision.dashboard.OrderServices.validate#OrderAccess" in-map="context"/>
-
         <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
         <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
             <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
@@ -118,7 +116,13 @@
         </entity-find>
         <set field="customerPortalUrl" from="storeSettings.isEmpty() ? '#' : String.format('%s?orderId=%s', storeSettings.getFirst().get('settingValue'), orderId)"/>
 
-        <set field="editableOrderState" from="['OrderOpen', 'OrderRequested', 'OrderProposed']"/>
+        <entity-find-count entity-name="moqui.basic.StatusFlowItem" count-field="editableOrderStatusCount">
+            <econditions>
+                <econdition field-name="statusFlowId" value="MkDashboardEditableOrderStatuses"/>
+                <econdition field-name="statusId" from="orderHeader.statusId"/>
+            </econditions>
+        </entity-find-count>
+        <set field="orderEditable" from="editableOrderStatusCount > 0 &amp;&amp; (orderHeader.lockUserId == null || orderHeader.lockUserId == ec.user.userId)"/>
     </actions>
 
     <widgets>
