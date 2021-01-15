@@ -132,7 +132,12 @@
             </else>
         </if>
 
-        <set field="editableOrderState" from="['OrderOpen', 'OrderRequested', 'OrderProposed']"/>
+        <entity-find-count entity-name="moqui.basic.StatusFlowItem" count-field="editableOrderStatusCount">
+            <econditions>
+                <econdition field-name="statusFlowId" value="MkDashboardEditableOrderStatuses"/>
+                <econdition field-name="statusId" from="orderHeader.statusId"/>
+            </econditions>
+        </entity-find-count>
     </actions>
 
     <widgets>
@@ -244,7 +249,7 @@
                         <display text="${ec.l10n.formatCurrency(unitAmount, orderHeader.currencyUomId)}"/>
                     </default-field>
                 </field>
-                <field name="options" hide="!editableOrderState.contains(orderHeader.statusId)">
+                <field name="options" hide="editableOrderStatusCount == 0">
                     <default-field title="" container-style="text-right">
                         <container-dialog id="EditItemDialog" button-text="Edit Item" width="960">
                             <form-single name="EditItemForm" transition="updateOrderItem">
@@ -480,7 +485,7 @@
                 </row-col>
                 <row-col sm="6" xs="6">
                     <container style="text-right">
-                        <link url="addParty" text="Add Party" condition="editableOrderState.contains(orderHeader.statusId)"/>
+                        <link url="addParty" text="Add Party" condition="editableOrderStatusCount > 0"/>
                     </container>
                 </row-col>
             </container-row>
@@ -523,7 +528,7 @@
                         <link link-type="anchor" url="mailto:${emailAddress}" text="${emailAddress}" url-type="plain"/>
                     </default-field>
                 </field>
-                <field name="options" hide="!editableOrderState.contains(orderHeader.statusId)">
+                <field name="options" hide="editableOrderStatusCount == 0">
                     <default-field title="" container-style="text-right">
                         <link icon="fa fa-pencil" link-type="hidden-form-link" url="editParty" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId]"/>
                         <link icon="fa fa-trash" link-type="hidden-form-link" btn-type="danger" url="archiveParty" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId]"/>
