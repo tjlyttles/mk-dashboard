@@ -3,7 +3,7 @@
        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-eca-2.1.xsd">
 
     <!-- Order service validation -->
-    <seca service="mkdecision\.dashboard\.OrderServices\.(.+)" name-is-pattern="true" when="pre-service">
+    <seca service="mkdecision\.dashboard\.OrderServices\.(?!(validate)).+" name-is-pattern="true" when="pre-service">
         <actions>
             <if condition="orderId != null &amp;&amp; !orderId.trim().equals('')">
                 <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
