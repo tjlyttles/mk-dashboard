@@ -1382,13 +1382,71 @@ class PartyServices {
         }
     }
 
+    static Map<String, Object> createMortgage(ExecutionContext ec) {
+
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+
+        // get the parameters
+        String partyId = (String) cs.getOrDefault("partyId", null)
+        String lenderName = (String) cs.getOrDefault("lenderName", null)
+        BigDecimal mortgageBalance = (BigDecimal) cs.getOrDefault("mortgageBalance", null)
+        BigDecimal mortgagePaymentMonthly = (BigDecimal) cs.getOrDefault("mortgagePaymentMonthly", null)
+
+        // validate fields
+        sf.sync().name("mkdecision.dashboard.PartyServices.validate#MortgageFields")
+                .parameters(cs)
+                .call()
+        if (mf.hasError()) {
+            return new HashMap<String, Object>()
+        }
+
+        // create lender
+        Map<String, Object> lenderResp = sf.sync().name("mantle.party.PartyServices.create#Organization")
+                .parameter("partyTypeEnumId", "PtyOrganization")
+                .parameter("organizationName", lenderName)
+                .parameter("roleTypeId", "Lender")
+                .call()
+        String lenderPartyId = (String) lenderResp.get("partyId")
+
+        // create lender relation
+        Map<String, Object> lenderRelationshipResp = sf.sync().name("create#mantle.party.PartyRelationship")
+                .parameter("relationshipTypeEnumId", "PrtMortgage")
+                .parameter("fromPartyId", partyId)
+                .parameter("fromRoleTypeId", "Borrower")
+                .parameter("toPartyId", lenderPartyId)
+                .parameter("toRoleTypeId", "Lender")
+                .parameter("fromDate", uf.getNowTimestamp())
+                .call()
+        String partyRelationshipId = lenderRelationshipResp.get("partyRelationshipId")
+
+        // create mortgage
+        sf.sync().name("create#mk.close.FinancialFlow")
+                .parameter("partyId", partyId)
+                .parameter("entryTypeEnumId", "MkEntryExpense")
+                .parameter("financialFlowTypeEnumId", "MkFinFlowMortgage")
+                .parameter("partyRelationshipId", partyRelationshipId)
+                .parameter("balance", mortgageBalance)
+                .parameter("amount", mortgagePaymentMonthly)
+                .call()
+
+
+        // return the output parameters
+        Map<String, Object> outParams = new HashMap<>()
+        outParams.put("partyId", partyId)
+        outParams.put("partyRelationshipId", partyRelationshipId)
+        return outParams
+    }
+
     static Map<String, Object> updateMortgage(ExecutionContext ec) {
 
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
         EntityFacade ef = ec.getEntity()
         ServiceFacade sf = ec.getService()
-        UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
         L10nFacade lf = ec.getL10n()
 

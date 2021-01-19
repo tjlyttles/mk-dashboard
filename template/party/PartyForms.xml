@@ -2108,11 +2108,47 @@
             </widgets>
         </section>
 
+        <section name="AddMortgage">
+            <widgets>
+                <container-dialog id="AddMortgageDialog" button-text="Add Mortgage">
+                    <form-single name="AddMortgageForm" transition="createMortgage">
+                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+
+                        <field name="lenderName">
+                            <default-field>
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="mortgageBalance">
+                            <default-field>
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+                        <field name="mortgagePaymentMonthly">
+                            <default-field>
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                                <label text="Exclude property taxes, insurance, or HOA fees" style="text-caption"/>
+                            </default-field>
+                        </field>
+
+                        <field name="submit">
+                            <default-field>
+                                <submit text="Save"/>
+                            </default-field>
+                        </field>
+                    </form-single>
+                </container-dialog>
+            </widgets>
+        </section>
+
         <section name="EditMortgage">
             <widgets>
                 <container-dialog id="EditMortgageDialog" button-text="Edit">
                     <form-single name="EditMortgageForm" transition="updateMortgage">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
                         <field name="partyRelationshipId"><default-field><hidden default-value="${partyRelationshipId}"/></default-field></field>
 

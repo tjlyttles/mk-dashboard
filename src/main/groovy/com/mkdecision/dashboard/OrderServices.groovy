@@ -948,9 +948,6 @@ class OrderServices {
         BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
         BigDecimal propertyTaxesAnnually = (BigDecimal) cs.getOrDefault("propertyTaxesAnnually", null)
         BigDecimal propertyInsuranceCostsAnnually = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsAnnually", null)
-        String lenderName = (String) cs.getOrDefault("lenderName", null)
-        BigDecimal mortgageBalance = (BigDecimal) cs.getOrDefault("mortgageBalance", null)
-        BigDecimal mortgagePaymentMonthly = (BigDecimal) cs.getOrDefault("mortgagePaymentMonthly", null)
 
         // validate asset class
         if (StringUtils.isBlank(classEnumId)) {
@@ -987,23 +984,6 @@ class OrderServices {
             mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_INSURANCE_COST_ANNUALLY"))
             return
         }
-
-        // validate lender name
-        if (StringUtils.isBlank(lenderName) && (mortgageBalance != null || mortgagePaymentMonthly != null)) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_LENDER_NAME"))
-            return
-        }
-
-        // validate mortgage balance
-        if (mortgageBalance != null && mortgageBalance <= 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE_BALANCE"))
-            return
-        }
-
-        // validate mortgage payment monthly
-        if (mortgagePaymentMonthly != null && mortgagePaymentMonthly <= 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE_PAYMENT_MONTHLY"))
-        }
     }
 
     static Map<String, Object> storeProperty(ExecutionContext ec) {
@@ -1026,9 +1006,6 @@ class OrderServices {
         BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
         BigDecimal propertyTaxesAnnually = (BigDecimal) cs.getOrDefault("propertyTaxesAnnually", null)
         BigDecimal propertyInsuranceCostsAnnually = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsAnnually", null)
-        String lenderName = (String) cs.getOrDefault("lenderName", null)
-        BigDecimal mortgageBalance = (BigDecimal) cs.getOrDefault("mortgageBalance", null)
-        BigDecimal mortgagePaymentMonthly = (BigDecimal) cs.getOrDefault("mortgagePaymentMonthly", null)
 
         // validate fields
         sf.sync().name("mkdecision.dashboard.OrderServices.validate#PropertyFields")
@@ -1124,39 +1101,6 @@ class OrderServices {
                 .parameter("assetId", assetId)
                 .parameter("amount", propertyInsuranceCostsAnnually)
                 .call()
-
-        // create lender
-        if (StringUtils.isNotBlank(lenderName)) {
-
-            // create lender
-            Map<String, Object> lenderResp = sf.sync().name("mantle.party.PartyServices.create#Organization")
-                    .parameter("partyTypeEnumId", "PtyOrganization")
-                    .parameter("organizationName", lenderName)
-                    .parameter("roleTypeId", "Lender")
-                    .call()
-            String lenderPartyId = (String) lenderResp.get("partyId")
-
-            // create lender relation
-            Map<String, Object> lenderRelationshipResp = sf.sync().name("create#mantle.party.PartyRelationship")
-                    .parameter("relationshipTypeEnumId", "PrtMortgage")
-                    .parameter("fromPartyId", partyId)
-                    .parameter("fromRoleTypeId", "Borrower")
-                    .parameter("toPartyId", lenderPartyId)
-                    .parameter("toRoleTypeId", "Lender")
-                    .parameter("fromDate", uf.getNowTimestamp())
-                    .call()
-            String lenderRelationshipId = lenderRelationshipResp.get("partyRelationshipId")
-
-            // create mortgage
-            sf.sync().name("create#mk.close.FinancialFlow")
-                    .parameter("partyId", partyId)
-                    .parameter("entryTypeEnumId", "MkEntryExpense")
-                    .parameter("financialFlowTypeEnumId", "MkFinFlowMortgage")
-                    .parameter("partyRelationshipId", lenderRelationshipId)
-                    .parameter("balance", mortgageBalance)
-                    .parameter("amount", mortgagePaymentMonthly)
-                    .call()
-        }
 
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()

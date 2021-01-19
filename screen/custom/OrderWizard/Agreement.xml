@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-2.1.xsd"
         default-menu-title="Agreement"
         default-menu-include="false"
-        default-menu-index="13">
+        default-menu-index="14">
 
     <parameter name="orderId" required="true"/>
     <parameter name="orderPartSeqId" required="true"/>
@@ -18,8 +18,8 @@
         </service-call>
         <default-response url="../../OrderProfile"/>
     </transition>
-    <transition name="property">
-        <default-response url="../Property">
+    <transition name="mortgage">
+        <default-response url="../Mortgage">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
         </default-response>
@@ -75,7 +75,7 @@
                 </field>
                 <field name="backButton">
                     <default-field container-style="dark-link">
-                        <link url="property" text="Back" btn-type="default"/>
+                        <link url="mortgage" text="Back" btn-type="default"/>
                     </default-field>
                 </field>
 
