@@ -9,7 +9,7 @@
     <widgets>
         <render-mode>
             <text type="html,vuet,qvt"><![CDATA[
-                //<script>window.location = '/dashboard'</script>
+                <script>window.location = '/dashboard'</script>
             ]]></text>
         </render-mode>
     </widgets>
