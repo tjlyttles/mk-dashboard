@@ -19,7 +19,7 @@
     <transition name="downloadOrderContent" read-only="true">
         <parameter name="contentId"/>
         <actions>
-            <entity-find-one entity-name="mantle.party.OrderContent" value-field="orderContent">
+            <entity-find-one entity-name="mantle.order.OrderContent" value-field="orderContent">
                 <field-map field-name="orderContentId" from="contentId"/>
             </entity-find-one>
             <script>ec.web.sendResourceResponse(orderContent?.contentLocation)</script>
