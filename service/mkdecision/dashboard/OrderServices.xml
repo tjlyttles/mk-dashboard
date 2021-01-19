@@ -217,9 +217,6 @@
             <parameter name="hoaFeeMonthly" type="BigDecimal"/>
             <parameter name="propertyTaxesAnnually" type="BigDecimal"/>
             <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal"/>
-            <parameter name="lenderName"/>
-            <parameter name="mortgageBalance" type="BigDecimal"/>
-            <parameter name="mortgagePaymentMonthly" type="BigDecimal"/>
         </in-parameters>
     </service>
     <service verb="store" noun="Property" type="java" location="com.mkdecision.dashboard.OrderServices" method="storeProperty">
@@ -243,13 +240,6 @@
             </parameter>
             <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal" required="true">
                 <number-range min="0" min-include-equals="true" message="Please enter the Insurance Costs Annually"/>
-            </parameter>
-            <parameter name="lenderName"/>
-            <parameter name="mortgageBalance" type="BigDecimal">
-                <number-range min="0" min-include-equals="false" message="Please enter the current Mortgage Balance"/>
-            </parameter>
-            <parameter name="mortgagePaymentMonthly" type="BigDecimal">
-                <number-range min="0" min-include-equals="false" message="Please enter the Mortgage Payment Monthly"/>
             </parameter>
         </in-parameters>
         <out-parameters>

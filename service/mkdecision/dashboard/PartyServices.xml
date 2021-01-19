@@ -420,6 +420,22 @@
             <parameter name="mortgagePaymentMonthly" type="BigDecimal"/>
         </in-parameters>
     </service>
+    <service verb="create" noun="Mortgage" type="java" location="com.mkdecision.dashboard.PartyServices" method="createMortgage">
+        <in-parameters>
+            <parameter name="partyId" required="true"/>
+            <parameter name="lenderName" required="true"/>
+            <parameter name="mortgageBalance" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter the current Mortgage Balance"/>
+            </parameter>
+            <parameter name="mortgagePaymentMonthly" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="false" message="Please enter the Mortgage Payment Monthly"/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyRelationshipId"/>
+        </out-parameters>
+    </service>
     <service verb="update" noun="Mortgage" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateMortgage">
         <in-parameters>
             <parameter name="partyId" required="true"/>

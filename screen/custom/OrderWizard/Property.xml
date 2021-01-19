@@ -10,18 +10,7 @@
 
     <transition name="storeProperty">
         <service-call name="mkdecision.dashboard.OrderServices.store#Property" in-map="context" out-map="context"/>
-        <conditional-response url="../Agreement">
-            <condition>
-                <expression>continueButton != null</expression>
-            </condition>
-            <parameter name="orderId"/>
-            <parameter name="orderPartSeqId"/>
-        </conditional-response>
-        <default-response url="."/>
-    </transition>
-    <transition name="deleteMortgage">
-        <service-call name="mkdecision.dashboard.PartyServices.delete#Mortgage" in-map="context"/>
-        <default-response url="."/>
+        <default-response url="../Mortgage"/>
     </transition>
     <transition name="coApplicant">
         <actions>
@@ -84,12 +73,6 @@
                 <econdition field-name="assetId" from="assetId"/>
             </entity-find>
             <set field="propertyInsuranceCostsAnnually" from="annualInsuranceCostFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
-
-            <entity-find entity-name="mantle.party.PartyToAndRelationship" list="mortgageRelationList">
-                <econdition field-name="relationshipTypeEnumId" value="PrtMortgage"/>
-                <econdition field-name="fromPartyId" from="partyId"/>
-                <econdition field-name="fromRoleTypeId" value="Borrower"/>
-            </entity-find>
         </if>
     </actions>
 
@@ -125,7 +108,7 @@
                     <default-field>
                         <label text="New Application" type="h4" style="margin-b-1"/>
                         <label text="Property" type="h5" style="margin-b-1"/>
-                        <label text="Please enter property information to continue." style="margin-b-1"/>
+                        <label text="Please enter property information to continue" style="margin-b-1"/>
                         <container style="h-separator margin-tb-2"/>
                     </default-field>
                 </field>
@@ -168,99 +151,6 @@
                     </default-field>
                 </field>
 
-                <field name="mortgageHeader">
-                    <default-field>
-                        <label text="Mortgage" type="h5" style="margin-tb-1"/>
-                        <label text="Please enter mortgage information to continue." style="margin-tb-1"/>
-                        <container style="h-separator margin-tb-1"/>
-                    </default-field>
-                </field>
-                <field name="mortgageRelations">
-                    <default-field>
-                        <section-iterate name="MortgageRelationIterator" list="mortgageRelationList" entry="mortgageRelation">
-                            <actions>
-                                <entity-find-one entity-name="mk.close.FinancialFlow" value-field="financialFlow">
-                                    <field-map field-name="partyId" from="mortgageRelation.fromPartyId"/>
-                                    <field-map field-name="financialFlowTypeEnumId" value="MkFinFlowMortgage"/>
-                                    <field-map field-name="entryTypeEnumId" value="MkEntryExpense"/>
-                                    <field-map field-name="partyRelationshipId" from="mortgageRelation.partyRelationshipId"/>
-                                </entity-find-one>
-                            </actions>
-                            <widgets>
-                                <form-single name="MortgageRelation">
-                                    <field name="relationshipHeader">
-                                        <default-field>
-                                            <label text="Mortgage ${sectionEntryIndex + 1}" style="margin-tb-1"/>
-                                        </default-field>
-                                    </field>
-                                    <field name="relationshipAction">
-                                        <default-field>
-                                            <link text="Remove Mortgage" btn-type="danger" url="deleteMortgage" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId, partyRelationshipId: mortgageRelation.partyRelationshipId]"/>
-                                        </default-field>
-                                    </field>
-                                    <field name="lenderName">
-                                        <default-field>
-                                            <display text="${mortgageRelation.organizationName}" style="bg-grey-1"/>
-                                        </default-field>
-                                    </field>
-                                    <field name="mortgageBalance">
-                                        <default-field>
-                                            <display text="${financialFlow.balance}" style="bg-grey-1"/>
-                                        </default-field>
-                                    </field>
-                                    <field name="mortgagePaymentMonthly">
-                                        <default-field>
-                                            <display text="${financialFlow.amount}" style="bg-grey-1"/>
-                                        </default-field>
-                                    </field>
-
-                                    <field-layout>
-                                        <field-col-row style="nested-form-field">
-                                            <field-col xs="6" sm="6" md="6" lg="6" style="margin-all-0"><field-ref name="relationshipHeader"/></field-col>
-                                            <field-col xs="6" sm="6" md="6" lg="6" style="margin-all-0 text-right"><field-ref name="relationshipAction"/></field-col>
-                                        </field-col-row>
-                                        <field-col-row style="nested-form-field">
-                                            <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="lenderName"/></field-col>
-                                        </field-col-row>
-                                        <field-col-row style="nested-form-field">
-                                            <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="mortgageBalance"/></field-col>
-                                        </field-col-row>
-                                        <field-col-row style="nested-form-field">
-                                            <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="mortgagePaymentMonthly"/></field-col>
-                                        </field-col-row>
-                                    </field-layout>
-                                </form-single>
-                            </widgets>
-                        </section-iterate>
-                    </default-field>
-                </field>
-                <field name="mortgageNumberHeader">
-                    <default-field>
-                        <label text="Mortgage ${(mortgageRelationList?.size() ?: 0) + 1}" style="margin-tb-1"/>
-                    </default-field>
-                </field>
-                <field name="lenderName">
-                    <default-field>
-                        <text-line/>
-                    </default-field>
-                </field>
-                <field name="mortgageBalance">
-                    <default-field>
-                        <text-line input-type="number" format="#.##" prefix="$"/>
-                    </default-field>
-                </field>
-                <field name="mortgagePaymentMonthly">
-                    <default-field>
-                        <text-line input-type="number" format="#.##" prefix="$"/>
-                        <label text="Exclude property taxes, insurance, or HOA fees" style="text-caption"/>
-                    </default-field>
-                </field>
-
-                <field name="submitButton">
-                    <default-field container-style="text-primary">
-                        <submit text="Add Mortgage"/>
-                    </default-field>
-                </field>
                 <field name="continueButton">
                     <default-field container-style="text-primary">
                         <submit text="Continue"/>
@@ -306,42 +196,6 @@
                     <field-col-row>
                         <field-col xs="0" sm="1" md="3" lg="3"/>
                         <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="propertyInsuranceCostsAnnually"/></field-col>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                    </field-col-row>
-
-                    <field-col-row>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="mortgageHeader"/></field-col>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                    </field-col-row>
-                    <field-col-row>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="mortgageRelations"/></field-col>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                    </field-col-row>
-                    <field-col-row>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="mortgageNumberHeader"/></field-col>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                    </field-col-row>
-                    <field-col-row>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="lenderName"/></field-col>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                    </field-col-row>
-                    <field-col-row>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="mortgageBalance"/></field-col>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                    </field-col-row>
-                    <field-col-row>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="mortgagePaymentMonthly"/></field-col>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                    </field-col-row>
-                    <field-col-row>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="submitButton"/></field-col>
                         <field-col xs="0" sm="1" md="3" lg="3"/>
                     </field-col-row>
 

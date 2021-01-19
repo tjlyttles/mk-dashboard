@@ -179,6 +179,48 @@
             </widgets>
         </section>
 
+        <section name="MortgageSection">
+            <widgets>
+                <section name="MortgageRelationSection" condition="mortgageRelationList.size() > 0">
+                    <widgets>
+                        <section-iterate name="MortgageIterator" list="mortgageRelationList" entry="mortgageRelation">
+                            <actions>
+                                <entity-find-one entity-name="mk.close.FinancialFlow" value-field="mortgageFinFlow">
+                                    <field-map field-name="partyId" from="mortgageRelation.fromPartyId"/>
+                                    <field-map field-name="financialFlowTypeEnumId" value="MkFinFlowMortgage"/>
+                                    <field-map field-name="entryTypeEnumId" value="MkEntryExpense"/>
+                                    <field-map field-name="partyRelationshipId" from="mortgageRelation.partyRelationshipId"/>
+                                </entity-find-one>
+
+                                <set field="partyRelationshipId" from="mortgageRelation.partyRelationshipId"/>
+                                <set field="lenderName" from="mortgageRelation.organizationName"/>
+                                <set field="mortgageBalance" from="mortgageFinFlow.balance"/>
+                                <set field="mortgagePaymentMonthly" from="mortgageFinFlow.amount"/>
+                            </actions>
+                            <widgets>
+                                <container-row>
+                                    <row-col xs="6" sm="6" md="6" lg="6">
+                                        <container style="margin-tb-05">
+                                            <label text="${lenderName}"/>
+                                        </container>
+                                    </row-col>
+                                    <row-col xs="6" sm="6" md="6" lg="6" style="text-right">
+                                        <section-include name="EditMortgage" location="component://mk-dashboard/template/party/PartyForms.xml"/>
+                                        <link text="Remove" btn-type="danger" url="deleteMortgage" parameter-map="[orderId: orderId, partyId: partyId, partyRelationshipId: mortgageRelation.partyRelationshipId]"/>
+                                    </row-col>
+                                </container-row>
+                                <container style="h-separator margin-tb-05"/>
+                            </widgets>
+                        </section-iterate>
+                        <container style="margin-tb-2"/>
+                    </widgets>
+                </section>
+                <container style="block margin-tb-1">
+                    <section-include name="AddMortgage" location="component://mk-dashboard/template/party/PartyForms.xml"/>
+                </container>
+            </widgets>
+        </section>
+
         <section name="IdentitySection" condition="identityList.size() > 0">
             <widgets>
                 <section-iterate name="IdentityIterator" list="identityList" entry="identity">
