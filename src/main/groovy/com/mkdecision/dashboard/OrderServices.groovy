@@ -205,6 +205,48 @@ class OrderServices {
         }
     }
 
+    static void validateFormResponse(ExecutionContext ec) {
+        // shortcuts for convenience
+        ContextStack cs = ec.getContext()
+        EntityFacade ef = ec.getEntity()
+        ServiceFacade sf = ec.getService()
+        UserFacade uf = ec.getUser()
+        MessageFacade mf = ec.getMessage()
+        L10nFacade lf = ec.getL10n()
+
+        String productId = (String) cs.getOrDefault("productId", null)
+        String formResponseId = (String) cs.getOrDefault("formResponseId", null)
+
+        // find product form
+        EntityList formList = ef.find("mantle.product.ProductDbForm")
+                .condition("productId", productId)
+                .list()
+        EntityValue form = formList.isEmpty() ? null : formList.getFirst()
+        if (form == null) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_ELIGIBILITY_FORM"))
+            return
+        }
+
+        // validate form fields
+        String formId = form.getString("formId")
+        EntityList fieldList = ef.find("moqui.screen.form.DbFormField")
+                .condition("formId", formId)
+                .list()
+        for (EntityValue field : fieldList) {
+            long answerCount = ef.find("moqui.screen.form.FormResponseAnswer")
+                    .condition("formResponseId", formResponseId)
+                    .condition("formId", formId)
+                    .condition("fieldName", field.getString("fieldName"))
+                    .condition("valueText", "true")
+                    .count()
+            if (answerCount == 0) {
+                mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
+                return
+            }
+        }
+
+    }
+
     static Map<String, Object> storeOrder(ExecutionContext ec) {
 
         // shortcuts for convenience
@@ -237,34 +279,6 @@ class OrderServices {
                 .call()
         if (mf.hasError()) {
             return new HashMap<String, Object>()
-        }
-
-        // find product form
-        EntityList formList = ef.find("mantle.product.ProductDbForm")
-                .condition("productId", productId)
-                .list()
-        EntityValue form = formList.isEmpty() ? null : formList.getFirst()
-        if (form == null) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_ELIGIBILITY_FORM"))
-            return new HashMap<String, Object>()
-        }
-
-        // validate form fields
-        String formId = form.getString("formId")
-        EntityList fieldList = ef.find("moqui.screen.form.DbFormField")
-                .condition("formId", formId)
-                .list()
-        for (EntityValue field : fieldList) {
-            long answerCount = ef.find("moqui.screen.form.FormResponseAnswer")
-                    .condition("formResponseId", formResponseId)
-                    .condition("formId", formId)
-                    .condition("fieldName", field.getString("fieldName"))
-                    .condition("valueText", "true")
-                    .count()
-            if (answerCount == 0) {
-                mf.addError(lf.localize("DASHBOARD_APPLICANT_NOT_ELIGIBLE"))
-                return new HashMap<String, Object>()
-            }
         }
 
         // store order

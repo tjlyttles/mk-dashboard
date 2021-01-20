@@ -20,10 +20,13 @@
     <parameter name="estimatedPayment"/>
 
     <transition name="storeFormResponse">
-        <service-call name="org.moqui.impl.ScreenServices.create#FormResponse" out-map="context">
-            <field-map field-name="formId" from="formId"/>
-            <field-map field-name="responseMap" from="ec.web.parameters"/>
-        </service-call>
+        <actions>
+            <service-call name="org.moqui.impl.ScreenServices.create#FormResponse" out-map="context">
+                <field-map field-name="formId" from="formId"/>
+                <field-map field-name="responseMap" from="ec.web.parameters"/>
+            </service-call>
+            <service-call name="mkdecision.dashboard.OrderServices.validate#FormResponse" in-map="context"/>
+        </actions>
         <default-response url="../PrimaryApplicant">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
