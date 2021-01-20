@@ -206,6 +206,7 @@ class OrderServices {
     }
 
     static void validateFormResponse(ExecutionContext ec) {
+
         // shortcuts for convenience
         ContextStack cs = ec.getContext()
         EntityFacade ef = ec.getEntity()
@@ -214,6 +215,7 @@ class OrderServices {
         MessageFacade mf = ec.getMessage()
         L10nFacade lf = ec.getL10n()
 
+        // get the parameters
         String productId = (String) cs.getOrDefault("productId", null)
         String formResponseId = (String) cs.getOrDefault("formResponseId", null)
 
@@ -244,7 +246,6 @@ class OrderServices {
                 return
             }
         }
-
     }
 
     static Map<String, Object> storeOrder(ExecutionContext ec) {
