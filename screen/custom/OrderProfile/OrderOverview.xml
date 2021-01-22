@@ -323,10 +323,9 @@
                                 <field name="estimatedPayment">
                                     <default-field>
                                         <text-line format="#.##" prefix="$" default-transition="calculateEstimatedPayment" disabled="true">
+                                            <depends-on field="productStoreId"/>
                                             <depends-on field="productId"/>
-                                            <depends-on field="totalPurchaseAmount"/>
-                                            <depends-on field="downPayment"/>
-                                            <depends-on field="loanFee"/>
+                                            <depends-on field="netPurchaseAmount"/>
                                         </text-line>
                                     </default-field>
                                 </field>
