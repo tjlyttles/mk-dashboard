@@ -261,12 +261,17 @@
                             <form-single name="EditItemForm" transition="updateOrderItem">
                                 <field name="orderId">
                                     <default-field>
-                                        <hidden default-value="${orderId}"/>
+                                        <hidden default-value="${orderHeader.orderId}"/>
                                     </default-field>
                                 </field>
                                 <field name="orderPartSeqId">
                                     <default-field>
                                         <hidden default-value="${orderPart.orderPartSeqId}"/>
+                                    </default-field>
+                                </field>
+                                <field name="productStoreId">
+                                    <default-field>
+                                        <hidden default-value="${orderHeader.productStoreId}"/>
                                     </default-field>
                                 </field>
                                 <field name="productCategoryId">
