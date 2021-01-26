@@ -86,22 +86,22 @@
                     <select-field field-name="contentDate"/>
                     <select-field field-name="userId"/>
                 </entity-find>
-                <else>
-                    <entity-find entity-name="mkdecision.dashboard.PartyContentDetail" list="partyContentList" distinct="true">
-                        <econdition field-name="partyId" operator="in" from="partyIdList"/>
-                        <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
-                        <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
-                        <econdition field-name="userId" from="ec.user.userId"/>
-                        <select-field field-name="partyContentId"/>
-                        <select-field field-name="partyId"/>
-                        <select-field field-name="contentLocation"/>
-                        <select-field field-name="partyContentTypeEnumId"/>
-                        <select-field field-name="description"/>
-                        <select-field field-name="contentDate"/>
-                        <select-field field-name="userId"/>
-                    </entity-find>
-                </else>
             </else-if>
+            <else>
+                <entity-find entity-name="mkdecision.dashboard.PartyContentDetail" list="partyContentList" distinct="true">
+                    <econdition field-name="partyId" operator="in" from="partyIdList"/>
+                    <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+                    <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
+                    <econdition field-name="userId" from="ec.user.userId"/>
+                    <select-field field-name="partyContentId"/>
+                    <select-field field-name="partyId"/>
+                    <select-field field-name="contentLocation"/>
+                    <select-field field-name="partyContentTypeEnumId"/>
+                    <select-field field-name="description"/>
+                    <select-field field-name="contentDate"/>
+                    <select-field field-name="userId"/>
+                </entity-find>
+            </else>
         </if>
 
         <if condition="isUnderwriter">
@@ -131,22 +131,22 @@
                     <select-field field-name="contentDate"/>
                     <select-field field-name="userId"/>
                 </entity-find>
-                <else>
-                    <entity-find entity-name="mkdecision.dashboard.OrderContentDetail" list="orderContentList" distinct="true">
-                        <econdition field-name="orderId" from="orderId"/>
-                        <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
-                        <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
-                        <econdition field-name="userId" from="ec.user.userId"/>
-                        <select-field field-name="orderContentId"/>
-                        <select-field field-name="orderContentTypeEnumId"/>
-                        <select-field field-name="orderId"/>
-                        <select-field field-name="contentLocation"/>
-                        <select-field field-name="description"/>
-                        <select-field field-name="contentDate"/>
-                        <select-field field-name="userId"/>
-                    </entity-find>
-                </else>
             </else-if>
+            <else>
+                <entity-find entity-name="mkdecision.dashboard.OrderContentDetail" list="orderContentList" distinct="true">
+                    <econdition field-name="orderId" from="orderId"/>
+                    <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
+                    <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
+                    <econdition field-name="userId" from="ec.user.userId"/>
+                    <select-field field-name="orderContentId"/>
+                    <select-field field-name="orderContentTypeEnumId"/>
+                    <select-field field-name="orderId"/>
+                    <select-field field-name="contentLocation"/>
+                    <select-field field-name="description"/>
+                    <select-field field-name="contentDate"/>
+                    <select-field field-name="userId"/>
+                </entity-find>
+            </else>
         </if>
 
         <set field="fileList" from="[]"/>
