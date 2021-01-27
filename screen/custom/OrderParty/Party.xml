@@ -227,6 +227,13 @@
                         </drop-down>
                     </default-field>
                 </field>
+
+                <field name="addressDurationHeader">
+                    <default-field>
+                        <label text="Address Duration" type="h5" style="margin-tb-1"/>
+                        <container style="h-separator margin-tb-1"/>
+                    </default-field>
+                </field>
                 <field name="addressYears">
                     <default-field title="Years">
                         <text-line input-type="number" rules="value =&gt; (value &gt;= 0 &amp;&amp; value &lt;= 100) || 'Please enter a number between 0 and 100.'"/>
@@ -356,6 +363,13 @@
                         <field-col xs="0" sm="1" md="3" lg="3"/>
                         <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="city"/></field-col>
                         <field-col xs="12" sm="5" md="3" lg="3"><field-ref name="stateProvinceGeoId"/></field-col>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                    </field-col-row>
+                    <field-col-row>
+                        <field-col xs="0" sm="1" md="3" lg="3"/>
+                        <field-col xs="12" sm="10" md="6" lg="6">
+                            <field-ref name="addressDurationHeader"/>
+                        </field-col>
                         <field-col xs="0" sm="1" md="3" lg="3"/>
                     </field-col-row>
                     <field-col-row>
