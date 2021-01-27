@@ -42,6 +42,7 @@
         <set field="agreementIdList" from="agreementList?.agreementId?.toSet()"/>
         <entity-find entity-name="mantle.party.agreement.AgreementContent" list="agreementContentList">
             <econdition field-name="agreementId" operator="in" from="agreementIdList"/>
+            <order-by field-name="-contentDate"/>
         </entity-find>
 
         <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
@@ -62,6 +63,7 @@
         <if condition="isUnderwriter">
             <entity-find entity-name="mkdecision.dashboard.PartyContentDetail" list="partyContentList" distinct="true">
                 <econdition field-name="partyId" operator="in" from="partyIdList"/>
+                <order-by field-name="-contentDate"/>
                 <select-field field-name="partyContentId"/>
                 <select-field field-name="partyId"/>
                 <select-field field-name="contentLocation"/>
@@ -78,6 +80,7 @@
                         <econdition field-name="storePartyRoleTypeId" value="FinanceManager"/>
                         <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
                     </econditions>
+                    <order-by field-name="-contentDate"/>
                     <select-field field-name="partyContentId"/>
                     <select-field field-name="partyId"/>
                     <select-field field-name="contentLocation"/>
@@ -92,6 +95,7 @@
                         <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
                         <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
                         <econdition field-name="userId" from="ec.user.userId"/>
+                        <order-by field-name="-contentDate"/>
                         <select-field field-name="partyContentId"/>
                         <select-field field-name="partyId"/>
                         <select-field field-name="contentLocation"/>
@@ -176,6 +180,7 @@
 
         <entity-find entity-name="mantle.order.OrderEmailMessageDetail" list="emailList">
             <econdition field-name="orderId" from="orderId"/>
+            <order-by field-name="-sentDate"/>
         </entity-find>
     </actions>
 
