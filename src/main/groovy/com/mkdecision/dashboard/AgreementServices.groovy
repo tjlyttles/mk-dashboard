@@ -24,9 +24,11 @@ class AgreementServices {
         // get the parameters
         String orderId = (String) cs.getOrDefault("orderId", null)
 
-        // find order agreements
-        EntityList orderAgreements = ef.find("mantle.order.OrderAgreement")
+        // find order agreements that are active and not cancelled
+        EntityList orderAgreements = ef.find("mantle.order.OrderAgreementDetail")
                 .condition("orderId", orderId)
+                .condition("statusId", EntityCondition.ComparisonOperator.NOT_EQUAL, "MkAgreeCancelled")
+                .condition("thruDate", EntityCondition.ComparisonOperator.IS_NOT_NULL, null)
                 .list()
 
         // find order parties
