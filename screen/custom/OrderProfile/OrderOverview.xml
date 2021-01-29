@@ -434,6 +434,7 @@
                     </service-call>
                     <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
+                        <field-map field-name="includeAreaCode" from="true"/>
                     </service-call>
                     <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryEmailAddress" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
@@ -499,17 +500,14 @@
                     </container>
                 </row-col>
             </container-row>
-            <form-list name="PartyList" list="partyList" list-entry="party">
+            <form-list name="PartyList" list="partyList">
                 <row-actions>
                     <entity-find-one entity-name="mantle.party.RoleType" value-field="roleType"/>
-                    <entity-find-one entity-name="mantle.party.PartyDetail" value-field="partyDetail">
-                        <field-map field-name="partyId" from="party.partyId"/>
-                    </entity-find-one>
-                    <set field="firstName" from="partyDetail?.firstName ?: null"/>
-                    <set field="middleName" from="partyDetail?.middleName ?: null"/>
-                    <set field="lastName" from="partyDetail?.lastName ?: null"/>
-                    <set field="suffix" from="partyDetail?.suffix ?: null"/>
-                    
+                    <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
+                        <field-map field-name="partyId" from="partyId"/>
+                        <field-map field-name="includeMiddleName" from="true"/>
+                        <field-map field-name="includeSuffix" from="true"/>
+                    </service-call>
                     <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
                     </service-call>
@@ -524,7 +522,7 @@
                 </field>
                 <field name="partyName">
                     <default-field title="Name">
-                        <display text="${firstName ?: '-'} ${middleName ?: ''} ${lastName ?: '-'} ${suffix ?: ''}"/>
+                        <display text="${partyName ?: '-'}"/>
                     </default-field>
                 </field>
                 <field name="contactNumber">

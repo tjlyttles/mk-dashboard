@@ -5,6 +5,8 @@
     <service verb="get" noun="PartyName" type="java" location="com.mkdecision.dashboard.PartyServices" method="getPartyName">
         <in-parameters>
             <parameter name="partyId"/>
+            <parameter name="includeMiddleName" type="Boolean" default="false"/>
+            <parameter name="includeSuffix" type="Boolean" default="false"/>
         </in-parameters>
         <out-parameters>
             <parameter name="partyId"/>
@@ -120,6 +122,7 @@
     <service verb="get" noun="PrimaryTelecomNumber" type="java" location="com.mkdecision.dashboard.PartyServices" method="getPrimaryTelecomNumber">
         <in-parameters>
             <parameter name="partyId"/>
+            <parameter name="includeAreaCode" type="Boolean" default="false"/>
         </in-parameters>
         <out-parameters>
             <parameter name="partyId"/>

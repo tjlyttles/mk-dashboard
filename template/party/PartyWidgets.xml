@@ -273,7 +273,7 @@
         <section name="PersonSection" condition="partyDetail.partyTypeEnumId == 'PtyPerson'">
             <widgets>
                 <container>
-                    <label text="${firstName ?: '-'} ${middleName ?: ''} ${lastName ?: '-'} ${suffix ?: ''}" type="h4"/>
+                    <label text="${partyName ?: '-'}" type="h4"/>
                     <label text="${roleType.description}"/>
                 </container>
 
