@@ -17,6 +17,8 @@ class PartyServices {
 
         // get the parameters
         String partyId = (String) cs.getOrDefault("partyId", null)
+        Boolean includeMiddleName = (Boolean) cs.getOrDefault("includeMiddleName", false)
+        Boolean includeSuffix = (Boolean) cs.getOrDefault("includeSuffix", false)
 
         // get the party
         EntityValue partyDetail = ef.find("mantle.party.PartyDetail")
@@ -28,7 +30,12 @@ class PartyServices {
         String partyNickname = null
         if (partyDetail != null) {
             if (partyDetail.getString("partyTypeEnumId").equals("PtyPerson")) {
-                partyName = String.format("%s %s", StringUtils.defaultString(partyDetail.getString("firstName")), StringUtils.defaultString(partyDetail.getString("lastName"))).trim()
+                if(includeMiddleName && includeSuffix){
+                    partyName = String.format("%s %s %s %s", StringUtils.defaultString(partyDetail.getString("firstName")), StringUtils.defaultString(partyDetail.getString("middleName")), StringUtils.defaultString(partyDetail.getString("lastName")), StringUtils.defaultString(partyDetail.getString("suffix"))).trim()
+                }
+                else {
+                    partyName = String.format("%s %s", StringUtils.defaultString(partyDetail.getString("firstName")), StringUtils.defaultString(partyDetail.getString("lastName"))).trim()
+                }
                 partyNickname = partyDetail.getString("nickname")
             } else if (partyDetail.getString("partyTypeEnumId").equals("PtyOrganization")) {
                 partyName = partyDetail.getString("organizationName")
@@ -147,6 +154,7 @@ class PartyServices {
 
         // get the parameters
         String partyId = (String) cs.getOrDefault("partyId", null)
+        Boolean includeAreaCode = (Boolean) cs.getOrDefault("includeAreaCode", false)
 
         // get the telecom numbers
         EntityList telecomNumbers = ef.find("mantle.party.contact.PartyContactMechTelecomNumber")
@@ -159,7 +167,9 @@ class PartyServices {
         String contactNumber = null
         String contactMechPurposeId = null
         if (telecomNumber != null) {
-            contactNumber = telecomNumber.getString("contactNumber")
+            String areaCode =  telecomNumber.getString("areaCode")
+            String phoneNumber = telecomNumber.getString("contactNumber")
+            contactNumber =  includeAreaCode ?  String.format("%s-%s", areaCode, phoneNumber): phoneNumber
             contactMechPurposeId = telecomNumber.getString("contactMechPurposeId")
         }
 
