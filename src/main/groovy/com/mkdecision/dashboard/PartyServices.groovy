@@ -29,15 +29,29 @@ class PartyServices {
         String partyName = null
         String partyNickname = null
         if (partyDetail != null) {
-            if (partyDetail.getString("partyTypeEnumId").equals("PtyPerson")) {
-                if(includeMiddleName && includeSuffix){
-                    partyName = String.format("%s %s %s %s", StringUtils.defaultString(partyDetail.getString("firstName")), StringUtils.defaultString(partyDetail.getString("middleName")), StringUtils.defaultString(partyDetail.getString("lastName")), StringUtils.defaultString(partyDetail.getString("suffix"))).trim()
+            if (partyDetail.getString("partyTypeEnumId") == "PtyPerson") {
+                String firstName = partyDetail.getString("firstName")
+                String middleName = partyDetail.getString("middleName")
+                String lastName = partyDetail.getString("lastName")
+                String suffix = partyDetail.getString("suffix")
+
+                ArrayList<String> partyNameParts = new ArrayList<>()
+                if (StringUtils.isNotBlank(firstName)) {
+                    partyNameParts.add(firstName)
                 }
-                else {
-                    partyName = String.format("%s %s", StringUtils.defaultString(partyDetail.getString("firstName")), StringUtils.defaultString(partyDetail.getString("lastName"))).trim()
+                if (includeMiddleName && StringUtils.isNotBlank(middleName)) {
+                    partyNameParts.add(middleName)
                 }
+                if (StringUtils.isNotBlank(lastName)) {
+                    partyNameParts.add(lastName)
+                }
+                if (includeSuffix && StringUtils.isNotBlank(suffix)) {
+                    partyNameParts.add(suffix)
+                }
+
+                partyName = StringUtils.defaultIfBlank(StringUtils.join(partyNameParts, " "), null)
                 partyNickname = partyDetail.getString("nickname")
-            } else if (partyDetail.getString("partyTypeEnumId").equals("PtyOrganization")) {
+            } else if (partyDetail.getString("partyTypeEnumId") == "PtyOrganization") {
                 partyName = partyDetail.getString("organizationName")
             }
         }
@@ -167,9 +181,9 @@ class PartyServices {
         String contactNumber = null
         String contactMechPurposeId = null
         if (telecomNumber != null) {
-            String areaCode =  telecomNumber.getString("areaCode")
+            String areaCode = telecomNumber.getString("areaCode")
             String phoneNumber = telecomNumber.getString("contactNumber")
-            contactNumber =  includeAreaCode ?  String.format("%s-%s", areaCode, phoneNumber): phoneNumber
+            contactNumber = includeAreaCode ? String.format("%s-%s", areaCode, phoneNumber) : phoneNumber
             contactMechPurposeId = telecomNumber.getString("contactMechPurposeId")
         }
 
