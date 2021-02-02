@@ -73,7 +73,7 @@
         <entity-find entity-name="mantle.product.asset.Asset" list="assetList">
             <econdition field-name="ownerPartyId" operator="in" from="partyList?.partyId?.toSet()"/>
         </entity-find>
-
+        <entity-find-related-one value-field="orderHeader" relationship-name="status" to-value-field="orderStatus"/>
         <set field="formId" from="formList.isEmpty() ? null : formList.getFirst().get('formId')"/>
         <set field="formResponseId" from="responseList?.getFirst()?.formResponseId ?: null"/>
         <if condition="formResponseId != null">

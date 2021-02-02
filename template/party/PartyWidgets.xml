@@ -4,6 +4,7 @@
         default-menu-include="false">
 
     <parameter name="partyId"/>
+    <parameter name="orderStatus"/>
 
     <widgets>
         <section name="CurrentEmploymentSection">
