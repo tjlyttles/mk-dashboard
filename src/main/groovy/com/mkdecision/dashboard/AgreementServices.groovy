@@ -24,9 +24,11 @@ class AgreementServices {
         // get the parameters
         String orderId = (String) cs.getOrDefault("orderId", null)
 
-        // find order agreements
-        EntityList orderAgreements = ef.find("mantle.order.OrderAgreement")
+        // find order agreements that are active and not cancelled
+        EntityList orderAgreements = ef.find("mantle.order.OrderAgreementDetail")
                 .condition("orderId", orderId)
+                .condition("statusId", EntityCondition.ComparisonOperator.NOT_EQUAL, "MkAgreeCancelled")
+                .condition("thruDate", EntityCondition.ComparisonOperator.IS_NOT_NULL, null)
                 .list()
 
         // find order parties
@@ -103,6 +105,7 @@ class AgreementServices {
         String agreementServiceGenerator = (String) cs.getOrDefault("serviceName", null)
         String partyId = uf.userAccount.getString("partyId")
         String textData = getAgreementText(sf, orderId, templateLocation, agreementServiceGenerator)
+        String agreementId
 
         // validate order
         EntityValue orderHeader = ef.find("mantle.order.OrderHeader")
@@ -124,14 +127,19 @@ class AgreementServices {
                 .condition("productStoreId", orderHeader.getString("productStoreId"))
                 .one()
 
-        // find all the coApplicant on the order for AgreementParty
-        EntityList orderPartParty = ef.find("mantle.order.OrderPartParty")
-                .condition("orderId", orderId)
-                .condition("roleTypeId", "in", "CoApplicant")
-                .list()
+        // check if agreement exist, if not create an agreement
+        EntityValue existingAgreement = ef.find("mantle.order.OrderAgreementDetail")
+                .condition("orderId" , orderId)
+                .condition("agreementTypeEnumId", agreementTypeEnumId)
+                .condition("statusId", "MkAgreeDraft")
+                .one()
 
-        // create agreement
-        Map<String, Object> agreementResp = sf.sync().name("create#mantle.party.agreement.Agreement")
+        if (existingAgreement){
+            // grab the existing agreementId
+            agreementId = (String) existingAgreement.get("agreementId")
+        }else{
+            // create agreement
+            Map<String, Object> agreementResp = sf.sync().name("create#mantle.party.agreement.Agreement")
                 .parameter("agreementTypeEnumId", agreementTypeEnumId)
                 .parameter("statusId", "MkAgreeDraft")
                 .parameter("organizationPartyId", productStore.getString("organizationPartyId"))
@@ -140,27 +148,21 @@ class AgreementServices {
                 .parameter("fromDate", uf.nowTimestamp)
                 .parameter("textData", textData)
                 .call()
-        String agreementId = (String) agreementResp.get("agreementId")
 
-        sf.sync().name("create#mantle.party.agreement.AgreementParty")
-            .parameter("agreementId", agreementId)
-            .parameter("partyId",orderPart.getString("customerPartyId") )
-            .parameter("roleTypeId", "PrimaryApplicant")
-            .call()
+            agreementId = (String) agreementResp.get("agreementId")
 
-        orderPartParty.each{party ->
-            sf.sync().name("create#mantle.party.agreement.AgreementParty")
-                .parameter("agreementId", agreementId)
-                .parameter("partyId",party.getString("partyId") )
-                .parameter("roleTypeId", "CoApplicant")
-                .call()
-        }
-
-        sf.sync().name("create#mantle.order.OrderAgreement")
+            sf.sync().name("create#mantle.order.OrderAgreement")
                 .parameter("orderId", orderId)
                 .parameter("orderPartSeqId", orderPart.getString("orderPartSeqId"))
                 .parameter("agreementId", agreementId)
                 .call()
+        }
+
+        sf.sync().name("create#mantle.party.agreement.AgreementParty")
+            .parameter("agreementId", agreementId)
+            .parameter("partyId",partyId )
+            .parameter("roleTypeId", "FinanceManager")
+            .call()
 
         sf.sync().name("close.AgreementServices.sign#AgreementWithRole")
                 .parameter("agreementId", agreementId)
