@@ -166,6 +166,8 @@
                     </entity-find-one>
                     <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
                         <field-map field-name="partyId" from="party.partyId"/>
+                        <field-map field-name="includeMiddleName" from="true"/>
+                        <field-map field-name="includeSuffix" from="true"/>
                     </service-call>
                     <service-call name="mkdecision.dashboard.PartyServices.get#SocialSecurityNumber" out-map="context">
                         <field-map field-name="partyId" from="party.partyId"/>

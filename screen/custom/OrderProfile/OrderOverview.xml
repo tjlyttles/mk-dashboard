@@ -434,6 +434,7 @@
                     </service-call>
                     <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
+                        <field-map field-name="includeAreaCode" from="true"/>
                     </service-call>
                     <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryEmailAddress" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
@@ -504,6 +505,8 @@
                     <entity-find-one entity-name="mantle.party.RoleType" value-field="roleType"/>
                     <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>
+                        <field-map field-name="includeMiddleName" from="true"/>
+                        <field-map field-name="includeSuffix" from="true"/>
                     </service-call>
                     <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" out-map="context">
                         <field-map field-name="partyId" from="partyId"/>

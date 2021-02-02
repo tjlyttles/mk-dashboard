@@ -293,8 +293,16 @@
                             <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${firstName ?: '-'}"/></row-col>
                         </container-row>
                         <container-row>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Middle Name" style="text-light-grey"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${middleName ?: '-'}"/></row-col>
+                        </container-row>
+                        <container-row>
                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Last name" style="text-light-grey"/></row-col>
                             <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${lastName ?: '-'}"/></row-col>
+                        </container-row>
+                        <container-row>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Suffix" style="text-light-grey"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${suffix ?: '-'}"/></row-col>
                         </container-row>
                         <container-row>
                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Other Name (AKA)" style="text-light-grey"/></row-col>

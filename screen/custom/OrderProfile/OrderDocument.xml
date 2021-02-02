@@ -62,6 +62,7 @@
         <if condition="isUnderwriter">
             <entity-find entity-name="mkdecision.dashboard.PartyContentDetail" list="partyContentList" distinct="true">
                 <econdition field-name="partyId" operator="in" from="partyIdList"/>
+                <econdition field-name="partyContentTypeEnumId" operator="not-equals" value="PcntCreditProfile"/>
                 <select-field field-name="partyContentId"/>
                 <select-field field-name="partyId"/>
                 <select-field field-name="contentLocation"/>
@@ -78,6 +79,7 @@
                         <econdition field-name="storePartyRoleTypeId" value="FinanceManager"/>
                         <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
                     </econditions>
+                    <econdition field-name="partyContentTypeEnumId" operator="not-equals" value="PcntCreditProfile"/>
                     <select-field field-name="partyContentId"/>
                     <select-field field-name="partyId"/>
                     <select-field field-name="contentLocation"/>
@@ -93,6 +95,7 @@
                     <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
                     <econdition field-name="storePartyRoleTypeId" value="SalesRepresentative"/>
                     <econdition field-name="userId" from="ec.user.userId"/>
+                    <econdition field-name="partyContentTypeEnumId" operator="not-equals" value="PcntCreditProfile"/>
                     <select-field field-name="partyContentId"/>
                     <select-field field-name="partyId"/>
                     <select-field field-name="contentLocation"/>
