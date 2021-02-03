@@ -129,9 +129,15 @@
                 <entity-find entity-name="mantle.order.OrderNote" list="noteList">
                     <econdition field-name="orderId" from="orderId"/>
                     <econditions combine="or">
-                        <econdition field-name="internalNote" operator="is-null" value=""/>
-                        <econdition field-name="internalNote" value="N"/>
-                        <econdition field-name="internalNote" value=""/>
+                        <econditions combine="or">
+                            <econdition field-name="internalNote" operator="is-null" value=""/>
+                            <econdition field-name="internalNote" value="N"/>
+                            <econdition field-name="internalNote" value=""/>
+                        </econditions>
+                        <econditions combine="and">
+                            <econdition field-name="internalNote" value="Y"/>
+                            <econdition field-name="userId" from="ec.user.userId"/>
+                        </econditions>
                     </econditions>
                 </entity-find>
             </else>
