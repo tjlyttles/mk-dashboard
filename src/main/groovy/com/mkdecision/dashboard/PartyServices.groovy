@@ -472,7 +472,7 @@ class PartyServices {
                 .parameter("contactMechId", postalAddress.get("contactMechId"))
                 .parameter("contactMechPurposeId", postalAddress.get("contactMechPurposeId"))
                 .parameter("fromDate", postalAddress.get("fromDate"))
-                .parameter("usedSince", usedSince)
+                .parameter("usedSince", usedSince.getTime())
                 .call()
 
         // update telecom number
