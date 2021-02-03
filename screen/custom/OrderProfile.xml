@@ -91,6 +91,7 @@
         
     <actions>
         <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <entity-find-related-one value-field="orderHeader" relationship-name="status" to-value-field="orderStatus"/>
         <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
             <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
             <econdition field-name="partyId" from="ec.user.getUserAccount().partyId"/>
@@ -279,7 +280,7 @@
                         </section>
                     </widgets>
                 </section-iterate>
-                <link url="cancelOrder" text="Cancel" btn-type="danger"/>
+                <link url="cancelOrder" text="Cancel" btn-type="danger" condition="orderStatus?.statusId != 'OrderCancelled'"/>
             </row-col>
         </container-row>
 
