@@ -165,6 +165,8 @@
         </entity-find>
         <set field="productStoreIdSet" from="new TreeSet(partyProductStoreList*.productStoreId)"/>
 
+        <set field="salesRepresentativeId" from="ec.user.userAccount.partyId"/>
+
         <if condition="orderId != null &amp;&amp; orderPartSeqId != null">
             <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
             <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
@@ -287,7 +289,7 @@
                     </default-field>
                 </field>
                 <field name="salesRepresentativeId">
-                    <default-field title="Sales Representative" validate-service="mkdecision.dashboard.OrderServices.store#Order">
+                    <default-field title="Representative" validate-service="mkdecision.dashboard.OrderServices.store#Order">
                         <drop-down required-manual-select="true">
                             <dynamic-options transition="getStoreSalesReps">
                                 <depends-on field="productStoreId"/>
