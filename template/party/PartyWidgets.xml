@@ -327,7 +327,7 @@
                         </container-row>
                         <container-row>
                             <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Occupation" style="text-light-grey"/></row-col>
-                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${occupation ?: '-'}"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${currentEmploymentRelationList.getFirst()?.relationshipName ?: '-'}"/></row-col>
                         </container-row>
                     </container>
                 </container>
@@ -483,7 +483,7 @@
                                     <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${years} years ${months} months"/></row-col>
                                 </container-row>
                                 <container-row>
-                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Title" style="text-light-grey"/></row-col>
+                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Occupation" style="text-light-grey"/></row-col>
                                     <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${jobTitle ?: '-'}"/></row-col>
                                 </container-row>
                                 <container-row>
@@ -601,7 +601,7 @@
                                     <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.format(employmentRelation.thruDate, 'MM-dd-yyyy') ?: ''}"/></row-col>
                                 </container-row>
                                 <container-row>
-                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Title" style="text-light-grey"/></row-col>
+                                    <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Occupation" style="text-light-grey"/></row-col>
                                     <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${jobTitle ?: '-'}"/></row-col>
                                 </container-row>
                                 <container-row>
