@@ -36,13 +36,13 @@
         <entity-find-related value-field="orderPart" relationship-name="parties" list="partyList"/>
         <set field="partyIdList" from="partyList?.partyId?.toSet()"/>
 
-        <entity-find entity-name="mantle.order.OrderAgreement" list="agreementList">
+        <entity-find entity-name="mantle.order.OrderAgreementDetail" list="agreementList">
             <econdition field-name="orderId" from="orderId"/>
         </entity-find>
-        <set field="agreementIdList" from="agreementList?.agreementId?.toSet()"/>
-        <entity-find entity-name="mantle.party.agreement.AgreementContent" list="agreementContentList">
-            <econdition field-name="agreementId" operator="in" from="agreementIdList"/>
+        <entity-find entity-name="mantle.party.agreement.Agreement" list="partyAgreementList">
+            <econdition field-name="otherPartyId" operator="in" from="partyIdList"/>
         </entity-find>
+        <set field="agreementsList" from="(partyAgreementList + agreementList)"/>
 
         <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
             <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
@@ -187,21 +187,39 @@
             <container>
                 <label text="Agreements" type="h4"/>
             </container>
-            <form-list name="AgreementList" list="agreementContentList" list-entry="content">
+            <form-list name="AgreementList" list="agreementsList" list-entry="agreement">
                 <row-actions>
                     <entity-find-one entity-name="moqui.basic.Enumeration" value-field="contentType">
-                        <field-map field-name="enumId" from="content.contentTypeEnumId"/>
+                        <field-map field-name="enumId" from="agreement.agreementTypeEnumId"/>
                     </entity-find-one>
-                    <entity-find-one entity-name="moqui.security.UserAccount" value-field="userAccount">
-                        <field-map field-name="userId" from="content.userId"/>
-                    </entity-find-one>
-                    <entity-find-one entity-name="mantle.party.agreement.Agreement" value-field="agreement">
-                        <field-map field-name="agreementId" from="content.agreementId"/>
-                    </entity-find-one>
+
                     <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="party">
                         <field-map field-name="partyId" from="agreement.otherPartyId"/>
                     </service-call>
-                    <set field="resourceRef" from="ec.resource.getLocationReference(content.contentLocation)"/>
+
+                    <if condition="party.partyName == null">
+                        <entity-find-one entity-name="mantle.party.agreement.AgreementParty" value-field="agreementParty">
+                            <field-map field-name="agreementId" from="agreement.agreementId"/>
+                            <field-map field-name="roleTypeId" value="PrimaryApplicant"/>
+                        </entity-find-one>
+                        <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="party">
+                            <field-map field-name="partyId" from="agreementParty?.partyId"/>
+                        </service-call>
+                    </if>
+
+                    <entity-find-one entity-name="mantle.party.agreement.AgreementContent" value-field="agreementContent">
+                        <field-map field-name="agreementId" from="agreement.agreementId"/>
+                    </entity-find-one>
+
+                    <set field="resourceRef" from="ec.resource.getLocationReference(agreementContent?.contentLocation)?.getFileName()"/>
+
+                    <if condition="resourceRef == null">
+                        <service-call name="mkdecision.dashboard.PartyServices.get#PartyName" out-map="orgParty">
+                            <field-map field-name="partyId" from="agreement?.organizationPartyId"/>
+                        </service-call>
+                        <set field="resourceRef" from="orgParty?.partyName"/>
+                    </if>
+                    <set field="contentDate" from="agreement?.agreementDate"/>
                 </row-actions>
                 <field name="description">
                     <default-field>
@@ -215,12 +233,13 @@
                 </field>
                 <field name="source">
                     <default-field>
-                        <display text="${resourceRef?.getFileName() ?: '-'}"/>
+                        <display text="${resourceRef ?: '-'}"/>
                     </default-field>
                 </field>
+                <!--TODO Need to discuss should we put the same name as party field here or the primaryApplicant if he signed only-->
                 <field name="performedBy">
                     <default-field>
-                        <display text="${userAccount?.userFullName ?: '-'}"/>
+                        <display text="-"/>
                     </default-field>
                 </field>
                 <field name="contentDate">
@@ -241,7 +260,7 @@
                     </column>
                 </columns>
             </form-list>
-            <section name="EmptyContentList" condition="contentList == null || agreementContentList.isEmpty()">
+            <section name="EmptyContentList" condition="contentList == null || agreementsList.isEmpty()">
                 <widgets>
                     <container style="padding-all-05 text-center">
                         <label text="No agreements have been added yet" style="text-grey"/>
