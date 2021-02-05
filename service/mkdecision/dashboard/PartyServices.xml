@@ -108,10 +108,10 @@
                 <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
             </parameter>
             <parameter name="contactMechPurposeId"/>
-            <parameter name="email" required="true">
+            <parameter name="email">
                 <text-email/>
             </parameter>
-            <parameter name="emailVerify" required="true">
+            <parameter name="emailVerify">
                 <text-email/>
             </parameter>
         </in-parameters>
