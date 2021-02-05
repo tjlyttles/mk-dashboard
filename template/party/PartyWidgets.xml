@@ -13,18 +13,18 @@
                         <section-iterate name="CurrentEmploymentIterator" list="currentEmploymentRelationList" entry="employmentRelation">
                             <actions>
                                 <entity-find entity-name="mantle.party.PartyClassificationAppl" list="partyClassList">
-                                    <econdition field-name="partyId" from="employmentRelation.toPartyId"/>
+                                    <econdition field-name="partyId" from="employmentRelation.getFirst()?.toPartyId"/>
                                     <date-filter/>
                                 </entity-find>
                                 <entity-find-one entity-name="mantle.party.PartyRelationshipSetting" value-field="employmentStatusSetting">
-                                    <field-map field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
+                                    <field-map field-name="partyRelationshipId" from="employmentRelation.getFirst()?.partyRelationshipId"/>
                                     <field-map field-name="partySettingTypeId" value="EmploymentStatus"/>
                                 </entity-find-one>
                                 <entity-find entity-name="mk.close.FinancialFlow" list="monthlyIncomeFinFlowList">
-                                    <econdition field-name="partyId" from="employmentRelation.fromPartyId"/>
+                                    <econdition field-name="partyId" from="employmentRelation.getFirst()?.fromPartyId"/>
                                     <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
                                     <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowTotalMonthlyIncome"/>
-                                    <econdition field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
+                                    <econdition field-name="partyRelationshipId" from="employmentRelation.getFirst()?.partyRelationshipId"/>
                                 </entity-find>
                                 <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" in-map="[partyId: employmentRelation.toPartyId]" out-map="telecomNumberResp"/>
                                 <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" in-map="[partyId: employmentRelation.toPartyId]" out-map="postalAddressResp"/>
@@ -357,12 +357,8 @@
                             <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${postalAddressString ?: '-'}"/></row-col>
                         </container-row>
                         <container-row>
-                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Address Duration Years" style="text-light-grey"/></row-col>
-                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${addressYears ?: '-'}"/></row-col>
-                        </container-row>
-                        <container-row>
-                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Address Duration Months" style="text-light-grey"/></row-col>
-                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${addressMonths ?: '-'}"/></row-col>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Address Duration" style="text-light-grey"/></row-col>
+                            <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${addressYears ?: '-'} years ${addressMonths ?: '-'} months"/></row-col>
                         </container-row>
                     </container>
                 </container>

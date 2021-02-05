@@ -786,7 +786,7 @@ class OrderServices {
                     .parameter("contactMechId", postalAddress.get("contactMechId"))
                     .parameter("contactMechPurposeId", postalAddress.get("contactMechPurposeId"))
                     .parameter("fromDate", postalAddress.get("fromDate"))
-                    .parameter("usedSince", usedSince)
+                    .parameter("usedSince", usedSince.getTime())
                     .call()
 
             // update telecom number
@@ -868,7 +868,7 @@ class OrderServices {
                     .parameter("city", city)
                     .parameter("postalCode", postalCode)
                     .parameter("stateProvinceGeoId", stateProvinceGeoId)
-                    .parameter("usedSince", usedSince)
+                    .parameter("usedSince", usedSince.getTime())
                     .parameter("contactMechPurposeId", "PostalPrimary")
                     .call()
 

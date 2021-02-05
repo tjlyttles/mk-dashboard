@@ -13,7 +13,7 @@
                         <label text="Eligibility Form" type="h4"/>
                     </row-col>
                     <row-col sm="4" xs="4" md="4" lg="4" style="text-right">
-                        <container-dialog id="EditEligibility" button-text="Edit">
+                        <container-dialog id="EditEligibility" button-text="Edit" condition="orderEditable">
                             <form-single name="EligibilityForm" extends="DbForm#${formId}" dynamic="true" transition="updateOrderItemEligibility" map="responseMap">
                                 <field name="orderId"><default-field><hidden/></default-field></field>
                                 <field name="orderPartSeqId"><default-field><hidden/></default-field></field>

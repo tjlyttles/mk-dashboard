@@ -47,6 +47,7 @@
 
     <actions>
         <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <entity-find-related-one value-field="orderHeader" relationship-name="status" to-value-field="orderStatus"/>
         <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart">
             <field-map field-name="orderId" from="orderId"/>
             <field-map field-name="orderPartSeqId" value="01"/>
@@ -85,6 +86,14 @@
             </service-call>
             <set field="responseMap" from="formResponse?.responseMap"/>
         </if>
+
+        <entity-find-count entity-name="moqui.basic.StatusFlowItem" count-field="editableOrderStatusCount">
+            <econditions>
+                <econdition field-name="statusFlowId" value="MkDashboardEditableOrderStatuses"/>
+                <econdition field-name="statusId" from="orderStatus.statusId"/>
+            </econditions>
+        </entity-find-count>
+        <set field="orderEditable" from="editableOrderStatusCount > 0 &amp;&amp; (orderHeader.lockUserId == null || orderHeader.lockUserId == ec.user.userId)"/>
     </actions>
 
     <widgets>
@@ -127,6 +136,7 @@
                         <econdition field-name="relationshipTypeEnumId" value="PrtMortgage"/>
                         <econdition field-name="fromPartyId" from="asset.ownerPartyId"/>
                         <econdition field-name="fromRoleTypeId" value="Borrower"/>
+                        <order-by field-name="fromDate"/>
                     </entity-find>
 
                     <set field="assetId" from="asset.assetId"/>
@@ -189,6 +199,7 @@
                         <econdition field-name="relationshipTypeEnumId" value="PrtEmployee"/>
                         <econdition field-name="fromPartyId" from="party.partyId"/>
                         <econdition field-name="fromRoleTypeId" value="Employee"/>
+                        <order-by field-name="fromDate"/>
                     </entity-find>
                     <entity-find entity-name="mk.close.FinancialFlow" list="incomeFinFlowList">
                         <econdition field-name="partyId" from="partyId"/>
@@ -199,6 +210,7 @@
                         <econdition field-name="relationshipTypeEnumId" value="PrtPreviousEmployee"/>
                         <econdition field-name="fromPartyId" from="party.partyId"/>
                         <econdition field-name="fromRoleTypeId" value="Employee"/>
+                        <order-by field-name="fromDate"/>
                     </entity-find>
 
                     <set field="firstName" from="partyDetail?.firstName ?: null"/>

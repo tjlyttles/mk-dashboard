@@ -8,7 +8,7 @@
     <widgets>
         <section name="EditPerson">
             <widgets>
-                <container-dialog id="EditPersonDialog" button-text="Edit">
+                <container-dialog id="EditPersonDialog" button-text="Edit" condition="orderEditable">
                     <form-single name="EditPersonForm" transition="updatePerson">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
@@ -112,7 +112,7 @@
 
         <section name="EditContact">
             <widgets>
-                <container-dialog id="EditContactDialog" button-text="Edit" width="960">
+                <container-dialog id="EditContactDialog" button-text="Edit" width="960" condition="orderEditable">
                     <form-single name="EditContactForm" transition="updateContact">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
@@ -279,7 +279,7 @@
 
         <section name="EditDriversLicense">
             <widgets>
-                <container-dialog id="EditDriversLicenseDialog" button-text="Edit" width="960" condition="partyIdTypeEnumId == 'PtidDriverLicense'">
+                <container-dialog id="EditDriversLicenseDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; partyIdTypeEnumId == 'PtidDriverLicense'">
                     <form-single name="EditDriversLicenseForm" transition="updateIdentity">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -375,7 +375,7 @@
 
         <section name="EditStateIssuedId">
             <widgets>
-                <container-dialog id="EditStateIssuedDialog" button-text="Edit" width="960" condition="partyIdTypeEnumId == 'PtidStateId'">
+                <container-dialog id="EditStateIssuedDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; partyIdTypeEnumId == 'PtidStateId'">
                     <form-single name="EditStateIssuedForm" transition="updateIdentity">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -470,7 +470,7 @@
 
         <section name="EditMilitaryId">
             <widgets>
-                <container-dialog id="EditMilitaryIdDialog" button-text="Edit" width="960" condition="partyIdTypeEnumId == 'PtidMilitaryId'">
+                <container-dialog id="EditMilitaryIdDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; partyIdTypeEnumId == 'PtidMilitaryId'">
                     <form-single name="EditMilitaryIdForm" transition="updateIdentity">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -564,7 +564,7 @@
 
         <section name="EditPassport">
             <widgets>
-                <container-dialog id="EditPassportDialog" button-text="Edit" width="960" condition="partyIdTypeEnumId == 'PtidPassport'">
+                <container-dialog id="EditPassportDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; partyIdTypeEnumId == 'PtidPassport'">
                     <form-single name="EditPassportForm" transition="updateIdentity">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -653,7 +653,7 @@
 
         <section name="EditPermanentResidentCard">
             <widgets>
-                <container-dialog id="EditPermanentResidentCardDialog" button-text="Edit" width="960" condition="partyIdTypeEnumId == 'PtidArn'">
+                <container-dialog id="EditPermanentResidentCardDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; partyIdTypeEnumId == 'PtidArn'">
                     <form-single name="EditPermanentResidentCardForm" transition="updateIdentity">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -842,7 +842,7 @@
 
         <section name="EditCurrentRegularEmployment">
             <widgets>
-                <container-dialog id="EditCurrentRegularEmploymentDialog" button-text="Edit" width="960" condition="employmentStatusEnumId == 'EmpsFullTime' || employmentStatusEnumId == 'EmpsPartTime'">
+                <container-dialog id="EditCurrentRegularEmploymentDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsFullTime' || employmentStatusEnumId == 'EmpsPartTime')">
                     <form-single name="EditCurrentRegularEmploymentForm" transition="updateEmployment">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -1144,7 +1144,7 @@
 
         <section name="EditCurrentSelfEmployment">
             <widgets>
-                <container-dialog id="EditCurrentSelfEmploymentDialog" button-text="Edit" width="960" condition="employmentStatusEnumId == 'EmpsContractor' || employmentStatusEnumId == 'EmpsSelf'">
+                <container-dialog id="EditCurrentSelfEmploymentDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsContractor' || employmentStatusEnumId == 'EmpsSelf')">
                     <form-single name="EditCurrentSelfEmploymentForm" transition="updateEmployment">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -1446,7 +1446,7 @@
 
         <section name="EditPreviousRegularEmployment">
             <widgets>
-                <container-dialog id="EditPreviousRegularEmploymentDialog" button-text="Edit" width="960" condition="employmentStatusEnumId == 'EmpsFullTime' || employmentStatusEnumId == 'EmpsPartTime'">
+                <container-dialog id="EditPreviousRegularEmploymentDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsFullTime' || employmentStatusEnumId == 'EmpsPartTime')">
                     <form-single name="EditPreviousRegularEmploymentForm" transition="updateEmployment">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -1748,7 +1748,7 @@
 
         <section name="EditPreviousSelfEmployment">
             <widgets>
-                <container-dialog id="EditPreviousSelfEmploymentDialog" button-text="Edit" width="960" condition="employmentStatusEnumId == 'EmpsContractor' || employmentStatusEnumId == 'EmpsSelf'">
+                <container-dialog id="EditPreviousSelfEmploymentDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsContractor' || employmentStatusEnumId == 'EmpsSelf')">
                     <form-single name="EditPreviousSelfEmploymentForm" transition="updateEmployment">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -1977,7 +1977,7 @@
 
         <section name="EditIncomeSource">
             <widgets>
-                <container-dialog id="EditIncomeSourceDialog" button-text="Edit" width="960">
+                <container-dialog id="EditIncomeSourceDialog" button-text="Edit" width="960" condition="orderEditable">
                     <form-single name="EditIncomeSourceForm" transition="updateIncomeSource">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -2053,7 +2053,7 @@
 
         <section name="EditProperty">
             <widgets>
-                <container-dialog id="EditPropertyDialog" button-text="Edit">
+                <container-dialog id="EditPropertyDialog" button-text="Edit" condition="orderEditable">
                     <form-single name="EditPropertyForm" transition="updateProperty">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
@@ -2145,7 +2145,7 @@
 
         <section name="EditMortgage">
             <widgets>
-                <container-dialog id="EditMortgageDialog" button-text="Edit">
+                <container-dialog id="EditMortgageDialog" button-text="Edit" condition="orderEditable">
                     <form-single name="EditMortgageForm" transition="updateMortgage">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
