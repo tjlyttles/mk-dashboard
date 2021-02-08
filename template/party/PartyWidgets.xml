@@ -13,18 +13,18 @@
                         <section-iterate name="CurrentEmploymentIterator" list="currentEmploymentRelationList" entry="employmentRelation">
                             <actions>
                                 <entity-find entity-name="mantle.party.PartyClassificationAppl" list="partyClassList">
-                                    <econdition field-name="partyId" from="employmentRelation.getFirst()?.toPartyId"/>
+                                    <econdition field-name="partyId" from="employmentRelation.toPartyId"/>
                                     <date-filter/>
                                 </entity-find>
                                 <entity-find-one entity-name="mantle.party.PartyRelationshipSetting" value-field="employmentStatusSetting">
-                                    <field-map field-name="partyRelationshipId" from="employmentRelation.getFirst()?.partyRelationshipId"/>
+                                    <field-map field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
                                     <field-map field-name="partySettingTypeId" value="EmploymentStatus"/>
                                 </entity-find-one>
                                 <entity-find entity-name="mk.close.FinancialFlow" list="monthlyIncomeFinFlowList">
-                                    <econdition field-name="partyId" from="employmentRelation.getFirst()?.fromPartyId"/>
+                                    <econdition field-name="partyId" from="employmentRelation.fromPartyId"/>
                                     <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
                                     <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowTotalMonthlyIncome"/>
-                                    <econdition field-name="partyRelationshipId" from="employmentRelation.getFirst()?.partyRelationshipId"/>
+                                    <econdition field-name="partyRelationshipId" from="employmentRelation.partyRelationshipId"/>
                                 </entity-find>
                                 <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryTelecomNumber" in-map="[partyId: employmentRelation.toPartyId]" out-map="telecomNumberResp"/>
                                 <service-call name="mkdecision.dashboard.PartyServices.get#PrimaryPostalAddress" in-map="[partyId: employmentRelation.toPartyId]" out-map="postalAddressResp"/>
