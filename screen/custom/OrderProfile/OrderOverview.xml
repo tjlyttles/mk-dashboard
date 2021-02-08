@@ -388,7 +388,7 @@
                     <entity-find-one entity-name="mantle.party.PartyDetail" value-field="decisionBy">
                         <field-map field-name="partyId" from="decision.decisionByPartyId"/>
                     </entity-find-one>
-                    <!--get reasons from decision-->
+
                     <entity-find entity-name="mantle.order.OrderDecisionReason" list="orderDecisionReasons">
                         <econdition field-name="orderId" from="decision?.orderId" />
                         <econdition field-name="decisionDate" from="decision?.decisionDate" />
@@ -397,7 +397,7 @@
                 </row-actions>
                 <field name="description">
                     <default-field>
-                        <container-dialog id="DecisionReasonsDialog" button-style="" button-text="${decisionStatus.description}">
+                        <container-dialog id="DecisionReasonsDialog" button-text="${decisionStatus.description}">
                             <form-list name="DecisionReasonsForm" list="orderDecisionReasons" list-entry="decisionReason">
                                 <row-actions>
                                     <entity-find-one entity-name="moqui.basic.Enumeration" value-field="decisionEnum">
