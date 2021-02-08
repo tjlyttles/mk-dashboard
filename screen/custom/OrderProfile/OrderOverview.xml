@@ -388,10 +388,29 @@
                     <entity-find-one entity-name="mantle.party.PartyDetail" value-field="decisionBy">
                         <field-map field-name="partyId" from="decision.decisionByPartyId"/>
                     </entity-find-one>
+                    <!--get reasons from decision-->
+                    <entity-find entity-name="mantle.order.OrderDecisionReason" list="orderDecisionReasons">
+                        <econdition field-name="orderId" from="decision?.orderId" />
+                        <econdition field-name="decisionDate" from="decision?.decisionDate" />
+                        <order-by field-name="sequenceNum" />
+                    </entity-find>
                 </row-actions>
                 <field name="description">
                     <default-field>
-                        <display text="${decisionStatus.description}"/>
+                        <container-dialog id="DecisionReasonsDialog" button-style="" button-text="${decisionStatus.description}">
+                            <form-list name="DecisionReasonsForm" list="orderDecisionReasons" list-entry="decisionReason">
+                                <row-actions>
+                                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="decisionEnum">
+                                        <field-map field-name="enumId" from="decisionReason.decisionReasonEnumId" />
+                                    </entity-find-one>
+                                </row-actions>
+                                <field name="decisionReasons">
+                                    <default-field>
+                                        <display text="${decisionEnum.description}" />
+                                    </default-field>
+                                </field>
+                            </form-list>
+                        </container-dialog>
                     </default-field>
                 </field>
                 <field name="decisionBy">
