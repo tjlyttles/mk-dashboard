@@ -61,6 +61,7 @@
             <econdition field-name="relationshipTypeEnumId" value="PrtEmployee"/>
             <econdition field-name="fromPartyId" from="partyId"/>
             <econdition field-name="fromRoleTypeId" value="Employee"/>
+            <order-by field-name="fromDate"/>
         </entity-find>
         <entity-find entity-name="mk.close.FinancialFlow" list="incomeFinFlowList">
             <econdition field-name="partyId" from="partyId"/>

@@ -50,6 +50,7 @@
             <econdition field-name="relationshipTypeEnumId" value="PrtMortgage"/>
             <econdition field-name="fromPartyId" from="partyId"/>
             <econdition field-name="fromRoleTypeId" value="Borrower"/>
+            <order-by field-name="fromDate"/>
         </entity-find>
         <log level="warn" message="${mortgageRelationList}"/>
     </actions>
