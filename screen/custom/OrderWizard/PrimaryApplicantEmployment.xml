@@ -22,6 +22,15 @@
         </default-response>
     </transition>
     <transition name="checkEmployment">
+        <actions>
+            <entity-find-count entity-name="mk.close.FinancialFlow" count-field="incomeCount">
+                <econdition field-name="partyId" from="partyId"/>
+                <econdition field-name="entryTypeEnumId" value="MkEntryIncome"/>
+            </entity-find-count>
+            <if condition="incomeCount == 0">
+                <return message="${ec.l10n.localize('DASHBOARD_INVALID_INCOME_SOURCE_COUNT')}" error="true"/>
+            </if>
+        </actions>
         <default-response url="../PrimaryApplicantEmploymentPrevious">
             <parameter name="orderId"/>
             <parameter name="orderPartSeqId"/>
@@ -52,6 +61,7 @@
             <econdition field-name="relationshipTypeEnumId" value="PrtEmployee"/>
             <econdition field-name="fromPartyId" from="partyId"/>
             <econdition field-name="fromRoleTypeId" value="Employee"/>
+            <order-by field-name="fromDate"/>
         </entity-find>
         <entity-find entity-name="mk.close.FinancialFlow" list="incomeFinFlowList">
             <econdition field-name="partyId" from="partyId"/>
@@ -105,7 +115,7 @@
                         <link url="primaryApplicantIdentity" text="Back" style="text-black"/>
                     </row-col>
                     <row-col xs="6" sm="6" md="6" lg="6" style="padding-all-0 text-right">
-                        <link url="checkEmployment" text="Continue" btn-type="default" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId]"/>
+                        <link url="checkEmployment" text="Continue" btn-type="default" parameter-map="[orderId: orderId, orderPartSeqId: orderPartSeqId, partyId: partyId]"/>
                     </row-col>
                 </container-row>
             </row-col>

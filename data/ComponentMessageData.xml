@@ -50,6 +50,7 @@
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_INCOME_SOURCE" locale="en" localized="Invalid income."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_INCOME_SOURCE_TYPE" locale="en" localized="Invalid income type."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_INCOME_SOURCE_AMOUNT" locale="en" localized="Invalid income amount."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_INCOME_SOURCE_COUNT" locale="en" localized="At least 1 income source is required."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_INCOME_SOURCE_DURATION" locale="en" localized="Invalid income duration."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ASSET_CLASS" locale="en" localized="Invalid property type."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_SALVAGE_VALUE" locale="en" localized="Invalid current property value."/>
