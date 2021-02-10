@@ -167,66 +167,6 @@
 
         <set field="salesRepresentativeId" from="ec.user.userAccount.partyId"/>
 
-        <if condition="orderId != null &amp;&amp; orderPartSeqId != null">
-            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
-            <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
-            <set field="salesChannelEnumId" from="orderHeader?.salesChannelEnumId ?: ''"/>
-            <set field="productStoreId" from="orderHeader?.productStoreId ?: ''"/>
-
-            <entity-find entity-name="mantle.order.OrderPartParty" list="salesRepresentativeList">
-                <econdition field-name="orderId" from="orderId"/>
-                <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
-                <econdition field-name="roleTypeId" value="SalesRepresentative"/>
-                <order-by field-name="-lastUpdatedStamp"/>
-            </entity-find>
-            <set field="salesRepresentativeId" from="salesRepresentativeList?.getFirst()?.partyId ?: ''"/>
-
-            <entity-find entity-name="mantle.order.OrderItem" list="orderItemList">
-                <econdition field-name="orderId" from="orderId"/>
-                <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>
-                <order-by field-name="-lastUpdatedStamp"/>
-            </entity-find>
-            <set field="orderItemSeqId" from="orderItemList?.getFirst()?.orderItemSeqId ?: ''"/>
-            <set field="productParameterSetId" from="orderItemList?.getFirst()?.productParameterSetId ?: ''"/>
-            <set field="productId" from="orderItemList?.getFirst()?.productId ?: ''"/>
-            <set field="netPurchaseAmount" from="orderItemList?.getFirst()?.unitAmount ?: ''"/>
-
-            <entity-find entity-name="mantle.product.ProductParameterValue" list="productCategoryParamList">
-                <econdition field-name="productParameterId" value="ProductCategory"/>
-                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
-            </entity-find>
-            <set field="productCategoryId" from="productCategoryParamList?.getFirst()?.parameterValue ?: ''"/>
-
-            <entity-find entity-name="mantle.product.ProductParameterValue" list="totalPurchaseAmountParamList">
-                <econdition field-name="productParameterId" value="TotalPurchaseAmount"/>
-                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
-            </entity-find>
-            <set field="totalPurchaseAmount" from="totalPurchaseAmountParamList?.getFirst()?.parameterValue ?: ''"/>
-
-            <entity-find entity-name="mantle.product.ProductParameterValue" list="downPaymentParamList">
-                <econdition field-name="productParameterId" value="DownPayment"/>
-                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
-            </entity-find>
-            <set field="downPayment" from="downPaymentParamList?.getFirst()?.parameterValue ?: ''"/>
-
-            <entity-find entity-name="mantle.product.ProductParameterValue" list="loanFeeParamList">
-                <econdition field-name="productParameterId" value="LoanFee"/>
-                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
-            </entity-find>
-            <set field="loanFee" from="loanFeeParamList?.getFirst()?.parameterValue ?: ''"/>
-
-            <entity-find entity-name="mantle.product.ProductParameterValue" list="financedAmountParamList">
-                <econdition field-name="productParameterId" value="FinancedAmount"/>
-                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
-            </entity-find>
-            <set field="financedAmount" from="financedAmountParamList?.getFirst()?.parameterValue ?: ''"/>
-
-            <entity-find entity-name="mantle.product.ProductParameterValue" list="estimatedPaymentParamList">
-                <econdition field-name="productParameterId" value="EstimatedPayment"/>
-                <econdition field-name="productParameterSetId" from="productParameterSetId"/>
-            </entity-find>
-            <set field="estimatedPayment" from="estimatedPaymentParamList?.getFirst()?.parameterValue ?: ''"/>
-        </if>
     </actions>
 
     <widgets>
