@@ -58,21 +58,21 @@
             </entity-find>
             <set field="hoaFeeMonthly" from="hoaMonthlyFeeFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
 
-            <entity-find entity-name="mk.close.FinancialFlow" list="annualPropertyTaxFinFlowList">
+            <entity-find entity-name="mk.close.FinancialFlow" list="monthlyPropertyTaxFinFlowList">
                 <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
-                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowAnnualPropertyTaxes"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowMonthlyPropertyTaxes"/>
                 <econdition field-name="partyId" from="partyId"/>
                 <econdition field-name="assetId" from="assetId"/>
             </entity-find>
-            <set field="propertyTaxesAnnually" from="annualPropertyTaxFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
+            <set field="propertyTaxesMonthly" from="monthlyPropertyTaxFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
 
-            <entity-find entity-name="mk.close.FinancialFlow" list="annualInsuranceCostFinFlowList">
+            <entity-find entity-name="mk.close.FinancialFlow" list="monthlyInsuranceCostFinFlowList">
                 <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
-                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowAnnualInsuranceCosts"/>
+                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowMonthlyInsuranceCosts"/>
                 <econdition field-name="partyId" from="partyId"/>
                 <econdition field-name="assetId" from="assetId"/>
             </entity-find>
-            <set field="propertyInsuranceCostsAnnually" from="annualInsuranceCostFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
+            <set field="propertyInsuranceCostsMonthly" from="monthlyInsuranceCostFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
         </if>
     </actions>
 
@@ -140,13 +140,13 @@
                         <text-line input-type="number" format="#.##" prefix="$"/>
                     </default-field>
                 </field>
-                <field name="propertyTaxesAnnually">
-                    <default-field title="Property Taxes Annually">
+                <field name="propertyTaxesMonthly">
+                    <default-field title="Property Taxes Monthly">
                         <text-line input-type="number" format="#.##" prefix="$"/>
                     </default-field>
                 </field>
-                <field name="propertyInsuranceCostsAnnually">
-                    <default-field title="Property Insurance Costs Annually">
+                <field name="propertyInsuranceCostsMonthly">
+                    <default-field title="Property Insurance Costs Monthly">
                         <text-line input-type="number" format="#.##" prefix="$"/>
                     </default-field>
                 </field>
@@ -190,12 +190,12 @@
                     </field-col-row>
                     <field-col-row>
                         <field-col xs="0" sm="1" md="3" lg="3"/>
-                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="propertyTaxesAnnually"/></field-col>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="propertyTaxesMonthly"/></field-col>
                         <field-col xs="0" sm="1" md="3" lg="3"/>
                     </field-col-row>
                     <field-col-row>
                         <field-col xs="0" sm="1" md="3" lg="3"/>
-                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="propertyInsuranceCostsAnnually"/></field-col>
+                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="propertyInsuranceCostsMonthly"/></field-col>
                         <field-col xs="0" sm="1" md="3" lg="3"/>
                     </field-col-row>
 

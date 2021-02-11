@@ -961,8 +961,8 @@ class OrderServices {
         BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
         BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
         BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
-        BigDecimal propertyTaxesAnnually = (BigDecimal) cs.getOrDefault("propertyTaxesAnnually", null)
-        BigDecimal propertyInsuranceCostsAnnually = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsAnnually", null)
+        BigDecimal propertyTaxesMonthly = (BigDecimal) cs.getOrDefault("propertyTaxesMonthly", null)
+        BigDecimal propertyInsuranceCostsMonthly = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsMonthly", null)
 
         // validate asset class
         if (StringUtils.isBlank(classEnumId)) {
@@ -988,15 +988,15 @@ class OrderServices {
             return
         }
 
-        // validate property tax annually
-        if (propertyTaxesAnnually == null || propertyTaxesAnnually < 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_TAX_ANNUALLY"))
+        // validate property tax monthly
+        if (propertyTaxesMonthly == null || propertyTaxesMonthly < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_TAX_MONTHLY"))
             return
         }
 
-        // validate property insurance cost annually
-        if (propertyInsuranceCostsAnnually == null || propertyInsuranceCostsAnnually < 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_INSURANCE_COST_ANNUALLY"))
+        // validate property insurance cost monthly
+        if (propertyInsuranceCostsMonthly == null || propertyInsuranceCostsMonthly < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_INSURANCE_COST_MONTHLY"))
             return
         }
     }
@@ -1019,8 +1019,8 @@ class OrderServices {
         BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
         BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
         BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
-        BigDecimal propertyTaxesAnnually = (BigDecimal) cs.getOrDefault("propertyTaxesAnnually", null)
-        BigDecimal propertyInsuranceCostsAnnually = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsAnnually", null)
+        BigDecimal propertyTaxesMonthly = (BigDecimal) cs.getOrDefault("propertyTaxesMonthly", null)
+        BigDecimal propertyInsuranceCostsMonthly = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsMonthly", null)
 
         // validate fields
         sf.sync().name("mkdecision.dashboard.OrderServices.validate#PropertyFields")
@@ -1099,22 +1099,22 @@ class OrderServices {
                 .parameter("amount", hoaFeeMonthly)
                 .call()
 
-        // create annual property taxes
+        // create monthly property taxes
         sf.sync().name("create#mk.close.FinancialFlow")
                 .parameter("partyId", partyId)
                 .parameter("entryTypeEnumId", "MkEntryExpense")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowAnnualPropertyTaxes")
+                .parameter("financialFlowTypeEnumId", "MkFinFlowMonthlyInsuranceCosts")
                 .parameter("assetId", assetId)
-                .parameter("amount", propertyTaxesAnnually)
+                .parameter("amount", propertyTaxesMonthly)
                 .call()
 
-        // create annual insurance costs
+        // create monthly insurance costs
         sf.sync().name("create#mk.close.FinancialFlow")
                 .parameter("partyId", partyId)
                 .parameter("entryTypeEnumId", "MkEntryExpense")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowAnnualInsuranceCosts")
+                .parameter("financialFlowTypeEnumId", "MkFinFlowMonthlyPropertyTaxes")
                 .parameter("assetId", assetId)
-                .parameter("amount", propertyInsuranceCostsAnnually)
+                .parameter("amount", propertyInsuranceCostsMonthly)
                 .call()
 
         // return the output parameters
