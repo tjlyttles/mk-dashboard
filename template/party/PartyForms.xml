@@ -2087,13 +2087,13 @@
                                 <text-line input-type="number" format="#.##" prefix="$"/>
                             </default-field>
                         </field>
-                        <field name="propertyTaxesAnnually">
-                            <default-field title="Property Taxes Annually">
+                        <field name="propertyTaxesMonthly">
+                            <default-field title="Property Taxes Monthly">
                                 <text-line input-type="number" format="#.##" prefix="$"/>
                             </default-field>
                         </field>
-                        <field name="propertyInsuranceCostsAnnually">
-                            <default-field title="Property Insurance Costs Annually">
+                        <field name="propertyInsuranceCostsMonthly">
+                            <default-field title="Property Insurance Costs Monthly">
                                 <text-line input-type="number" format="#.##" prefix="$"/>
                             </default-field>
                         </field>

@@ -51,6 +51,7 @@
             <econdition field-name="relationshipTypeEnumId" value="PrtPreviousEmployee"/>
             <econdition field-name="fromPartyId" from="partyId"/>
             <econdition field-name="fromRoleTypeId" value="Employee"/>
+            <order-by field-name="fromDate"/>
         </entity-find>
     </actions>
 

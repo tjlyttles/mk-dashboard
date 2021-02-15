@@ -384,8 +384,8 @@
             <parameter name="salvageValue" type="BigDecimal"/>
             <parameter name="acquireCost" type="BigDecimal"/>
             <parameter name="hoaFeeMonthly" type="BigDecimal"/>
-            <parameter name="propertyTaxesAnnually" type="BigDecimal"/>
-            <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal"/>
+            <parameter name="propertyTaxesMonthly" type="BigDecimal"/>
+            <parameter name="propertyInsuranceCostsMonthly" type="BigDecimal"/>
         </in-parameters>
     </service>
     <service verb="update" noun="Property" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateProperty">
@@ -402,11 +402,11 @@
             <parameter name="hoaFeeMonthly" type="BigDecimal" required="true">
                 <number-range min="0" message="Please enter the HOA Fee Monthly"/>
             </parameter>
-            <parameter name="propertyTaxesAnnually" type="BigDecimal" required="true">
-                <number-range min="0" message="Please enter the Property Taxes Annually"/>
+            <parameter name="propertyTaxesMonthly" type="BigDecimal" required="true">
+                <number-range min="0" message="Please enter the Property Taxes Monthly"/>
             </parameter>
-            <parameter name="propertyInsuranceCostsAnnually" type="BigDecimal" required="true">
-                <number-range min="0" message="Please enter the Insurance Costs Annually"/>
+            <parameter name="propertyInsuranceCostsMonthly" type="BigDecimal" required="true">
+                <number-range min="0" message="Please enter the Insurance Costs Monthly"/>
             </parameter>
         </in-parameters>
         <out-parameters>

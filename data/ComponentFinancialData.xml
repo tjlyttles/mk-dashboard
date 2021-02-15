@@ -14,6 +14,8 @@
     <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowAnnualInsuranceCosts" description="Annual Insurance Costs"/>
     <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowAnnualPropertyTaxes" description="Annual Property Taxes"/>
     <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowHoaMonthlyFee" description="HOA Monthly Fee"/>
+    <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowMonthlyInsuranceCosts" description="Monthly Insurance Costs"/>
+    <moqui.basic.Enumeration enumTypeId="FinancialFlow" enumId="MkFinFlowMonthlyPropertyTaxes" description="Monthly Property Taxes"/>
 
     <!-- Income sources -->
     <moqui.basic.Enumeration enumTypeId="EnumGroup" enumId="DefaultDashboardIncomeSourceGroup" description="Default Dashboard Income Source Group"/>
