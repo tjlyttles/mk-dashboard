@@ -70,6 +70,7 @@
                 <select-field field-name="description"/>
                 <select-field field-name="contentDate"/>
                 <select-field field-name="userId"/>
+                <order-by field-name="-contentDate"/>
             </entity-find>
             <else-if condition="isFinanceManager">
                 <entity-find entity-name="mkdecision.dashboard.PartyContentDetail" list="partyContentList" distinct="true">
@@ -87,6 +88,7 @@
                     <select-field field-name="description"/>
                     <select-field field-name="contentDate"/>
                     <select-field field-name="userId"/>
+                    <order-by field-name="-contentDate"/>
                 </entity-find>
             </else-if>
             <else>
@@ -103,6 +105,7 @@
                     <select-field field-name="description"/>
                     <select-field field-name="contentDate"/>
                     <select-field field-name="userId"/>
+                    <order-by field-name="-contentDate"/>
                 </entity-find>
             </else>
         </if>
@@ -117,6 +120,7 @@
                 <select-field field-name="description"/>
                 <select-field field-name="contentDate"/>
                 <select-field field-name="userId"/>
+                <order-by field-name="-contentDate"/>
             </entity-find>
             <else-if condition="isFinanceManager">
                 <entity-find entity-name="mkdecision.dashboard.OrderContentDetail" list="orderContentList" distinct="true">
@@ -133,6 +137,7 @@
                     <select-field field-name="description"/>
                     <select-field field-name="contentDate"/>
                     <select-field field-name="userId"/>
+                    <order-by field-name="-contentDate"/>
                 </entity-find>
             </else-if>
             <else>
@@ -148,6 +153,7 @@
                     <select-field field-name="description"/>
                     <select-field field-name="contentDate"/>
                     <select-field field-name="userId"/>
+                    <order-by field-name="-contentDate"/>
                 </entity-find>
             </else>
         </if>
