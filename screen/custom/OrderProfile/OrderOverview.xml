@@ -630,7 +630,7 @@
                 </field>
                 <field name="status">
                     <conditional-field condition="requirementId.statusId == 'RqmtStApproved'">
-                        <display text="Closed"/>
+                        <display text="Complete"/>
                     </conditional-field>
                     <default-field>
                         <display text="Open"/>
