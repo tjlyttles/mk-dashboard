@@ -314,7 +314,7 @@
             <parameter name="partyRelationshipId"/>
         </out-parameters>
     </service>
-    <service verb="add" noun="CurrentEmployment" type="java" location="com.mkdecision.dashboard.PartyServices" method="addCurrentEmployment">
+    <service verb="add" noun="CurrentEmployment" type="java" location="com.mkdecision.dashboard.PartyServices" method="addEmployment">
         <in-parameters>
             <parameter name="partyId"/>
             <parameter name="relationshipTypeEnumId"/>
@@ -333,7 +333,7 @@
             <parameter name="partyRelationshipId"/>
         </out-parameters>
     </service>
-    <service verb="update" noun="CurrentEmployment" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateCurrentEmployment">
+    <service verb="update" noun="CurrentEmployment" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateEmployment">
         <in-parameters>
             <parameter name="partyId"/>
             <parameter name="relationshipTypeEnumId"/>
@@ -352,7 +352,7 @@
             <parameter name="partyRelationshipId"/>
         </out-parameters>
     </service>
-    <service verb="add" noun="PreviousEmployment" type="java" location="com.mkdecision.dashboard.PartyServices" method="addPreviousEmployment">
+    <service verb="add" noun="PreviousEmployment" type="java" location="com.mkdecision.dashboard.PartyServices" method="addEmployment">
         <in-parameters>
             <parameter name="partyId"/>
             <parameter name="relationshipTypeEnumId"/>
@@ -365,7 +365,7 @@
             <parameter name="partyRelationshipId"/>
         </out-parameters>
     </service>
-    <service verb="update" noun="PreviousEmployment" type="java" location="com.mkdecision.dashboard.PartyServices" method="updatePreviousEmployment">
+    <service verb="update" noun="PreviousEmployment" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateEmployment">
         <in-parameters>
             <parameter name="partyId"/>
             <parameter name="relationshipTypeEnumId"/>
