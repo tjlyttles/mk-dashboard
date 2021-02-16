@@ -69,6 +69,8 @@
             <econditions combine="or">
                 <econdition field-name="roleTypeId" value="PrimaryApplicant"/>
                 <econdition field-name="roleTypeId" value="CoApplicant"/>
+                <econdition field-name="roleTypeId" value="CcSpouseSeparate"/>
+                <econdition field-name="roleTypeId" value="NonBorrowerOwner"/>
             </econditions>
         </entity-find>
         <entity-find entity-name="mantle.product.asset.Asset" list="assetList">
