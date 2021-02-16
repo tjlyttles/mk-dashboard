@@ -185,6 +185,7 @@
 
         <entity-find entity-name="mantle.order.OrderEmailMessageDetail" list="emailList">
             <econdition field-name="orderId" from="orderId"/>
+            <order-by field-name="-sentDate"/>
         </entity-find>
     </actions>
 
