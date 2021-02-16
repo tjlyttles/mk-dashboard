@@ -314,6 +314,70 @@
             <parameter name="partyRelationshipId"/>
         </out-parameters>
     </service>
+    <service verb="add" noun="CurrentEmployment" type="java" location="com.mkdecision.dashboard.PartyServices" method="addEmployment">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="relationshipTypeEnumId"/>
+            <parameter name="jobTitle" required="true">
+                <matches regexp="^[- A-Za-z']+$" message="Please enter an occupation using only letters, apostrophes or hyphens."/>
+            </parameter>
+            <parameter name="years" type="Integer" required="true">
+                <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
+            </parameter>
+            <parameter name="months" type="Integer" required="true">
+                <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyRelationshipId"/>
+        </out-parameters>
+    </service>
+    <service verb="update" noun="CurrentEmployment" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateEmployment">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="relationshipTypeEnumId"/>
+            <parameter name="jobTitle" required="true">
+                <matches regexp="^[- A-Za-z']+$" message="Please enter an occupation using only letters, apostrophes or hyphens."/>
+            </parameter>
+            <parameter name="years" type="Integer" required="true">
+                <number-range min="0" max="100" max-include-equals="true" message="Please enter a number between 0 and 100."/>
+            </parameter>
+            <parameter name="months" type="Integer" required="true">
+                <number-range min="0" max="11" max-include-equals="true" message="Please enter a number between 0 and 11."/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyRelationshipId"/>
+        </out-parameters>
+    </service>
+    <service verb="add" noun="PreviousEmployment" type="java" location="com.mkdecision.dashboard.PartyServices" method="addEmployment">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="relationshipTypeEnumId"/>
+            <parameter name="jobTitle" required="true">
+                <matches regexp="^[- A-Za-z']+$" message="Please enter an occupation using only letters, apostrophes or hyphens."/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyRelationshipId"/>
+        </out-parameters>
+    </service>
+    <service verb="update" noun="PreviousEmployment" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateEmployment">
+        <in-parameters>
+            <parameter name="partyId"/>
+            <parameter name="relationshipTypeEnumId"/>
+            <parameter name="jobTitle" required="true">
+                <matches regexp="^[- A-Za-z']+$" message="Please enter an occupation using only letters, apostrophes or hyphens."/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId"/>
+            <parameter name="partyRelationshipId"/>
+        </out-parameters>
+    </service>
     <service verb="delete" noun="Employment" type="java" location="com.mkdecision.dashboard.PartyServices" method="deleteEmployment">
         <in-parameters>
             <parameter name="partyId" required="true"/>

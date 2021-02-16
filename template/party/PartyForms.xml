@@ -735,17 +735,17 @@
                             </default-field>
                         </field>
                         <field name="years">
-                            <default-field validate-service="mkdecision.dashboard.PartyServices.add#Employment">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.add#CurrentEmployment">
                                 <text-line input-type="number"/>
                             </default-field>
                         </field>
                         <field name="months">
-                            <default-field validate-service="mkdecision.dashboard.PartyServices.add#Employment">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.add#CurrentEmployment">
                                 <text-line input-type="number"/>
                             </default-field>
                         </field>
                         <field name="jobTitle">
-                            <default-field title="Occupation">
+                            <default-field title="Occupation" validate-service="mkdecision.dashboard.PartyServices.add#CurrentEmployment">
                                 <text-line/>
                             </default-field>
                         </field>
@@ -883,17 +883,17 @@
                             </default-field>
                         </field>
                         <field name="years">
-                            <default-field validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.update#CurrentEmployment">
                                 <text-line input-type="number"/>
                             </default-field>
                         </field>
                         <field name="months">
-                            <default-field validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.update#CurrentEmployment">
                                 <text-line input-type="number"/>
                             </default-field>
                         </field>
                         <field name="jobTitle">
-                            <default-field title="Occupation">
+                            <default-field title="Occupation" validate-service="mkdecision.dashboard.PartyServices.update#CurrentEmployment">
                                 <text-line/>
                             </default-field>
                         </field>
@@ -1043,12 +1043,12 @@
                             </default-field>
                         </field>
                         <field name="years">
-                            <default-field validate-service="mkdecision.dashboard.PartyServices.add#Employment">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.add#CurrentEmployment">
                                 <text-line input-type="number"/>
                             </default-field>
                         </field>
                         <field name="months">
-                            <default-field validate-service="mkdecision.dashboard.PartyServices.add#Employment">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.add#CurrentEmployment">
                                 <text-line input-type="number"/>
                             </default-field>
                         </field>
@@ -1197,12 +1197,12 @@
                             </default-field>
                         </field>
                         <field name="years">
-                            <default-field validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.update#CurrentEmployment">
                                 <text-line input-type="number"/>
                             </default-field>
                         </field>
-                        <field name="months" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
-                            <default-field>
+                        <field name="months">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.update#CurrentEmployment">
                                 <text-line input-type="number"/>
                             </default-field>
                         </field>
@@ -1348,7 +1348,7 @@
                             </default-field>
                         </field>
                         <field name="jobTitle">
-                            <default-field title="Occupation">
+                            <default-field title="Occupation" validate-service="mkdecision.dashboard.PartyServices.add#PreviousEmployment">
                                 <text-line/>
                             </default-field>
                         </field>
@@ -1497,7 +1497,7 @@
                             </default-field>
                         </field>
                         <field name="jobTitle">
-                            <default-field title="Occupation">
+                            <default-field title="Occupation" validate-service="mkdecision.dashboard.PartyServices.update#PreviousEmployment">
                                 <text-line/>
                             </default-field>
                         </field>
