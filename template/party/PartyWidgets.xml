@@ -650,7 +650,7 @@
                             <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(hoaFeeMonthly ?: 0, orderHeader.currencyUomId)}"/></row-col>
                         </container-row>
                         <container-row>
-                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Property Tax Monthly" style="text-light-grey"/></row-col>
+                            <row-col lg="3" md="3" sm="4" xs="12" style="padding-all-0"><label text="Property Taxes Monthly" style="text-light-grey"/></row-col>
                             <row-col lg="9" md="9" sm="8" xs="12" style="padding-all-0"><label text="${ec.l10n.formatCurrency(propertyTaxesMonthly ?: 0, orderHeader.currencyUomId)}"/></row-col>
                         </container-row>
                         <container-row>
