@@ -865,6 +865,7 @@ class PartyServices {
                 .parameter("financialFlowTypeEnumId", "MkFinFlowTotalMonthlyIncome")
                 .parameter("amount", monthlyIncome)
                 .parameter("fromDate", fromDate.getTime())
+                .parameter("thruDate", toDate.getTime())
                 .call()
 
         // return the output parameters

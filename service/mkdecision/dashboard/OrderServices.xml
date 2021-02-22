@@ -176,7 +176,7 @@
             <parameter name="suffix"/>
             <parameter name="nickname"/>
             <parameter name="address1" required="true">
-                <matches regexp="^(?=[- #a-zA-Z0-9.',\/]+$)(?!.*(?:(.*([p|P][\s?.?]*[o|O][\s?.?]*[b|B][\s]|\b[p|P][\s?.?]*[o|O][\s?.?]*[b|B][\s]*[o|O][\s]*[x|X][\s]*[a-zA-Z0-9]*|\b[P|p]+(OST|ost|o|O)?\s*[O|o|0]+(ffice|FFICE)?\s*[B|b][O|o|0]?[X|x]+\.?\s+[#]?(\d+)*(\D+)*)))).*$" message="Please enter a valid street address using only letters, numbers, spaces, periods, commas, and -, /, ', or #. and No P.O. Boxes"/>
+                <matches regexp="^(?=[- #a-zA-Z0-9.',\/]+$)(?!.*(?:(.*([p|P][\s?.?]*[o|O][\s?.?]*[b|B][\s]|\b[p|P][\s?.?]*[o|O][\s?.?]*[b|B][\s]*[o|O][\s]*[x|X][\s]*[a-zA-Z0-9]*|\b[P|p]+(OST|ost|o|O)?\s*[O|o|0]+(ffice|FFICE)?\s*[B|b][O|o|0]?[X|x]+\.?\s+[#]?(\d+)*(\D+)*)))).*$" message="Please enter a valid street address using only letters, numbers, spaces and special characters (periods, commas, -, /, ', or #). Do not include P.O. Box numbers."/>
             </parameter>
             <parameter name="unitNumber"/>
             <parameter name="postalCode" required="true">
