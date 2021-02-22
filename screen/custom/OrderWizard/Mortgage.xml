@@ -44,7 +44,6 @@
             <econdition field-name="fromRoleTypeId" value="Borrower"/>
             <order-by field-name="fromDate"/>
         </entity-find>
-        <log level="warn" message="${mortgageRelationList}"/>
     </actions>
 
     <widgets>

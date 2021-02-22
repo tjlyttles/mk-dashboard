@@ -38,8 +38,6 @@
                                 <set field="days" from="java.util.concurrent.TimeUnit.DAYS.convert(millis, java.util.concurrent.TimeUnit.MILLISECONDS)"/>
                                 <set field="years" from="Math.floor(days / 365)" type="Integer"/>
                                 <set field="months" from="Math.floor(days / 30.4) - (years * 12)" type="Integer"/>
-                                <log level="warn" message=">> ${years}"/>
-                                <log level="warn" message=">> ${months}"/>
                                 <set field="employerContactNumber" from="telecomNumberResp.contactNumber"/>
                                 <set field="employerAddress1" from="postalAddressResp.postalAddress?.address1"/>
                                 <set field="employerUnitNumber" from="postalAddressResp.postalAddress?.unitNumber"/>
