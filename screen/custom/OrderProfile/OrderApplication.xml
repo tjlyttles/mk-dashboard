@@ -137,9 +137,9 @@
                     <set field="classEnumId" from="asset.classEnumId"/>
                     <set field="salvageValue" from="asset.salvageValue"/>
                     <set field="acquireCost" from="asset.acquireCost"/>
-                    <set field="hoaFeeMonthly" from="hoaMonthlyFeeFinFlowList?.getFirst().amount ?: 0"/>
-                    <set field="propertyTaxesMonthly" from="monthlyPropertyTaxFinFlowList?.getFirst().amount ?: 0"/>
-                    <set field="propertyInsuranceCostsMonthly" from="monthlyInsuranceCostFinFlowList?.getFirst().amount ?: 0"/>
+                    <set field="hoaFeeMonthly" from="hoaMonthlyFeeFinFlowList?.getFirst()?.amount ?: 0"/>
+                    <set field="propertyTaxesMonthly" from="monthlyPropertyTaxFinFlowList?.getFirst()?.amount ?: 0"/>
+                    <set field="propertyInsuranceCostsMonthly" from="monthlyInsuranceCostFinFlowList?.getFirst()?.amount ?: 0"/>
                 </actions>
                 <widgets>
                     <container style="col-lg-6 col-md-12 col-sm-12 col-xs-12">
