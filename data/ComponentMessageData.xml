@@ -56,7 +56,7 @@
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_SALVAGE_VALUE" locale="en" localized="Invalid current property value."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_ACQUIRE_COST" locale="en" localized="Invalid original purchase price."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_HOA_FEE_MONTHLY" locale="en" localized="Invalid HOA fee monthly."/>
-    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PROPERTY_TAX_MONTHLY" locale="en" localized="Invalid property tax monthly."/>
+    <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PROPERTY_TAX_MONTHLY" locale="en" localized="Invalid property taxes monthly."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_PROPERTY_INSURANCE_COST_MONTHLY" locale="en" localized="Invalid property insurance cost monthly."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_LENDER_NAME" locale="en" localized="Invalid lender name."/>
     <moqui.basic.LocalizedMessage original="DASHBOARD_INVALID_MORTGAGE_BALANCE" locale="en" localized="Invalid mortgage balance."/>

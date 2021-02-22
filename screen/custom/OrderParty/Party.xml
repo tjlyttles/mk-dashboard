@@ -71,7 +71,7 @@
             <set field="emailVerify" from="emailAddress"/>
         </if>
 
-        <set field="productRoleTypes" from="['PrimaryApplicant', 'CoApplicant', 'NonBorrowerOwner', 'NonApplicantSpouse']"/>
+        <set field="productRoleTypes" from="['PrimaryApplicant', 'CoApplicant', 'NonBorrowerOwner', 'CcSpouseSeparate',]"/>
     </actions>
 
     <widgets>
