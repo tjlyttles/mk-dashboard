@@ -10,7 +10,7 @@
                 <if condition="orderHeader != null">
                     <entity-find-count entity-name="moqui.basic.StatusFlowItem" count-field="editableOrderStatusCount">
                         <econditions>
-                            <econdition field-name="statusFlowId" value="MkDashboardEditableOrderStatuses"/>
+                            <econdition field-name="statusFlowId" value="ec.user.getPreference('UsrPrfMkDashboardEditableOrderStatuses')"/>
                             <econdition field-name="statusId" from="orderHeader.statusId"/>
                         </econditions>
                     </entity-find-count>

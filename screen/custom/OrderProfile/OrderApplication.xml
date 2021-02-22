@@ -88,14 +88,6 @@
             </service-call>
             <set field="responseMap" from="formResponse?.responseMap"/>
         </if>
-
-        <entity-find-count entity-name="moqui.basic.StatusFlowItem" count-field="editableOrderStatusCount">
-            <econditions>
-                <econdition field-name="statusFlowId" value="MkDashboardEditableOrderStatuses"/>
-                <econdition field-name="statusId" from="orderStatus.statusId"/>
-            </econditions>
-        </entity-find-count>
-        <set field="orderEditable" from="editableOrderStatusCount > 0 &amp;&amp; (orderHeader.lockUserId == null || orderHeader.lockUserId == ec.user.userId)"/>
     </actions>
 
     <widgets>

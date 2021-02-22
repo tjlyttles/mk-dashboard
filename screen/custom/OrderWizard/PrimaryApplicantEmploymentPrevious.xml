@@ -40,14 +40,6 @@
         <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
         <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
 
-        <entity-find-count entity-name="moqui.basic.StatusFlowItem" count-field="editableOrderStatusCount">
-            <econditions>
-                <econdition field-name="statusFlowId" value="MkDashboardEditableOrderStatuses"/>
-                <econdition field-name="statusId" from="orderHeader.statusId"/>
-            </econditions>
-        </entity-find-count>
-        <set field="orderEditable" from="editableOrderStatusCount > 0 &amp;&amp; (orderHeader.lockUserId == null || orderHeader.lockUserId == ec.user.userId)"/>
-
         <entity-find entity-name="mantle.order.OrderPartParty" list="partyList">
             <econdition field-name="orderId" from="orderId"/>
             <econdition field-name="orderPartSeqId" from="orderPartSeqId"/>

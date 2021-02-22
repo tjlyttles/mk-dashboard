@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<entity-facade-xml type="seed">
-    <moqui.basic.StatusFlow statusFlowId="MkDealerDashboardEditableOrderStatuses" description="Default List of Statuses Where Order Is Editable In Dealer Dashboard"/>
-    <moqui.basic.StatusFlowItem statusFlowId="MkDealerDashboardEditableOrderStatuses" statusId="OrderOpen"/>
-    <moqui.security.UserGroupPreference userGroupId="FINANCE_MANAGER" preferenceKey="UsrPrfMkDashboardEditableOrderStatuses" preferenceValue="MkDealerDashboardEditableOrderStatuses"/>
-    <moqui.security.UserGroupPreference userGroupId="SALES_REPRESENTATIVE" preferenceKey="UsrPrfMkDashboardEditableOrderStatuses" preferenceValue="MkDealerDashboardEditableOrderStatuses"/>
-    <moqui.security.UserGroupPreference userGroupId="LOAN_PROCESSOR" preferenceKey="UsrPrfMkDashboardEditableOrderStatuses" preferenceValue="MkDealerDashboardEditableOrderStatuses"/>
-</entity-facade-xml>
