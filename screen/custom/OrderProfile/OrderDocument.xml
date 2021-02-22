@@ -42,7 +42,7 @@
         <entity-find entity-name="mantle.party.agreement.Agreement" list="partyAgreementList">
             <econdition field-name="otherPartyId" operator="in" from="partyIdList"/>
         </entity-find>
-        <set field="agreementsList" from="(partyAgreementList + agreementList)"/>
+        <set field="agreementsList" from="(partyAgreementList + agreementList).orderByFields(['-agreementDate'])"/>
 
         <entity-find-count entity-name="mantle.product.store.ProductStoreParty" count-field="financeManagerCount">
             <econdition field-name="productStoreId" from="orderHeader.productStoreId"/>
