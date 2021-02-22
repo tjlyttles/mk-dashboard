@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed">
+
+    <!-- Editable order status flow -->
+    <moqui.basic.StatusFlow statusFlowId="MkStorePartyEditableOrderStatuses" description="List of statuses where an Order is editable by the store party"/>
+    <moqui.basic.StatusFlowItem statusFlowId="MkStorePartyEditableOrderStatuses" statusId="OrderOpen"/>
+
+    <!-- Editable order user group preferences -->
+    <moqui.security.UserGroupPreference userGroupId="FINANCE_MANAGER" preferenceKey="UsrPrfMkDashboardEditableOrderStatuses" preferenceValue="MkStorePartyEditableOrderStatuses"/>
+    <moqui.security.UserGroupPreference userGroupId="SALES_REPRESENTATIVE" preferenceKey="UsrPrfMkDashboardEditableOrderStatuses" preferenceValue="MkStorePartyEditableOrderStatuses"/>
+
+</entity-facade-xml>
