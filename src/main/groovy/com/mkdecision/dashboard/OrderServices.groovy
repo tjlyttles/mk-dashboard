@@ -960,9 +960,6 @@ class OrderServices {
         String classEnumId = (String) cs.getOrDefault("classEnumId", null)
         BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
         BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
-        BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
-        BigDecimal propertyTaxesMonthly = (BigDecimal) cs.getOrDefault("propertyTaxesMonthly", null)
-        BigDecimal propertyInsuranceCostsMonthly = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsMonthly", null)
 
         // validate asset class
         if (StringUtils.isBlank(classEnumId)) {
@@ -979,24 +976,6 @@ class OrderServices {
         // validate acquire cost
         if (acquireCost == null || acquireCost < 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_ACQUIRE_COST"))
-            return
-        }
-
-        // validate HOA monthly fee
-        if (hoaFeeMonthly == null || hoaFeeMonthly < 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_HOA_FEE_MONTHLY"))
-            return
-        }
-
-        // validate property tax monthly
-        if (propertyTaxesMonthly == null || propertyTaxesMonthly < 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_TAX_MONTHLY"))
-            return
-        }
-
-        // validate property insurance cost monthly
-        if (propertyInsuranceCostsMonthly == null || propertyInsuranceCostsMonthly < 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_INSURANCE_COST_MONTHLY"))
             return
         }
     }
@@ -1018,9 +997,6 @@ class OrderServices {
         String classEnumId = (String) cs.getOrDefault("classEnumId", null)
         BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
         BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
-        BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
-        BigDecimal propertyTaxesMonthly = (BigDecimal) cs.getOrDefault("propertyTaxesMonthly", null)
-        BigDecimal propertyInsuranceCostsMonthly = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsMonthly", null)
 
         // validate fields
         sf.sync().name("mkdecision.dashboard.OrderServices.validate#PropertyFields")
@@ -1089,33 +1065,6 @@ class OrderServices {
                     .call()
             assetId = (String) assetResp.get("assetId")
         }
-
-        // create HOA monthly fee
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("entryTypeEnumId", "MkEntryExpense")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowHoaMonthlyFee")
-                .parameter("assetId", assetId)
-                .parameter("amount", hoaFeeMonthly)
-                .call()
-
-        // create monthly property taxes
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("entryTypeEnumId", "MkEntryExpense")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowMonthlyInsuranceCosts")
-                .parameter("assetId", assetId)
-                .parameter("amount", propertyTaxesMonthly)
-                .call()
-
-        // create monthly insurance costs
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("entryTypeEnumId", "MkEntryExpense")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowMonthlyPropertyTaxes")
-                .parameter("assetId", assetId)
-                .parameter("amount", propertyInsuranceCostsMonthly)
-                .call()
 
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()

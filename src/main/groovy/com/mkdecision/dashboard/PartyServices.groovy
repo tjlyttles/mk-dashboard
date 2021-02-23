@@ -1259,9 +1259,6 @@ class PartyServices {
         String classEnumId = (String) cs.getOrDefault("classEnumId", null)
         BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
         BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
-        BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
-        BigDecimal propertyTaxesMonthly = (BigDecimal) cs.getOrDefault("propertyTaxesMonthly", null)
-        BigDecimal propertyInsuranceCostsMonthly = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsMonthly", null)
 
         // validate asset class
         if (StringUtils.isBlank(classEnumId)) {
@@ -1280,23 +1277,6 @@ class PartyServices {
             mf.addError(lf.localize("DASHBOARD_INVALID_ACQUIRE_COST"))
             return
         }
-
-        // validate HOA monthly fee
-        if (hoaFeeMonthly == null || hoaFeeMonthly < 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_HOA_FEE_MONTHLY"))
-            return
-        }
-
-        // validate property tax monthly
-        if (propertyTaxesMonthly == null || propertyTaxesMonthly < 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_TAX_MONTHLY"))
-            return
-        }
-
-        // validate property insurance cost monthly
-        if (propertyInsuranceCostsMonthly == null || propertyInsuranceCostsMonthly < 0) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_INSURANCE_COST_MONTHLY"))
-        }
     }
 
     static Map<String, Object> updateProperty(ExecutionContext ec) {
@@ -1313,10 +1293,7 @@ class PartyServices {
         String classEnumId = (String) cs.getOrDefault("classEnumId", null)
         BigDecimal salvageValue = (BigDecimal) cs.getOrDefault("salvageValue", null)
         BigDecimal acquireCost = (BigDecimal) cs.getOrDefault("acquireCost", null)
-        BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
-        BigDecimal propertyTaxesMonthly = (BigDecimal) cs.getOrDefault("propertyTaxesMonthly", null)
-        BigDecimal propertyInsuranceCostsMonthly = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsMonthly", null)
-
+     
         // validate fields
         sf.sync().name("mkdecision.dashboard.PartyServices.validate#PropertyFields")
                 .parameters(cs)
@@ -1345,33 +1322,6 @@ class PartyServices {
                     .call()
         }
 
-        // create HOA monthly fee
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("entryTypeEnumId", "MkEntryExpense")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowHoaMonthlyFee")
-                .parameter("assetId", assetId)
-                .parameter("amount", hoaFeeMonthly)
-                .call()
-
-        // create annual property taxes
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("entryTypeEnumId", "MkEntryExpense")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowMonthlyPropertyTaxes")
-                .parameter("assetId", assetId)
-                .parameter("amount", propertyTaxesMonthly)
-                .call()
-
-        // create annual insurance costs
-        sf.sync().name("create#mk.close.FinancialFlow")
-                .parameter("partyId", partyId)
-                .parameter("entryTypeEnumId", "MkEntryExpense")
-                .parameter("financialFlowTypeEnumId", "MkFinFlowMonthlyInsuranceCosts")
-                .parameter("assetId", assetId)
-                .parameter("amount", propertyInsuranceCostsMonthly)
-                .call()
-
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()
         outParams.put("partyId", partyId)
@@ -1387,9 +1337,13 @@ class PartyServices {
         L10nFacade lf = ec.getL10n()
 
         // get the parameters
+        String classEnumId = (String) cs.getOrDefault("classEnumId", null)
         String lenderName = (String) cs.getOrDefault("lenderName", null)
         BigDecimal mortgageBalance = (BigDecimal) cs.getOrDefault("mortgageBalance", null)
         BigDecimal mortgagePaymentMonthly = (BigDecimal) cs.getOrDefault("mortgagePaymentMonthly", null)
+        BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
+        BigDecimal propertyTaxesMonthly = (BigDecimal) cs.getOrDefault("propertyTaxesMonthly", null)
+        BigDecimal propertyInsuranceCostsMonthly = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsMonthly", null)
 
         // validate lender name
         if (StringUtils.isBlank(lenderName)) {
@@ -1407,6 +1361,24 @@ class PartyServices {
         if (mortgagePaymentMonthly != null && mortgagePaymentMonthly <= 0) {
             mf.addError(lf.localize("DASHBOARD_INVALID_MORTGAGE_PAYMENT_MONTHLY"))
         }
+
+        // validate HOA monthly fee
+        if (hoaFeeMonthly == null || hoaFeeMonthly < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_HOA_FEE_MONTHLY"))
+            return
+        }
+
+        // validate property tax monthly
+        if (propertyTaxesMonthly == null || propertyTaxesMonthly < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_TAX_MONTHLY"))
+            return
+        }
+
+        // validate property insurance cost monthly
+        if (propertyInsuranceCostsMonthly == null || propertyInsuranceCostsMonthly < 0) {
+            mf.addError(lf.localize("DASHBOARD_INVALID_PROPERTY_INSURANCE_COST_MONTHLY"))
+            return
+        }
     }
 
     static Map<String, Object> createMortgage(ExecutionContext ec) {
@@ -1416,12 +1388,17 @@ class PartyServices {
         ServiceFacade sf = ec.getService()
         UserFacade uf = ec.getUser()
         MessageFacade mf = ec.getMessage()
+        EntityFacade ef = ec.getEntity()
 
         // get the parameters
         String partyId = (String) cs.getOrDefault("partyId", null)
+        String assetId = (String) cs.getOrDefault("assetId", null)
         String lenderName = (String) cs.getOrDefault("lenderName", null)
         BigDecimal mortgageBalance = (BigDecimal) cs.getOrDefault("mortgageBalance", null)
         BigDecimal mortgagePaymentMonthly = (BigDecimal) cs.getOrDefault("mortgagePaymentMonthly", null)
+        BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
+        BigDecimal propertyTaxesMonthly = (BigDecimal) cs.getOrDefault("propertyTaxesMonthly", null)
+        BigDecimal propertyInsuranceCostsMonthly = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsMonthly", null)
 
         // validate fields
         sf.sync().name("mkdecision.dashboard.PartyServices.validate#MortgageFields")
@@ -1460,11 +1437,70 @@ class PartyServices {
                 .parameter("amount", mortgagePaymentMonthly)
                 .call()
 
+        // create facility
+        Map<String, Object> facilityResp = sf.sync().name("create#mantle.facility.Facility")
+            .parameter("facilityTypeEnumId", "FcTpHeadquarters")
+            .call()
+        String facilityId = (String) facilityResp.get("facilityId")
+
+        // create facility contact mech
+        EntityValue postalAddress = ef.find("mantle.party.contact.PartyContactMechPostalAddress")
+            .condition("partyId", partyId)
+            .condition("contactMechTypeEnumId", "CmtPostalAddress")
+            .condition("contactMechPurposeId", "PostalPrimary")
+            .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
+            .list()
+            .getFirst()
+        String contactMechId = postalAddress.getString("contactMechId")
+        sf.sync().name("create#mantle.facility.FacilityContactMech")
+            .parameter("facilityId", facilityId)
+            .parameter("contactMechId", contactMechId)
+            .parameter("contactMechPurposeId", "PostalProperty")
+            .parameter("fromDate", uf.getNowTimestamp())
+            .call()
+
+        // create asset
+        Map<String, Object> assetResp = sf.sync().name("create#mantle.product.asset.Asset")
+            .parameter("assetId", assetId)
+            .parameter("assetTypeEnumId", "AstTpRealEstate")
+            .parameter("facilityId", facilityId)
+            .parameter("ownerPartyId", partyId)
+            .call()
+        assetId = (String) assetResp.get("assetId")
+
+        sf.sync().name("create#mk.close.FinancialFlow")
+            .parameter("partyId", partyId)
+            .parameter("entryTypeEnumId", "MkEntryExpense")
+            .parameter("financialFlowTypeEnumId", "MkFinFlowHoaMonthlyFee")
+            .parameter("assetId", assetId)
+            .parameter("amount", hoaFeeMonthly)
+            .call()
+
+        // create monthly property taxes
+        sf.sync().name("create#mk.close.FinancialFlow")
+            .parameter("partyId", partyId)
+            .parameter("entryTypeEnumId", "MkEntryExpense")
+            .parameter("financialFlowTypeEnumId", "MkFinFlowMonthlyInsuranceCosts")
+            .parameter("assetId", assetId)
+            .parameter("amount", propertyTaxesMonthly)
+            .call()
+
+        // create monthly insurance costs
+        sf.sync().name("create#mk.close.FinancialFlow")
+            .parameter("partyId", partyId)
+            .parameter("entryTypeEnumId", "MkEntryExpense")
+            .parameter("financialFlowTypeEnumId", "MkFinFlowMonthlyPropertyTaxes")
+            .parameter("assetId", assetId)
+            .parameter("amount", propertyInsuranceCostsMonthly)
+            .call()
+
+
 
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()
         outParams.put("partyId", partyId)
         outParams.put("partyRelationshipId", partyRelationshipId)
+        outParams.put("assetId", assetId)
         return outParams
     }
 
@@ -1479,10 +1515,15 @@ class PartyServices {
 
         // get the parameters
         String partyId = (String) cs.getOrDefault("partyId", null)
+        String assetId = (String) cs.getOrDefault("assetId", null)
+        String classEnumId = (String) cs.getOrDefault("classEnumId", null)
         String partyRelationshipId = (String) cs.getOrDefault("partyRelationshipId", null)
         String lenderName = (String) cs.getOrDefault("lenderName", null)
         BigDecimal mortgageBalance = (BigDecimal) cs.getOrDefault("mortgageBalance", null)
         BigDecimal mortgagePaymentMonthly = (BigDecimal) cs.getOrDefault("mortgagePaymentMonthly", null)
+        BigDecimal hoaFeeMonthly = (BigDecimal) cs.getOrDefault("hoaFeeMonthly", null)
+        BigDecimal propertyTaxesMonthly = (BigDecimal) cs.getOrDefault("propertyTaxesMonthly", null)
+        BigDecimal propertyInsuranceCostsMonthly = (BigDecimal) cs.getOrDefault("propertyInsuranceCostsMonthly", null)
 
         // validate fields
         sf.sync().name("mkdecision.dashboard.PartyServices.validate#MortgageFields")
@@ -1521,11 +1562,33 @@ class PartyServices {
                 .parameter("balance", mortgageBalance)
                 .parameter("amount", mortgagePaymentMonthly)
                 .call()
+        sf.sync().name("update#mk.close.FinancialFlow")
+            .parameter("partyId", partyId)
+            .parameter("entryTypeEnumId", "MkEntryExpense")
+            .parameter("financialFlowTypeEnumId", "MkFinFlowHoaMonthlyFee")
+            .parameter("assetId", assetId)
+            .parameter("amount", hoaFeeMonthly)
+            .call()
+        sf.sync().name("update#mk.close.FinancialFlow")
+            .parameter("partyId", partyId)
+            .parameter("entryTypeEnumId", "MkEntryExpense")
+            .parameter("financialFlowTypeEnumId", "MkFinFlowMonthlyPropertyTaxes")
+            .parameter("assetId", assetId)
+            .parameter("amount", propertyTaxesMonthly)
+            .call()
+        sf.sync().name("update#mk.close.FinancialFlow")
+            .parameter("partyId", partyId)
+            .parameter("entryTypeEnumId", "MkEntryExpense")
+            .parameter("financialFlowTypeEnumId", "MkFinFlowMonthlyInsuranceCosts")
+            .parameter("assetId", assetId)
+            .parameter("amount", propertyInsuranceCostsMonthly)
+            .call()
 
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()
         outParams.put("partyId", partyId)
         outParams.put("partyRelationshipId", partyRelationshipId)
+        outParams.put("assetId", assetId)
         return outParams
     }
 
@@ -1541,6 +1604,8 @@ class PartyServices {
         // get the parameters
         String partyId = (String) cs.getOrDefault("partyId", null)
         String partyRelationshipId = (String) cs.getOrDefault("partyRelationshipId", null)
+        String assetId = (String) cs.getOrDefault("assetId", null)
+        String classEnumId = (String) cs.getOrDefault("classEnumId", null)
 
         // find relationship
         EntityValue relationship = ef.find("mantle.party.PartyRelationship")
@@ -1570,6 +1635,16 @@ class PartyServices {
                 .parameter("partyRelationshipId", partyRelationshipId)
                 .call()
 
+        EntityList financialFlowList = ef.find("mk.close.FinancialFlow")
+            .condition("partyId", partyId)
+            .condition("entryTypeEnumId", "MkEntryExpense")
+            .condition("assetId", assetId)
+            .list()
+        for (EntityValue financialFlow : financialFlowList) {
+            sf.sync().name("delete#mk.close.FinancialFlow")
+                .parameter("financialFlowId", financialFlow.getString("financialFlowId"))
+                .call()
+        }
         // return the output parameters
         return new HashMap<>()
     }

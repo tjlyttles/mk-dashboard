@@ -2082,22 +2082,6 @@
                                 <text-line input-type="number" format="#.##" prefix="$"/>
                             </default-field>
                         </field>
-                        <field name="hoaFeeMonthly">
-                            <default-field title="HOA Fee Monthly">
-                                <text-line input-type="number" format="#.##" prefix="$"/>
-                            </default-field>
-                        </field>
-                        <field name="propertyTaxesMonthly">
-                            <default-field title="Property Taxes Monthly">
-                                <text-line input-type="number" format="#.##" prefix="$"/>
-                            </default-field>
-                        </field>
-                        <field name="propertyInsuranceCostsMonthly">
-                            <default-field title="Property Insurance Costs Monthly">
-                                <text-line input-type="number" format="#.##" prefix="$"/>
-                            </default-field>
-                        </field>
-
                         <field name="submit">
                             <default-field>
                                 <submit text="Save"/>
@@ -2129,7 +2113,21 @@
                         <field name="mortgagePaymentMonthly">
                             <default-field validate-service="mkdecision.dashboard.PartyServices.create#Mortgage">
                                 <text-line input-type="number" format="#.##" prefix="$"/>
-                                <label text="Exclude property taxes, insurance, or HOA fees" style="text-caption"/>
+                            </default-field>
+                        </field>
+                        <field name="hoaFeeMonthly">
+                            <default-field title="HOA Fee Monthly">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+                        <field name="propertyTaxesMonthly">
+                            <default-field title="Property Taxes Monthly">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+                        <field name="propertyInsuranceCostsMonthly">
+                            <default-field title="Property Insurance Costs Monthly">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
                             </default-field>
                         </field>
 
@@ -2166,6 +2164,21 @@
                             <default-field  validate-service="mkdecision.dashboard.PartyServices.update#Mortgage">
                                 <text-line input-type="number" format="#.##" prefix="$"/>
                                 <label text="Exclude property taxes, insurance, or HOA fees" style="text-caption"/>
+                            </default-field>
+                        </field>
+                        <field name="hoaFeeMonthly">
+                            <default-field title="HOA Fee Monthly">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+                        <field name="propertyTaxesMonthly">
+                            <default-field title="Property Taxes Monthly">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+                        <field name="propertyInsuranceCostsMonthly">
+                            <default-field title="Property Insurance Costs Monthly">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
                             </default-field>
                         </field>
 

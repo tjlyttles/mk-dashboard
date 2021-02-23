@@ -220,9 +220,6 @@
             <parameter name="classEnumId"/>
             <parameter name="salvageValue" type="BigDecimal"/>
             <parameter name="acquireCost" type="BigDecimal"/>
-            <parameter name="hoaFeeMonthly" type="BigDecimal"/>
-            <parameter name="propertyTaxesMonthly" type="BigDecimal"/>
-            <parameter name="propertyInsuranceCostsMonthly" type="BigDecimal"/>
         </in-parameters>
     </service>
     <service verb="store" noun="Property" type="java" location="com.mkdecision.dashboard.OrderServices" method="storeProperty">
@@ -237,15 +234,6 @@
             </parameter>
             <parameter name="acquireCost" type="BigDecimal" required="true">
                 <number-range min="0" min-include-equals="true" message="Please enter the Original Purchase Price"/>
-            </parameter>
-            <parameter name="hoaFeeMonthly" type="BigDecimal" required="true">
-                <number-range min="0" min-include-equals="true" message="Please enter the HOA Fee Monthly"/>
-            </parameter>
-            <parameter name="propertyTaxesMonthly" type="BigDecimal" required="true">
-                <number-range min="0" min-include-equals="true" message="Please enter the Property Taxes Monthly"/>
-            </parameter>
-            <parameter name="propertyInsuranceCostsMonthly" type="BigDecimal" required="true">
-                <number-range min="0" min-include-equals="true" message="Please enter the Insurance Costs Monthly"/>
             </parameter>
         </in-parameters>
         <out-parameters>

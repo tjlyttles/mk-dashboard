@@ -54,7 +54,6 @@
                 <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
                 <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowHoaMonthlyFee"/>
                 <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="assetId" from="assetId"/>
             </entity-find>
             <set field="hoaFeeMonthly" from="hoaMonthlyFeeFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
 
@@ -62,7 +61,6 @@
                 <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
                 <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowMonthlyPropertyTaxes"/>
                 <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="assetId" from="assetId"/>
             </entity-find>
             <set field="propertyTaxesMonthly" from="monthlyPropertyTaxFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
 
@@ -70,7 +68,6 @@
                 <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
                 <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowMonthlyInsuranceCosts"/>
                 <econdition field-name="partyId" from="partyId"/>
-                <econdition field-name="assetId" from="assetId"/>
             </entity-find>
             <set field="propertyInsuranceCostsMonthly" from="monthlyInsuranceCostFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
         </if>
@@ -135,22 +132,6 @@
                         <text-line input-type="number" format="#.##" prefix="$"/>
                     </default-field>
                 </field>
-                <field name="hoaFeeMonthly">
-                    <default-field title="HOA Fee Monthly">
-                        <text-line input-type="number" format="#.##" prefix="$"/>
-                    </default-field>
-                </field>
-                <field name="propertyTaxesMonthly">
-                    <default-field title="Property Taxes Monthly">
-                        <text-line input-type="number" format="#.##" prefix="$"/>
-                    </default-field>
-                </field>
-                <field name="propertyInsuranceCostsMonthly">
-                    <default-field title="Property Insurance Costs Monthly">
-                        <text-line input-type="number" format="#.##" prefix="$"/>
-                    </default-field>
-                </field>
-
                 <field name="continueButton">
                     <default-field container-style="text-primary">
                         <submit text="Continue"/>
@@ -183,24 +164,7 @@
                         <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="acquireCost"/></field-col>
                         <field-col xs="0" sm="1" md="3" lg="3"/>
                     </field-col-row>
-                    <field-col-row>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="hoaFeeMonthly"/></field-col>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                    </field-col-row>
-                    <field-col-row>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="propertyTaxesMonthly"/></field-col>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                    </field-col-row>
-                    <field-col-row>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                        <field-col xs="12" sm="10" md="6" lg="6"><field-ref name="propertyInsuranceCostsMonthly"/></field-col>
-                        <field-col xs="0" sm="1" md="3" lg="3"/>
-                    </field-col-row>
-
                     <fields-not-referenced/>
-
                     <field-col-row>
                         <field-col xs="0" sm="1" md="3" lg="3"/>
                         <field-col xs="6" sm="5" md="3" lg="3"><field-ref name="backButton"/></field-col>

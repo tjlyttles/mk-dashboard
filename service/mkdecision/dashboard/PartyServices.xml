@@ -447,9 +447,6 @@
             <parameter name="classEnumId"/>
             <parameter name="salvageValue" type="BigDecimal"/>
             <parameter name="acquireCost" type="BigDecimal"/>
-            <parameter name="hoaFeeMonthly" type="BigDecimal"/>
-            <parameter name="propertyTaxesMonthly" type="BigDecimal"/>
-            <parameter name="propertyInsuranceCostsMonthly" type="BigDecimal"/>
         </in-parameters>
     </service>
     <service verb="update" noun="Property" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateProperty">
@@ -462,15 +459,6 @@
             </parameter>
             <parameter name="acquireCost" type="BigDecimal" required="true">
                 <number-range min="0" message="Please enter the Original Purchase Price"/>
-            </parameter>
-            <parameter name="hoaFeeMonthly" type="BigDecimal" required="true">
-                <number-range min="0" message="Please enter the HOA Fee Monthly"/>
-            </parameter>
-            <parameter name="propertyTaxesMonthly" type="BigDecimal" required="true">
-                <number-range min="0" message="Please enter the Property Taxes Monthly"/>
-            </parameter>
-            <parameter name="propertyInsuranceCostsMonthly" type="BigDecimal" required="true">
-                <number-range min="0" message="Please enter the Insurance Costs Monthly"/>
             </parameter>
         </in-parameters>
         <out-parameters>
@@ -485,11 +473,15 @@
             <parameter name="lenderName"/>
             <parameter name="mortgageBalance" type="BigDecimal"/>
             <parameter name="mortgagePaymentMonthly" type="BigDecimal"/>
+            <parameter name="hoaFeeMonthly" type="BigDecimal"/>
+            <parameter name="propertyTaxesMonthly" type="BigDecimal"/>
+            <parameter name="propertyInsuranceCostsMonthly" type="BigDecimal"/>
         </in-parameters>
     </service>
     <service verb="create" noun="Mortgage" type="java" location="com.mkdecision.dashboard.PartyServices" method="createMortgage">
         <in-parameters>
             <parameter name="partyId" required="true"/>
+            <parameter name="assetId"/>
             <parameter name="lenderName" required="true"/>
             <parameter name="mortgageBalance" type="BigDecimal" required="true">
                 <number-range min="0" min-include-equals="false" message="Please enter the current Mortgage Balance"/>
@@ -497,15 +489,26 @@
             <parameter name="mortgagePaymentMonthly" type="BigDecimal" required="true">
                 <number-range min="0" min-include-equals="false" message="Please enter the Mortgage Payment Monthly"/>
             </parameter>
+            <parameter name="hoaFeeMonthly" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="true" message="Please enter the HOA Fee Monthly"/>
+            </parameter>
+            <parameter name="propertyTaxesMonthly" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="true" message="Please enter the Property Taxes Monthly"/>
+            </parameter>
+            <parameter name="propertyInsuranceCostsMonthly" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="true" message="Please enter the Insurance Costs Monthly"/>
+            </parameter>
         </in-parameters>
         <out-parameters>
             <parameter name="partyId"/>
             <parameter name="partyRelationshipId"/>
+            <parameter name="assetId"/>
         </out-parameters>
     </service>
     <service verb="update" noun="Mortgage" type="java" location="com.mkdecision.dashboard.PartyServices" method="updateMortgage">
         <in-parameters>
             <parameter name="partyId" required="true"/>
+            <parameter name="assetId"/>
             <parameter name="partyRelationshipId" required="true"/>
             <parameter name="lenderName" required="true"/>
             <parameter name="mortgageBalance" type="BigDecimal" required="true">
@@ -514,9 +517,19 @@
             <parameter name="mortgagePaymentMonthly" type="BigDecimal" required="true">
                 <number-range min="0" min-include-equals="false" message="Please enter the Mortgage Payment Monthly"/>
             </parameter>
+            <parameter name="hoaFeeMonthly" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="true" message="Please enter the HOA Fee Monthly"/>
+            </parameter>
+            <parameter name="propertyTaxesMonthly" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="true" message="Please enter the Property Taxes Monthly"/>
+            </parameter>
+            <parameter name="propertyInsuranceCostsMonthly" type="BigDecimal" required="true">
+                <number-range min="0" min-include-equals="true" message="Please enter the Insurance Costs Monthly"/>
+            </parameter>
         </in-parameters>
         <out-parameters>
             <parameter name="partyId"/>
+            <parameter name="assetId"/>
             <parameter name="partyRelationshipId"/>
         </out-parameters>
     </service>
@@ -524,6 +537,7 @@
         <in-parameters>
             <parameter name="partyId" required="true"/>
             <parameter name="partyRelationshipId" required="true"/>
+            <parameter name="assetId"/>
         </in-parameters>
     </service>
 
