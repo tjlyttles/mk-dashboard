@@ -506,10 +506,19 @@ class PartyServices {
                 .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
                 .list()
                 .getFirst()
-        sf.sync().name("update#mantle.party.contact.ContactMech")
-                .parameter("contactMechId", info.getString("contactMechId"))
-                .parameter("infoString", email)
-                .call()
+        if (info == null) {
+            sf.sync().name("mantle.party.ContactServices.create#EmailAddress")
+                    .parameter("partyId", partyId)
+                    .parameter("emailAddress", email)
+                    .parameter("contactMechPurposeId", "EmailPrimary")
+                    .call()
+        } else {
+            sf.sync().name("update#mantle.party.contact.ContactMech")
+                    .parameter("contactMechId", info.getString("contactMechId"))
+                    .parameter("infoString", email)
+                    .call()
+        }
+
 
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()
