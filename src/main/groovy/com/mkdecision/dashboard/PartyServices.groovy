@@ -811,7 +811,7 @@ class PartyServices {
             sf.sync().name("create#mantle.party.PartyClassificationAppl")
                     .parameter("partyId", employerPartyId)
                     .parameter("partyClassificationId", employerClassificationId)
-                    .parameter("fromDate", fromDate.getTime())
+                    .parameter("fromDate", fromDate)
                     .call()
         }
 
@@ -864,8 +864,8 @@ class PartyServices {
                 .parameter("entryTypeEnumId", "MkEntryIncome")
                 .parameter("financialFlowTypeEnumId", "MkFinFlowTotalMonthlyIncome")
                 .parameter("amount", monthlyIncome)
-                .parameter("fromDate", fromDate.getTime())
-                .parameter("thruDate", toDate.getTime())
+                .parameter("fromDate", fromDate)
+                .parameter("thruDate", toDate)
                 .call()
 
         // return the output parameters
@@ -951,7 +951,7 @@ class PartyServices {
             sf.sync().name("create#mantle.party.PartyClassificationAppl")
                     .parameter("partyId", employerPartyId)
                     .parameter("partyClassificationId", employerClassificationId)
-                    .parameter("fromDate", fromDate.getTime())
+                    .parameter("fromDate", fromDate)
                     .call()
         }
 
@@ -1002,7 +1002,7 @@ class PartyServices {
         // update employment relation
         Map<String, Object> employmentRelationshipResp = sf.sync().name("update#mantle.party.PartyRelationship")
                 .parameter("partyRelationshipId", partyRelationshipId)
-                .parameter("fromDate", fromDate.getTime())
+                .parameter("fromDate", fromDate)
                 .parameter("thruDate", toDate)
                 .parameter("relationshipName", jobTitle)
                 .call()
@@ -1025,7 +1025,7 @@ class PartyServices {
         sf.sync().name("update#mk.close.FinancialFlow")
                 .parameter("financialFlowId", monthlyIncomeFinFlow.getString("financialFlowId"))
                 .parameter("amount", monthlyIncome)
-                .parameter("fromDate", fromDate.getTime())
+                .parameter("fromDate", fromDate)
                 .call()
 
         // return the output parameters
@@ -1153,7 +1153,7 @@ class PartyServices {
                 .parameter("financialFlowTypeEnumId", financialFlowTypeEnumId)
                 .parameter("partyId", partyId)
                 .parameter("amount", amount)
-                .parameter("fromDate", incomeStartDate.getTime())
+                .parameter("fromDate", incomeStartDate)
                 .call()
         String financialFlowId = (String) finFlowResp.get("financialFlowId")
 
@@ -1207,7 +1207,7 @@ class PartyServices {
                 .parameter("financialFlowId", financialFlowId)
                 .parameter("financialFlowTypeEnumId", financialFlowTypeEnumId)
                 .parameter("amount", amount)
-                .parameter("fromDate", incomeStartDate.getTime())
+                .parameter("fromDate", incomeStartDate)
                 .call()
 
         // return the output parameters

@@ -6,6 +6,19 @@
 
     <subscreens default-item="OrderHeader"/>
 
+    <always-actions>
+        <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"/>
+        <if condition="orderHeader">
+            <entity-find-count entity-name="moqui.basic.StatusFlowItem" count-field="editableOrderStatusCount">
+                <econditions>
+                    <econdition field-name="statusFlowId" from="ec.user.getPreference('UsrPrfMkDashboardEditableOrderStatuses')"/>
+                    <econdition field-name="statusId" from="orderHeader.statusId"/>
+                </econditions>
+            </entity-find-count>
+            <set field="orderEditable" from="editableOrderStatusCount > 0 &amp;&amp; (orderHeader.lockUserId == null || orderHeader.lockUserId == ec.user.userId)"/>
+        </if>
+    </always-actions>
+
     <widgets>
         <subscreens-active/>
     </widgets>
