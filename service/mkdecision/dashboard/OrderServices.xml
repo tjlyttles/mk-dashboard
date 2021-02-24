@@ -202,10 +202,10 @@
                 <matches regexp="^[0,2-9]{1}\d{2}([-])\d{3}([-])\d{4}" message="Please enter a valid phone number"/>
             </parameter>
             <parameter name="contactMechPurposeId"/>
-            <parameter name="email" required="true">
+            <parameter name="email">
                 <text-email/>
             </parameter>
-            <parameter name="emailVerify" required="true">
+            <parameter name="emailVerify">
                 <text-email/>
             </parameter>
         </in-parameters>

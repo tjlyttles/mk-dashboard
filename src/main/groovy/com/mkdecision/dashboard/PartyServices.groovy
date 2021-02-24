@@ -409,10 +409,10 @@ class PartyServices {
         }
 
         // validate email address
-        if (StringUtils.isBlank(email)) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL"))
-        } else if (!StringUtils.equals(email, emailVerify)) {
-            mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL_VERIFY"))
+        if (StringUtils.isNotBlank(email) || StringUtils.isNotBlank(emailVerify)){
+            if (!StringUtils.equals(email, emailVerify)) {
+                    mf.addError(lf.localize("DASHBOARD_INVALID_EMAIL_VERIFY"))
+                }
         }
     }
 
@@ -506,11 +506,19 @@ class PartyServices {
                 .conditionDate("fromDate", "thruDate", uf.getNowTimestamp())
                 .list()
                 .getFirst()
-        sf.sync().name("update#mantle.party.contact.ContactMech")
-                .parameter("contactMechId", info.getString("contactMechId"))
-                .parameter("infoString", email)
-                .call()
-
+        if (info != null){
+                sf.sync().name("update#mantle.party.contact.ContactMech")
+                        .parameter("contactMechId", info.getString("contactMechId"))
+                        .parameter("infoString", email)
+                        .call()
+        }
+        if (StringUtils.isNotBlank(email)) {
+            sf.sync().name("mantle.party.ContactServices.create#EmailAddress")
+                    .parameter("partyId", partyId)
+                    .parameter("emailAddress", email)
+                    .parameter("contactMechPurposeId", "EmailPrimary")
+                    .call()
+        }
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()
         outParams.put("partyId", partyId)
