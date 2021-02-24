@@ -1290,10 +1290,10 @@
             </widgets>
         </section>
 
-        <section name="AddCurrentIndependentContractor">
+        <section name="AddCurrentContractorEmployment">
             <widgets>
-                <container-dialog id="AddCurrentIndependentContractorDialog" button-text="Add Independent Contractor" width="960">
-                    <form-single name="AddCurrentIndependentContractorForm" transition="addEmployment">
+                <container-dialog id="AddCurrentContractorEmploymentDialog" button-text="Add Independent Contractor" width="960">
+                    <form-single name="AddCurrentContractorEmploymentForm" transition="addEmployment">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
@@ -1440,10 +1440,10 @@
             </widgets>
         </section>
 
-        <section name="EditCurrentIndependentContractor">
+        <section name="EditCurrentContractorEmployment">
             <widgets>
-                <container-dialog id="EditCurrentIndependentContractorDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsContractor')">
-                    <form-single name="EditCurrentIndependentContractorForm" transition="updateEmployment">
+                <container-dialog id="EditCurrentContractorEmploymentDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsContractor')">
+                    <form-single name="EditCurrentContractorEmploymentForm" transition="updateEmployment">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
@@ -2189,10 +2189,10 @@
             </widgets>
         </section>
 
-        <section name="AddPreviousIndependentContractor">
+        <section name="AddPreviousContractorEmployment">
             <widgets>
-                <container-dialog id="AddPreviousIndependentContractorDialog" button-text="Add Independent Contractor" width="960">
-                    <form-single name="AddPreviousIndependentContractorForm" transition="addEmployment">
+                <container-dialog id="AddPreviousContractorEmploymentDialog" button-text="Add Independent Contractor" width="960">
+                    <form-single name="AddPreviousContractorEmploymentForm" transition="addEmployment">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
@@ -2339,10 +2339,10 @@
             </widgets>
         </section>
 
-        <section name="EditPreviousIndependentContractor">
+        <section name="EditPreviousContractorEmployment">
             <widgets>
-                <container-dialog id="EditPreviousIndependentContractorDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsContractor')">
-                    <form-single name="EditPreviousIndependentContractorForm" transition="updateEmployment">
+                <container-dialog id="EditPreviousContractorEmploymentDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsContractor')">
+                    <form-single name="EditPreviousContractorEmploymentForm" transition="updateEmployment">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
