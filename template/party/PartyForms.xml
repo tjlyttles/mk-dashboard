@@ -178,12 +178,12 @@
                             </default-field>
                         </field>
                         <field name="email">
-                            <default-field title="Email Address">
+                            <default-field title="Email Address (Optional)">
                                 <text-line input-type="email"/>
                             </default-field>
                         </field>
                         <field name="emailVerify">
-                            <default-field title="Verify Email Address">
+                            <default-field title="Verify Email Address (Optional)">
                                 <text-line input-type="email"/>
                             </default-field>
                         </field>
@@ -991,7 +991,7 @@
 
         <section name="AddCurrentSelfEmployment">
             <widgets>
-                <container-dialog id="AddCurrentSelfEmploymentDialog" button-text="Add Contractor or Self-Employment" width="960">
+                <container-dialog id="AddCurrentSelfEmploymentDialog" button-text="Add Self-Employment" width="960">
                     <form-single name="AddCurrentSelfEmploymentForm" transition="addEmployment">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -1021,10 +1021,7 @@
                                     <entity-options text="${description}" key="${enumId}">
                                         <entity-find entity-name="moqui.basic.Enumeration">
                                             <econdition field-name="enumTypeId" value="EmploymentStatus"/>
-                                            <econditions combine="or">
-                                                <econdition field-name="enumId" value="EmpsContractor"/>
-                                                <econdition field-name="enumId" value="EmpsSelf"/>
-                                            </econditions>
+                                            <econdition field-name="enumId" value="EmpsSelf"/>
                                             <order-by field-name="description"/>
                                         </entity-find>
                                     </entity-options>
@@ -1144,7 +1141,7 @@
 
         <section name="EditCurrentSelfEmployment">
             <widgets>
-                <container-dialog id="EditCurrentSelfEmploymentDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsContractor' || employmentStatusEnumId == 'EmpsSelf')">
+                <container-dialog id="EditCurrentSelfEmploymentDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsSelf')">
                     <form-single name="EditCurrentSelfEmploymentForm" transition="updateEmployment">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -1175,10 +1172,308 @@
                                     <entity-options text="${description}" key="${enumId}">
                                         <entity-find entity-name="moqui.basic.Enumeration">
                                             <econdition field-name="enumTypeId" value="EmploymentStatus"/>
-                                            <econditions combine="or">
-                                                <econdition field-name="enumId" value="EmpsContractor"/>
-                                                <econdition field-name="enumId" value="EmpsSelf"/>
-                                            </econditions>
+                                            <econdition field-name="enumId" value="EmpsSelf"/>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="monthlyIncome">
+                            <default-field title="Gross Income Monthly" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+
+                        <field name="durationHeader">
+                            <default-field>
+                                <label text="Duration" style="margin-tb-1"/>
+                            </default-field>
+                        </field>
+                        <field name="years">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.update#CurrentEmployment">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="months">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.update#CurrentEmployment">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+
+                        <field name="employerContactNumber">
+                            <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line  mask="###-###-####" input-type="tel"/>
+                            </default-field>
+                        </field>
+                        <field name="employerAddress1">
+                            <default-field title="Employer Address (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerUnitNumber">
+                            <default-field title="Apt / Unit # (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerPostalCode">
+                            <default-field title="ZIP Code (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="employerCity">
+                            <default-field title="Employer City (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerStateProvinceGeoId">
+                            <default-field title="State (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <drop-down allow-empty="true">
+                                    <entity-options text="${geoName}" key="${toGeoId}">
+                                        <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                            <econdition field-name="geoId" value="USA"/>
+                                            <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                            <order-by field-name="geoName"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+
+                        <field name="submit">
+                            <default-field>
+                                <submit text="Save"/>
+                            </default-field>
+                        </field>
+
+                        <field-layout>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerClassificationId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerName"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                            </field-col-row>
+
+                            <fields-not-referenced/>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                            </field-col-row>
+                        </field-layout>
+                    </form-single>
+                </container-dialog>
+            </widgets>
+        </section>
+
+        <section name="AddCurrentContractorEmployment">
+            <widgets>
+                <container-dialog id="AddCurrentContractorEmploymentDialog" button-text="Add Independent Contractor" width="960">
+                    <form-single name="AddCurrentContractorEmploymentForm" transition="addEmployment">
+                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                        <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtEmployee"/></default-field></field>
+
+                        <field name="employerName">
+                            <default-field title="Business Name" validate-service="mkdecision.dashboard.PartyServices.add#Employment">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerClassificationId">
+                            <default-field title="Business Activity" validate-service="mkdecision.dashboard.PartyServices.add#Employment">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${partyClassificationId}">
+                                        <entity-find entity-name="mantle.party.PartyClassification">
+                                            <econdition field-name="classificationTypeEnumId" value="PcltIndustry"/>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="employmentStatusEnumId">
+                            <default-field title="Employment Status" validate-service="mkdecision.dashboard.PartyServices.add#Employment">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${enumId}">
+                                        <entity-find entity-name="moqui.basic.Enumeration">
+                                            <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                            <econdition field-name="enumId" value="EmpsContractor"/>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="monthlyIncome">
+                            <default-field title="Gross Income Monthly" validate-service="mkdecision.dashboard.PartyServices.add#Employment">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+
+                        <field name="durationHeader">
+                            <default-field>
+                                <label text="Duration" style="margin-tb-1"/>
+                            </default-field>
+                        </field>
+                        <field name="years">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.add#CurrentEmployment">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="months">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.add#CurrentEmployment">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+
+                        <field name="employerContactNumber">
+                            <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.PartyServices.add#Employment">
+                                <text-line  mask="###-###-####" input-type="tel"/>
+                            </default-field>
+                        </field>
+                        <field name="employerAddress1">
+                            <default-field title="Employer Address (Optional)" validate-service="mkdecision.dashboard.PartyServices.add#Employment">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerUnitNumber">
+                            <default-field title="Apt / Unit # (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerPostalCode">
+                            <default-field title="ZIP Code (Optional)" validate-service="mkdecision.dashboard.PartyServices.add#Employment">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="employerCity">
+                            <default-field title="Employer City (Optional)" validate-service="mkdecision.dashboard.PartyServices.add#Employment">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerStateProvinceGeoId">
+                            <default-field title="State (Optional)" validate-service="mkdecision.dashboard.PartyServices.add#Employment">
+                                <drop-down allow-empty="true">
+                                    <entity-options text="${geoName}" key="${toGeoId}">
+                                        <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                            <econdition field-name="geoId" value="USA"/>
+                                            <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                            <order-by field-name="geoName"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+
+                        <field name="submit">
+                            <default-field>
+                                <submit text="Save"/>
+                            </default-field>
+                        </field>
+
+                        <field-layout>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerClassificationId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerName"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="years"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="months"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                            </field-col-row>
+
+                            <fields-not-referenced/>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                            </field-col-row>
+                        </field-layout>
+                    </form-single>
+                </container-dialog>
+            </widgets>
+        </section>
+
+        <section name="EditCurrentContractorEmployment">
+            <widgets>
+                <container-dialog id="EditCurrentContractorEmploymentDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsContractor')">
+                    <form-single name="EditCurrentContractorEmploymentForm" transition="updateEmployment">
+                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                        <field name="partyRelationshipId"><default-field><hidden default-value="${employmentRelation.partyRelationshipId}"/></default-field></field>
+                        <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtEmployee"/></default-field></field>
+
+                        <field name="employerName">
+                            <default-field title="Business Name" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerClassificationId">
+                            <default-field title="Business Activity" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${partyClassificationId}">
+                                        <entity-find entity-name="mantle.party.PartyClassification">
+                                            <econdition field-name="classificationTypeEnumId" value="PcltIndustry"/>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="employmentStatusEnumId">
+                            <default-field title="Employment Status" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${enumId}">
+                                        <entity-find entity-name="moqui.basic.Enumeration">
+                                            <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                            <econdition field-name="enumId" value="EmpsContractor"/>
                                             <order-by field-name="description"/>
                                         </entity-find>
                                     </entity-options>
@@ -1595,7 +1890,7 @@
 
         <section name="AddPreviousSelfEmployment">
             <widgets>
-                <container-dialog id="AddPreviousSelfEmploymentDialog" button-text="Add Contractor or Self-Employment" width="960">
+                <container-dialog id="AddPreviousSelfEmploymentDialog" button-text="Add Self-Employment" width="960">
                     <form-single name="AddPreviousSelfEmploymentForm" transition="addEmployment">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -1625,10 +1920,7 @@
                                     <entity-options text="${description}" key="${enumId}">
                                         <entity-find entity-name="moqui.basic.Enumeration">
                                             <econdition field-name="enumTypeId" value="EmploymentStatus"/>
-                                            <econditions combine="or">
-                                                <econdition field-name="enumId" value="EmpsContractor"/>
-                                                <econdition field-name="enumId" value="EmpsSelf"/>
-                                            </econditions>
+                                            <econdition field-name="enumId" value="EmpsSelf"/>
                                             <order-by field-name="description"/>
                                         </entity-find>
                                     </entity-options>
@@ -1748,7 +2040,7 @@
 
         <section name="EditPreviousSelfEmployment">
             <widgets>
-                <container-dialog id="EditPreviousSelfEmploymentDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsContractor' || employmentStatusEnumId == 'EmpsSelf')">
+                <container-dialog id="EditPreviousSelfEmploymentDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsSelf')">
                     <form-single name="EditPreviousSelfEmploymentForm" transition="updateEmployment">
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
@@ -1779,10 +2071,308 @@
                                     <entity-options text="${description}" key="${enumId}">
                                         <entity-find entity-name="moqui.basic.Enumeration">
                                             <econdition field-name="enumTypeId" value="EmploymentStatus"/>
-                                            <econditions combine="or">
-                                                <econdition field-name="enumId" value="EmpsContractor"/>
-                                                <econdition field-name="enumId" value="EmpsSelf"/>
-                                            </econditions>
+                                            <econdition field-name="enumId" value="EmpsSelf"/>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="monthlyIncome">
+                            <default-field title="Gross Income Monthly" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+
+                        <field name="durationHeader">
+                            <default-field>
+                                <label text="Duration" style="margin-tb-1"/>
+                            </default-field>
+                        </field>
+                        <field name="fromDate">
+                            <default-field>
+                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; (!!value &amp;&amp; value.indexOf('_') === -1) || 'Please enter a valid date.'"/>
+                            </default-field>
+                        </field>
+                        <field name="toDate">
+                            <default-field>
+                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; (!!value &amp;&amp; value.indexOf('_') === -1) || 'Please enter a valid date.'"/>
+                            </default-field>
+                        </field>
+
+                        <field name="employerContactNumber">
+                            <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line  mask="###-###-####" input-type="tel"/>
+                            </default-field>
+                        </field>
+                        <field name="employerAddress1">
+                            <default-field title="Employer Address (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerUnitNumber">
+                            <default-field title="Apt / Unit # (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerPostalCode">
+                            <default-field title="ZIP Code (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="employerCity">
+                            <default-field title="Employer City (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerStateProvinceGeoId">
+                            <default-field title="State (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <drop-down allow-empty="true">
+                                    <entity-options text="${geoName}" key="${toGeoId}">
+                                        <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                            <econdition field-name="geoId" value="USA"/>
+                                            <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                            <order-by field-name="geoName"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+
+                        <field name="submit">
+                            <default-field>
+                                <submit text="Save"/>
+                            </default-field>
+                        </field>
+
+                        <field-layout>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerClassificationId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerName"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="fromDate"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="toDate"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                            </field-col-row>
+
+                            <fields-not-referenced/>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                            </field-col-row>
+                        </field-layout>
+                    </form-single>
+                </container-dialog>
+            </widgets>
+        </section>
+
+        <section name="AddPreviousContractorEmployment">
+            <widgets>
+                <container-dialog id="AddPreviousContractorEmploymentDialog" button-text="Add Independent Contractor" width="960">
+                    <form-single name="AddPreviousContractorEmploymentForm" transition="addEmployment">
+                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                        <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtPreviousEmployee"/></default-field></field>
+
+                        <field name="employerName">
+                            <default-field title="Business Name" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerClassificationId">
+                            <default-field title="Business Activity" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${partyClassificationId}">
+                                        <entity-find entity-name="mantle.party.PartyClassification">
+                                            <econdition field-name="classificationTypeEnumId" value="PcltIndustry"/>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="employmentStatusEnumId">
+                            <default-field title="Employment Status" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${enumId}">
+                                        <entity-find entity-name="moqui.basic.Enumeration">
+                                            <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                            <econdition field-name="enumId" value="EmpsContractor"/>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="monthlyIncome">
+                            <default-field title="Gross Income Monthly" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line input-type="number" format="#.##" prefix="$"/>
+                            </default-field>
+                        </field>
+
+                        <field name="durationHeader">
+                            <default-field>
+                                <label text="Duration" style="margin-tb-1"/>
+                            </default-field>
+                        </field>
+                        <field name="fromDate">
+                            <default-field>
+                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; (!!value &amp;&amp; value.indexOf('_') === -1) || 'Please enter a valid date.'"/>
+                            </default-field>
+                        </field>
+                        <field name="toDate">
+                            <default-field>
+                                <date-time type="date" size="200" format="MM-dd-yyyy" rules="value =&gt; (!!value &amp;&amp; value.indexOf('_') === -1) || 'Please enter a valid date.'"/>
+                            </default-field>
+                        </field>
+
+                        <field name="employerContactNumber">
+                            <default-field title="Employer Phone Number (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line  mask="###-###-####" input-type="tel"/>
+                            </default-field>
+                        </field>
+                        <field name="employerAddress1">
+                            <default-field title="Employer Address (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerUnitNumber">
+                            <default-field title="Apt / Unit # (Optional)">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerPostalCode">
+                            <default-field title="ZIP Code (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line input-type="number"/>
+                            </default-field>
+                        </field>
+                        <field name="employerCity">
+                            <default-field title="Employer City (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerStateProvinceGeoId">
+                            <default-field title="State (Optional)" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <drop-down allow-empty="true">
+                                    <entity-options text="${geoName}" key="${toGeoId}">
+                                        <entity-find entity-name="moqui.basic.GeoAssocAndToDetail">
+                                            <econdition field-name="geoId" value="USA"/>
+                                            <econdition field-name="geoTypeEnumId" value="GEOT_STATE"/>
+                                            <order-by field-name="geoName"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+
+                        <field name="submit">
+                            <default-field>
+                                <submit text="Save"/>
+                            </default-field>
+                        </field>
+
+                        <field-layout>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerClassificationId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerName"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employmentStatusEnumId"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="monthlyIncome"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="durationHeader"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="fromDate"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="toDate"/></field-col>
+                            </field-col-row>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerContactNumber"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="employerAddress1"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerUnitNumber"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerPostalCode"/></field-col>
+                            </field-col-row>
+                            <field-col-row>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerCity"/></field-col>
+                                <field-col xs="12" sm="6" md="6" lg="6"><field-ref name="employerStateProvinceGeoId"/></field-col>
+                            </field-col-row>
+
+                            <fields-not-referenced/>
+
+                            <field-col-row>
+                                <field-col xs="12" sm="12" md="12" lg="12"><field-ref name="submit"/></field-col>
+                            </field-col-row>
+                        </field-layout>
+                    </form-single>
+                </container-dialog>
+            </widgets>
+        </section>
+
+        <section name="EditPreviousContractorEmployment">
+            <widgets>
+                <container-dialog id="EditPreviousContractorEmploymentDialog" button-text="Edit" width="960" condition="orderEditable &amp;&amp; (employmentStatusEnumId == 'EmpsContractor')">
+                    <form-single name="EditPreviousContractorEmploymentForm" transition="updateEmployment">
+                        <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
+                        <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
+                        <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                        <field name="partyRelationshipId"><default-field><hidden default-value="${employmentRelation.partyRelationshipId}"/></default-field></field>
+                        <field name="relationshipTypeEnumId"><default-field><hidden default-value="PrtPreviousEmployee"/></default-field></field>
+
+                        <field name="employerName">
+                            <default-field title="Business Name" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <text-line/>
+                            </default-field>
+                        </field>
+                        <field name="employerClassificationId">
+                            <default-field title="Business Activity" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${partyClassificationId}">
+                                        <entity-find entity-name="mantle.party.PartyClassification">
+                                            <econdition field-name="classificationTypeEnumId" value="PcltIndustry"/>
+                                            <order-by field-name="description"/>
+                                        </entity-find>
+                                    </entity-options>
+                                </drop-down>
+                            </default-field>
+                        </field>
+                        <field name="employmentStatusEnumId">
+                            <default-field title="Employment Status" validate-service="mkdecision.dashboard.PartyServices.update#Employment">
+                                <drop-down required-manual-select="true">
+                                    <entity-options text="${description}" key="${enumId}">
+                                        <entity-find entity-name="moqui.basic.Enumeration">
+                                            <econdition field-name="enumTypeId" value="EmploymentStatus"/>
+                                            <econdition field-name="enumId" value="EmpsContractor"/>
                                             <order-by field-name="description"/>
                                         </entity-find>
                                     </entity-options>

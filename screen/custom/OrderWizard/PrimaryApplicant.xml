@@ -296,12 +296,12 @@
                     </default-field>
                 </field>
                 <field name="email">
-                    <default-field title="Email Address" validate-service="mkdecision.dashboard.OrderServices.store#Applicant">
+                    <default-field title="Email Address (Optional)" validate-service="mkdecision.dashboard.OrderServices.store#Applicant">
                         <text-line input-type="email"/>
                     </default-field>
                 </field>
                 <field name="emailVerify">
-                    <default-field title="Verify Email Address" validate-service="mkdecision.dashboard.OrderServices.store#Applicant">
+                    <default-field title="Verify Email Address (Optional)" validate-service="mkdecision.dashboard.OrderServices.store#Applicant">
                         <text-line input-type="email"/>
                     </default-field>
                 </field>

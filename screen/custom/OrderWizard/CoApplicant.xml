@@ -276,12 +276,12 @@
                     </default-field>
                 </field>
                 <field name="email">
-                    <default-field title="Email Address">
+                    <default-field title="Email Address (Optional)">
                         <text-line input-type="email"/>
                     </default-field>
                 </field>
                 <field name="emailVerify">
-                    <default-field title="Verify Email Address">
+                    <default-field title="Verify Email Address (Optional)">
                         <text-line input-type="email"/>
                     </default-field>
                 </field>
