@@ -2706,17 +2706,17 @@
                             </default-field>
                         </field>
                         <field name="hoaFeeMonthly">
-                            <default-field title="HOA Fee Monthly">
+                            <default-field title="HOA Fee Monthly" validate-service="mkdecision.dashboard.PartyServices.create#Mortgage">
                                 <text-line input-type="number" format="#.##" prefix="$"/>
                             </default-field>
                         </field>
                         <field name="propertyTaxesMonthly">
-                            <default-field title="Property Taxes Monthly">
+                            <default-field title="Property Taxes Monthly" validate-service="mkdecision.dashboard.PartyServices.create#Mortgage">
                                 <text-line input-type="number" format="#.##" prefix="$"/>
                             </default-field>
                         </field>
                         <field name="propertyInsuranceCostsMonthly">
-                            <default-field title="Property Insurance Costs Monthly">
+                            <default-field title="Property Insurance Costs Monthly" validate-service="mkdecision.dashboard.PartyServices.create#Mortgage">
                                 <text-line input-type="number" format="#.##" prefix="$"/>
                             </default-field>
                         </field>
@@ -2741,33 +2741,32 @@
                         <field name="partyRelationshipId"><default-field><hidden default-value="${partyRelationshipId}"/></default-field></field>
 
                         <field name="lenderName">
-                            <default-field  validate-service="mkdecision.dashboard.PartyServices.update#Mortgage">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.update#Mortgage">
                                 <text-line/>
                             </default-field>
                         </field>
                         <field name="mortgageBalance">
-                            <default-field  validate-service="mkdecision.dashboard.PartyServices.update#Mortgage">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.update#Mortgage">
                                 <text-line input-type="number" format="#.##" prefix="$"/>
                             </default-field>
                         </field>
                         <field name="mortgagePaymentMonthly">
-                            <default-field  validate-service="mkdecision.dashboard.PartyServices.update#Mortgage">
+                            <default-field validate-service="mkdecision.dashboard.PartyServices.update#Mortgage">
                                 <text-line input-type="number" format="#.##" prefix="$"/>
-                                <label text="Exclude property taxes, insurance, or HOA fees" style="text-caption"/>
                             </default-field>
                         </field>
                         <field name="hoaFeeMonthly">
-                            <default-field title="HOA Fee Monthly">
+                            <default-field title="HOA Fee Monthly" validate-service="mkdecision.dashboard.PartyServices.update#Mortgage">
                                 <text-line input-type="number" format="#.##" prefix="$"/>
                             </default-field>
                         </field>
                         <field name="propertyTaxesMonthly">
-                            <default-field title="Property Taxes Monthly">
+                            <default-field title="Property Taxes Monthly" validate-service="mkdecision.dashboard.PartyServices.update#Mortgage">
                                 <text-line input-type="number" format="#.##" prefix="$"/>
                             </default-field>
                         </field>
                         <field name="propertyInsuranceCostsMonthly">
-                            <default-field title="Property Insurance Costs Monthly">
+                            <default-field title="Property Insurance Costs Monthly" validate-service="mkdecision.dashboard.PartyServices.update#Mortgage">
                                 <text-line input-type="number" format="#.##" prefix="$"/>
                             </default-field>
                         </field>

@@ -1346,7 +1346,6 @@ class PartyServices {
         L10nFacade lf = ec.getL10n()
 
         // get the parameters
-        String classEnumId = (String) cs.getOrDefault("classEnumId", null)
         String lenderName = (String) cs.getOrDefault("lenderName", null)
         BigDecimal mortgageBalance = (BigDecimal) cs.getOrDefault("mortgageBalance", null)
         BigDecimal mortgagePaymentMonthly = (BigDecimal) cs.getOrDefault("mortgagePaymentMonthly", null)
@@ -1503,8 +1502,6 @@ class PartyServices {
             .parameter("amount", propertyInsuranceCostsMonthly)
             .call()
 
-
-
         // return the output parameters
         Map<String, Object> outParams = new HashMap<>()
         outParams.put("partyId", partyId)
@@ -1572,19 +1569,19 @@ class PartyServices {
                 .parameter("amount", mortgagePaymentMonthly)
                 .call()
         sf.sync().name("update#mk.close.FinancialFlow")
-            .parameter("partyId", partyId)
-            .parameter("entryTypeEnumId", "MkEntryExpense")
-            .parameter("financialFlowTypeEnumId", "MkFinFlowHoaMonthlyFee")
-            .parameter("assetId", assetId)
-            .parameter("amount", hoaFeeMonthly)
-            .call()
+                .parameter("partyId", partyId)
+                .parameter("entryTypeEnumId", "MkEntryExpense")
+                .parameter("financialFlowTypeEnumId", "MkFinFlowHoaMonthlyFee")
+                .parameter("assetId", assetId)
+                .parameter("amount", hoaFeeMonthly)
+                .call()
         sf.sync().name("update#mk.close.FinancialFlow")
-            .parameter("partyId", partyId)
-            .parameter("entryTypeEnumId", "MkEntryExpense")
-            .parameter("financialFlowTypeEnumId", "MkFinFlowMonthlyPropertyTaxes")
-            .parameter("assetId", assetId)
-            .parameter("amount", propertyTaxesMonthly)
-            .call()
+                .parameter("partyId", partyId)
+                .parameter("entryTypeEnumId", "MkEntryExpense")
+                .parameter("financialFlowTypeEnumId", "MkFinFlowMonthlyPropertyTaxes")
+                .parameter("assetId", assetId)
+                .parameter("amount", propertyTaxesMonthly)
+                .call()
         sf.sync().name("update#mk.close.FinancialFlow")
             .parameter("partyId", partyId)
             .parameter("entryTypeEnumId", "MkEntryExpense")
