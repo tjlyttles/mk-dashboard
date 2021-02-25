@@ -379,34 +379,18 @@
             <form-list name="DecisionList" list="decisionList" list-entry="decision">
                 <row-actions>
                     <entity-find-one entity-name="moqui.basic.StatusItem" value-field="decisionStatus">
-                        <field-map field-name="statusId" from="decision.statusId"/>
+                        <field-map field-name="statusId" from="decision?.statusId"/>
                     </entity-find-one>
                     <entity-find-one entity-name="mantle.party.PartyDetail" value-field="decisionBy">
-                        <field-map field-name="partyId" from="decision.decisionByPartyId"/>
+                        <field-map field-name="partyId" from="decision?.decisionByPartyId"/>
                     </entity-find-one>
-
-                    <entity-find entity-name="mantle.order.OrderDecisionReason" list="orderDecisionReasons">
-                        <econdition field-name="orderId" from="decision?.orderId" />
-                        <econdition field-name="decisionDate" from="decision?.decisionDate" />
-                        <order-by field-name="sequenceNum" />
-                    </entity-find>
                 </row-actions>
                 <field name="description">
                     <default-field>
-                        <container-dialog id="DecisionReasonsDialog" button-text="${decisionStatus.description}">
-                            <form-list name="DecisionReasonsForm" list="orderDecisionReasons" list-entry="decisionReason">
-                                <row-actions>
-                                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="decisionEnum">
-                                        <field-map field-name="enumId" from="decisionReason.decisionReasonEnumId" />
-                                    </entity-find-one>
-                                </row-actions>
-                                <field name="decisionReasons">
-                                    <default-field>
-                                        <display text="${decisionEnum?.description}" />
-                                    </default-field>
-                                </field>
-                            </form-list>
-                        </container-dialog>
+                        <dynamic-dialog id="DecisionReasonsDialog" button-text="${decisionStatus?.description}" transition="../DecisionReasons" condition="decision">
+                            <parameter name="orderId" from="decision.orderId"/>
+                            <parameter name="decisionDate" from="decision.decisionDate"/>
+                        </dynamic-dialog>
                     </default-field>
                 </field>
                 <field name="decisionBy">
