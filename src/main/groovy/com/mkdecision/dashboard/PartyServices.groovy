@@ -1467,15 +1467,6 @@ class PartyServices {
             .parameter("fromDate", uf.getNowTimestamp())
             .call()
 
-        // create asset
-        Map<String, Object> assetResp = sf.sync().name("create#mantle.product.asset.Asset")
-            .parameter("assetId", assetId)
-            .parameter("assetTypeEnumId", "AstTpRealEstate")
-            .parameter("facilityId", facilityId)
-            .parameter("ownerPartyId", partyId)
-            .call()
-        assetId = (String) assetResp.get("assetId")
-
         sf.sync().name("create#mk.close.FinancialFlow")
             .parameter("partyId", partyId)
             .parameter("entryTypeEnumId", "MkEntryExpense")

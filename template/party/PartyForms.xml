@@ -2689,6 +2689,7 @@
                         <field name="orderId"><default-field><hidden default-value="${orderId}"/></default-field></field>
                         <field name="orderPartSeqId"><default-field><hidden default-value="${orderPartSeqId}"/></default-field></field>
                         <field name="partyId"><default-field><hidden default-value="${partyId}"/></default-field></field>
+                        <field name="assetId"><default-field><hidden default-value="${assetId}"/></default-field></field>
 
                         <field name="lenderName">
                             <default-field validate-service="mkdecision.dashboard.PartyServices.create#Mortgage">

@@ -10,7 +10,9 @@
 
     <transition name="storeProperty">
         <service-call name="mkdecision.dashboard.OrderServices.store#Property" in-map="context" out-map="context"/>
-        <default-response url="../Mortgage"/>
+        <default-response url="../Mortgage">
+            <parameter name="assetId"/>
+        </default-response>
     </transition>
     <transition name="coApplicant">
         <actions>
@@ -50,25 +52,6 @@
 
         <if condition="assetId != null">
             <entity-find-one entity-name="mantle.product.asset.Asset" value-field="asset"/>
-            <entity-find entity-name="mk.close.FinancialFlow" list="hoaMonthlyFeeFinFlowList">
-                <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
-                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowHoaMonthlyFee"/>
-                <econdition field-name="partyId" from="partyId"/>
-            </entity-find>
-            <set field="hoaFeeMonthly" from="hoaMonthlyFeeFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
-
-            <entity-find entity-name="mk.close.FinancialFlow" list="monthlyPropertyTaxFinFlowList">
-                <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
-                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowMonthlyPropertyTaxes"/>
-                <econdition field-name="partyId" from="partyId"/>
-            </entity-find>
-            <set field="propertyTaxesMonthly" from="monthlyPropertyTaxFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
-
-            <entity-find entity-name="mk.close.FinancialFlow" list="monthlyInsuranceCostFinFlowList">
-                <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
-                <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowMonthlyInsuranceCosts"/>
-                <econdition field-name="partyId" from="partyId"/>
-            </entity-find>
             <set field="propertyInsuranceCostsMonthly" from="monthlyInsuranceCostFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
         </if>
     </actions>

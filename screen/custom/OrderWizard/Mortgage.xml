@@ -7,6 +7,7 @@
 
     <parameter name="orderId" required="true"/>
     <parameter name="orderPartSeqId" required="true"/>
+    <parameter name="assetId" required="true"/>
 
     <transition name="createMortgage">
         <service-call name="mkdecision.dashboard.PartyServices.create#Mortgage" in-map="context"/>
@@ -37,6 +38,27 @@
             <econdition field-name="roleTypeId" value="PrimaryApplicant"/>
         </entity-find>
         <set field="partyId" from="partyList?.getFirst()?.partyId ?: null"/>
+
+        <entity-find entity-name="mk.close.FinancialFlow" list="hoaMonthlyFeeFinFlowList">
+            <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+            <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowHoaMonthlyFee"/>
+            <econdition field-name="partyId" from="partyId"/>
+        </entity-find>
+        <set field="hoaFeeMonthly" from="hoaMonthlyFeeFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
+
+        <entity-find entity-name="mk.close.FinancialFlow" list="monthlyPropertyTaxFinFlowList">
+            <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+            <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowMonthlyPropertyTaxes"/>
+            <econdition field-name="partyId" from="partyId"/>
+        </entity-find>
+        <set field="propertyTaxesMonthly" from="monthlyPropertyTaxFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
+
+        <entity-find entity-name="mk.close.FinancialFlow" list="monthlyInsuranceCostFinFlowList">
+            <econdition field-name="entryTypeEnumId" value="MkEntryExpense"/>
+            <econdition field-name="financialFlowTypeEnumId" value="MkFinFlowMonthlyInsuranceCosts"/>
+            <econdition field-name="partyId" from="partyId"/>
+        </entity-find>
+        <set field="propertyInsuranceCostsMonthly" from="monthlyInsuranceCostFinFlowList?.getFirst()?.amount ?: null" type="BigDecimal"/>
 
         <entity-find entity-name="mantle.party.PartyToAndRelationship" list="mortgageRelationList">
             <econdition field-name="relationshipTypeEnumId" value="PrtMortgage"/>
