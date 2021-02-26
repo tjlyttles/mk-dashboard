@@ -21,6 +21,7 @@ along with this software (see the LICENSE.md file). If not, see
             <entity-find entity-name="mantle.order.OrderDecisionReason" list="decisionReasonList">
                 <econdition field-name="orderId" from="orderId"/>
                 <econdition field-name="decisionDate" from="new java.sql.Timestamp(Long.parseLong(decisionDate))"/>
+                <order-by field-name="sequenceNum"/>
             </entity-find>
         </actions>
     <widgets>
